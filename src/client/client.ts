@@ -1,6 +1,13 @@
 import * as THREE from 'three'
 import { MapControls, OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+type LandmarkCoords = {
+    x:number
+    y:number
+    z:number
+}
+const testJson:LandmarkCoords[] = require('./data/level_us_01_01.pak.json')
+
 const scene = new THREE.Scene()
 
 
@@ -19,8 +26,8 @@ controls.dampingFactor = 0.05
 
 controls.screenSpacePanning = false
 
-controls.minDistance = 100
-controls.maxDistance = 500
+controls.minDistance = 10
+controls.maxDistance = 999
 
 controls.maxPolarAngle = Math.PI / 2
 const geometry = new THREE.BoxGeometry()
@@ -29,15 +36,28 @@ const material = new THREE.MeshBasicMaterial({
     wireframe: false,
 })
 
-const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
-
+console.log(testJson)
 // world
 
 const landmarkGeometry = new THREE.BoxGeometry(1, 1, 1)
 landmarkGeometry.translate(0, 0.5, 0)
-const landmarkMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
+const landmarkMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: false })
 
+for (const lmk of testJson) {
+    const mesh = new THREE.Mesh(landmarkGeometry, landmarkMaterial)
+    //const point = new THREE.Points(landmarkGeometry, landmarkMaterial)
+    mesh.position.x = lmk.x
+    mesh.position.y = lmk.y
+    mesh.position.z = lmk.z
+    mesh.scale.x = 1
+    mesh.scale.y = 1
+    mesh.scale.z = 1
+    mesh.updateMatrix()
+    mesh.matrixAutoUpdate = false
+    scene.add(mesh)
+}
+
+/*
 for (let i = 0; i < 500; i++) {
     const mesh = new THREE.Mesh(landmarkGeometry, landmarkMaterial)
     mesh.position.x = Math.random() * 1600 - 800
@@ -49,7 +69,7 @@ for (let i = 0; i < 500; i++) {
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
     scene.add(mesh)
-}
+}*/
 
 // lights
 
@@ -59,7 +79,7 @@ scene.add(dirLight1)
 
 const dirLight2 = new THREE.DirectionalLight(0x002288)
 dirLight2.position.set(-1, -1, -1)
-scene.add(dirLight2)
+//scene.add(dirLight2)
 
 const ambientLight = new THREE.AmbientLight(0x222222)
 scene.add(ambientLight)
@@ -74,9 +94,6 @@ function onWindowResize() {
 
 function animate() {
     requestAnimationFrame(animate)
-
-    cube.rotation.x += 0.0001
-    cube.rotation.y += 0.001
 
     controls.update()
 
