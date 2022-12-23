@@ -25,7 +25,9 @@ controls.minDistance = 10
 controls.maxDistance = 999
 controls.maxPolarAngle = Math.PI / 2
 
-// world
+// world -----------------------
+
+// Landmarks--------------------
 const landmarkMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
 const landmarkSpruceTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x188c37,
@@ -36,7 +38,7 @@ const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
     flatShading: true,
 })
 
-var mergedGeoms = []
+var mergedLandmarkGeoms = []
 var mergedSpruceTreeGeoms = []
 var mergedBirchTreeGeoms = []
 for (const landmark of landmarks) {
@@ -48,28 +50,31 @@ for (const landmark of landmarks) {
             mergedSpruceTreeGeoms.push(newBox1)
         } else if (landmark.name.includes('birch_')) {
             mergedBirchTreeGeoms.push(newBox1)
-        } else mergedGeoms.push(newBox1)
+        } else mergedLandmarkGeoms.push(newBox1)
+    }
+}
+const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, landmarkMaterial)
+scene.add(landmarksMesh)
+
+const landmarkSpruceTreesMesh = staticMergedMesh(mergedSpruceTreeGeoms, landmarkSpruceTreeMaterial)
+scene.add(landmarkSpruceTreesMesh)
+
+const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, landmarkBirchTreeMaterial)
+scene.add(landmarkBirchTreesMesh)
+
+// Models--------------------
+var mergedModelGeoms = []
+for (const model of models) {
+    console.log(model.type)
+    for (const entry of model.models) {
+        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
+        newBox1.translate(entry.x, entry.y, entry.z)
+        mergedModelGeoms.push(newBox1)
     }
 }
 
-var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
-const landmarksMesh = new THREE.Mesh(mergedBoxes, landmarkMaterial)
-landmarksMesh.updateMatrix()
-landmarksMesh.matrixAutoUpdate = false
-scene.add(landmarksMesh)
-
-//trees:
-var mergedSpruceTreeBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedSpruceTreeGeoms)
-const landmarkSpruceTreesMesh = new THREE.Mesh(mergedSpruceTreeBoxes, landmarkSpruceTreeMaterial)
-landmarkSpruceTreesMesh.updateMatrix()
-landmarkSpruceTreesMesh.matrixAutoUpdate = false
-scene.add(landmarkSpruceTreesMesh)
-
-var mergedBirchTreeBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedBirchTreeGeoms)
-const landmarkBirchTreesMesh = new THREE.Mesh(mergedBirchTreeBoxes, landmarkBirchTreeMaterial)
-landmarkBirchTreesMesh.updateMatrix()
-landmarkBirchTreesMesh.matrixAutoUpdate = false
-scene.add(landmarkBirchTreesMesh)
+const modelsMesh = staticMergedMesh(mergedModelGeoms, landmarkMaterial)
+scene.add(modelsMesh)
 
 // lights
 const dirLight1 = new THREE.DirectionalLight(0xffffff)
@@ -88,7 +93,16 @@ window.addEventListener('resize', onWindowResize, false)
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
 layersFolder.add(landmarksMesh, 'visible', true)
+layersFolder.add(modelsMesh, 'visible', true)
 layersFolder.open()
+
+function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
+    var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
+    const mesh = new THREE.Mesh(mergedBoxes, material)
+    mesh.updateMatrix()
+    mesh.matrixAutoUpdate = false
+    return mesh
+}
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight
