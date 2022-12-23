@@ -1,14 +1,17 @@
 import { GUI } from 'dat.gui'
 import * as THREE from 'three'
-import { MapControls, OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 
 type LandmarkCoords = {
-    x: number
-    y: number
-    z: number
+    name: string
+    entries: {
+        x: number
+        y: number
+        z: number
+    }[]
 }
-const testJson: LandmarkCoords[] = require('./data/level_us_01_01.pak.json')
+const landmarksJson: LandmarkCoords[] = require('./data/level_us_01_01.pak.json')
 
 const scene = new THREE.Scene()
 
@@ -33,20 +36,50 @@ controls.maxDistance = 999
 controls.maxPolarAngle = Math.PI / 2
 
 // world
-
 const landmarkMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
+const landmarkSpruceTreeMaterial = new THREE.MeshPhongMaterial({
+    color: 0x188c37,
+    flatShading: true,
+})
+const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
+    color: 0x8c6f18,
+    flatShading: true,
+})
 
 var mergedGeoms = []
-for (const lmk of testJson) {
-    var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-    newBox1.translate(lmk.x, lmk.y, lmk.z)
-    mergedGeoms.push(newBox1)
+var mergedSpruceTreeGeoms = []
+var mergedBirchTreeGeoms = []
+for (const landmark of landmarksJson) {
+    console.log(landmark.name)
+    for (const entry of landmark.entries) {
+        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
+        newBox1.translate(entry.x, entry.y, entry.z)
+        if (landmark.name.includes('spruce_')) {
+            mergedSpruceTreeGeoms.push(newBox1)
+        } else if (landmark.name.includes('birch_')) {
+            mergedBirchTreeGeoms.push(newBox1)
+        } else mergedGeoms.push(newBox1)
+    }
 }
+
 var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
-const mesh = new THREE.Mesh(mergedBoxes, landmarkMaterial)
-mesh.updateMatrix()
-mesh.matrixAutoUpdate = false
-scene.add(mesh)
+const landmarksMesh = new THREE.Mesh(mergedBoxes, landmarkMaterial)
+landmarksMesh.updateMatrix()
+landmarksMesh.matrixAutoUpdate = false
+scene.add(landmarksMesh)
+
+//trees:
+var mergedSpruceTreeBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedSpruceTreeGeoms)
+const landmarkSpruceTreesMesh = new THREE.Mesh(mergedSpruceTreeBoxes, landmarkSpruceTreeMaterial)
+landmarkSpruceTreesMesh.updateMatrix()
+landmarkSpruceTreesMesh.matrixAutoUpdate = false
+scene.add(landmarkSpruceTreesMesh)
+
+var mergedBirchTreeBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedBirchTreeGeoms)
+const landmarkBirchTreesMesh = new THREE.Mesh(mergedBirchTreeBoxes, landmarkBirchTreeMaterial)
+landmarkBirchTreesMesh.updateMatrix()
+landmarkBirchTreesMesh.matrixAutoUpdate = false
+scene.add(landmarkBirchTreesMesh)
 
 // lights
 const dirLight1 = new THREE.DirectionalLight(0xffffff)
@@ -62,10 +95,9 @@ scene.add(ambientLight)
 
 window.addEventListener('resize', onWindowResize, false)
 
-
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
-layersFolder.add(mesh, 'visible', true)
+layersFolder.add(landmarksMesh, 'visible', true)
 layersFolder.open()
 
 function onWindowResize() {
