@@ -1,5 +1,5 @@
 {
-  "name": "three.js-typescript-boilerplate",
+  "name": "maprunner2",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -9,7 +9,7 @@
     "start": "node ./dist/server/server.js",
     "deploy": "gh-pages -d dist/client"
   },
-  "author": "Sean Bradley",
+  "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/dat.gui": "^0.7.7",
