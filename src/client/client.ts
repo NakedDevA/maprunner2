@@ -37,7 +37,12 @@ const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x8c6f18,
     flatShading: true,
 })
-const zoneMaterial = new THREE.MeshPhongMaterial({ color: 0xd007de, flatShading: true })
+const zoneMaterial = new THREE.MeshPhongMaterial({
+    color: 0xd007de,
+    opacity: 0.5,
+    transparent: true,
+})
+const truckMaterial = new THREE.MeshPhongMaterial({ color: 0xff0303, flatShading: true })
 
 var mergedLandmarkGeoms = []
 var mergedSpruceTreeGeoms = []
@@ -45,7 +50,7 @@ var mergedBirchTreeGeoms = []
 for (const landmark of landmarks) {
     //console.log(landmark.name)
     for (const entry of landmark.entries) {
-        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
+        var newBox1 = new THREE.BoxGeometry(3, 3, 3)
         newBox1.translate(entry.x, entry.y, entry.z)
         if (landmark.name.includes('spruce_')) {
             mergedSpruceTreeGeoms.push(newBox1)
@@ -77,18 +82,29 @@ for (const model of models) {
 const modelsMesh = staticMergedMesh(mergedModelGeoms, landmarkMaterial)
 scene.add(modelsMesh)
 
-
 // Zones--------------------
-const ZONEHEIGHT = 20;
+const ZONEHEIGHT = 70
 var mergedZoneGeoms = []
 for (const zone of zones) {
     //console.log(zone.name)
-    var newBox1 = new THREE.BoxGeometry(zone.sizeX, 2, zone.sizeZ)
+    var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
     newBox1.translate(zone.x, ZONEHEIGHT, zone.z)
     mergedZoneGeoms.push(newBox1)
 }
 const zonesMesh = staticMergedMesh(mergedZoneGeoms, zoneMaterial)
+zonesMesh.visible = false
 scene.add(zonesMesh)
+
+// Trucks--------------------
+var mergedTruckGeoms = []
+for (const truck of trucks) {
+    //console.log(zone.name)
+    var newBox1 = new THREE.BoxGeometry(8, 4, 4)
+    newBox1.translate(truck.x, truck.y, truck.z)
+    mergedTruckGeoms.push(newBox1)
+}
+const trucksMesh = staticMergedMesh(mergedTruckGeoms, truckMaterial)
+scene.add(trucksMesh)
 
 // lights
 const dirLight1 = new THREE.DirectionalLight(0xffffff)
@@ -106,8 +122,8 @@ window.addEventListener('resize', onWindowResize, false)
 
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
-layersFolder.add(landmarksMesh, 'visible', true)
-layersFolder.add(modelsMesh, 'visible', true)
+layersFolder.add(zonesMesh, 'visible', true)
+layersFolder.add(trucksMesh, 'visible', true)
 layersFolder.open()
 
 function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
