@@ -1,3 +1,4 @@
+import { GUI } from 'dat.gui'
 import * as THREE from 'three'
 import { MapControls, OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
@@ -60,6 +61,13 @@ const ambientLight = new THREE.AmbientLight(0x222222)
 scene.add(ambientLight)
 
 window.addEventListener('resize', onWindowResize, false)
+
+
+const gui = new GUI()
+const layersFolder = gui.addFolder('Layers')
+layersFolder.add(mesh, 'visible', true)
+layersFolder.open()
+
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
