@@ -52,7 +52,7 @@ for (const landmark of landmarks) {
     //console.log(landmark.name)
     for (const entry of landmark.entries) {
         var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-        newBox1.translate(entry.x, entry.y, entry.z)
+        newBox1.translate(-entry.x, entry.y, entry.z)
         if (landmark.name.includes('spruce_')) {
             mergedSpruceTreeGeoms.push(newBox1)
         } else if (landmark.name.includes('birch_')) {
@@ -77,7 +77,7 @@ for (const model of models) {
         // some models correspond to the landmarks we're already drawing, don't duplicate
         if (!model.landmark.length) {
             var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-            newBox1.translate(entry.x, entry.y, entry.z)
+            newBox1.translate(-entry.x, entry.y, entry.z)
             mergedModelGeoms.push(newBox1)
         }
     }
@@ -93,7 +93,7 @@ var mergedZoneGeoms = []
 for (const zone of zones) {
     //console.log(zone.name)
     var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
-    newBox1.translate(zone.x, ZONEHEIGHT, zone.z)
+    newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
     mergedZoneGeoms.push(newBox1)
 }
 const zonesMesh = staticMergedMesh(mergedZoneGeoms, zoneMaterial)
@@ -105,7 +105,7 @@ var mergedTruckGeoms = []
 for (const truck of trucks) {
     //console.log(zone.name)
     var newBox1 = new THREE.BoxGeometry(8, 4, 4)
-    newBox1.translate(truck.x, truck.y, truck.z)
+    newBox1.translate(-truck.x, truck.y, truck.z)
     mergedTruckGeoms.push(newBox1)
 }
 const trucksMesh = staticMergedMesh(mergedTruckGeoms, truckMaterial)
