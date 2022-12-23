@@ -8,6 +8,7 @@ type LandmarkCoords = {
 }
 type ModelCoords = {
     type: string
+    landmark: string
     models: {
         x: number
         y: number

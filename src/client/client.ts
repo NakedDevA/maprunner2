@@ -37,6 +37,7 @@ const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x8c6f18,
     flatShading: true,
 })
+const modelMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3c42, flatShading: true })
 const zoneMaterial = new THREE.MeshPhongMaterial({
     color: 0xd007de,
     opacity: 0.5,
@@ -50,7 +51,7 @@ var mergedBirchTreeGeoms = []
 for (const landmark of landmarks) {
     //console.log(landmark.name)
     for (const entry of landmark.entries) {
-        var newBox1 = new THREE.BoxGeometry(3, 3, 3)
+        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
         newBox1.translate(entry.x, entry.y, entry.z)
         if (landmark.name.includes('spruce_')) {
             mergedSpruceTreeGeoms.push(newBox1)
@@ -71,15 +72,19 @@ scene.add(landmarkBirchTreesMesh)
 // Models--------------------
 var mergedModelGeoms = []
 for (const model of models) {
-    //console.log(model.type)
+    console.log(model.type)
     for (const entry of model.models) {
-        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-        newBox1.translate(entry.x, entry.y, entry.z)
-        mergedModelGeoms.push(newBox1)
+        // some models correspond to the landmarks we're already drawing, don't duplicate
+        if (!model.landmark.length) {
+            var newBox1 = new THREE.BoxGeometry(2, 2, 2)
+            newBox1.translate(entry.x, entry.y, entry.z)
+            mergedModelGeoms.push(newBox1)
+        }
     }
 }
 
-const modelsMesh = staticMergedMesh(mergedModelGeoms, landmarkMaterial)
+const modelsMesh = staticMergedMesh(mergedModelGeoms, modelMaterial)
+modelsMesh.renderOrder = 99
 scene.add(modelsMesh)
 
 // Zones--------------------
