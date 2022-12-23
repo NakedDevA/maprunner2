@@ -11,7 +11,39 @@ type LandmarkCoords = {
         z: number
     }[]
 }
-const landmarksJson: LandmarkCoords[] = require('./data/level_us_01_01.pak.json')
+type ModelCoords = {
+    type: string
+    models: {
+        x: number
+        y: number
+        z: number
+    }[]
+}
+type ZoneCoords = {
+    name: string
+    x: number
+    y: number
+    z: number
+    angleA: number
+    angleB: number
+    sizeX: number
+    sizeZ: number
+}
+
+type TruckCoords = {
+    name: string
+    x: number
+    y: number
+    z: number
+    task: string
+}
+type LevelJson = {
+    landmarks: LandmarkCoords[]
+    models: ModelCoords[]
+    zones: ZoneCoords[]
+    trucks: TruckCoords[]
+}
+const {landmarks, models, zones, trucks}: LevelJson = require('./data/level_us_01_01.pak.json')
 
 const scene = new THREE.Scene()
 
@@ -49,7 +81,7 @@ const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
 var mergedGeoms = []
 var mergedSpruceTreeGeoms = []
 var mergedBirchTreeGeoms = []
-for (const landmark of landmarksJson) {
+for (const landmark of landmarks) {
     console.log(landmark.name)
     for (const entry of landmark.entries) {
         var newBox1 = new THREE.BoxGeometry(2, 2, 2)
