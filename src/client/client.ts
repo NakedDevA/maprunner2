@@ -2,48 +2,9 @@ import { GUI } from 'dat.gui'
 import * as THREE from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { LevelJson } from '../typings/types'
 
-type LandmarkCoords = {
-    name: string
-    entries: {
-        x: number
-        y: number
-        z: number
-    }[]
-}
-type ModelCoords = {
-    type: string
-    models: {
-        x: number
-        y: number
-        z: number
-    }[]
-}
-type ZoneCoords = {
-    name: string
-    x: number
-    y: number
-    z: number
-    angleA: number
-    angleB: number
-    sizeX: number
-    sizeZ: number
-}
-
-type TruckCoords = {
-    name: string
-    x: number
-    y: number
-    z: number
-    task: string
-}
-type LevelJson = {
-    landmarks: LandmarkCoords[]
-    models: ModelCoords[]
-    zones: ZoneCoords[]
-    trucks: TruckCoords[]
-}
-const {landmarks, models, zones, trucks}: LevelJson = require('./data/level_us_01_01.pak.json')
+const { landmarks, models, zones, trucks }: LevelJson = require('./data/level_us_01_01.pak.json')
 
 const scene = new THREE.Scene()
 
@@ -59,12 +20,9 @@ const controls = new MapControls(camera, renderer.domElement)
 
 controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
 controls.dampingFactor = 0.05
-
 controls.screenSpacePanning = false
-
 controls.minDistance = 10
 controls.maxDistance = 999
-
 controls.maxPolarAngle = Math.PI / 2
 
 // world
