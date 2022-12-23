@@ -37,12 +37,13 @@ const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x8c6f18,
     flatShading: true,
 })
+const zoneMaterial = new THREE.MeshPhongMaterial({ color: 0xd007de, flatShading: true })
 
 var mergedLandmarkGeoms = []
 var mergedSpruceTreeGeoms = []
 var mergedBirchTreeGeoms = []
 for (const landmark of landmarks) {
-    console.log(landmark.name)
+    //console.log(landmark.name)
     for (const entry of landmark.entries) {
         var newBox1 = new THREE.BoxGeometry(2, 2, 2)
         newBox1.translate(entry.x, entry.y, entry.z)
@@ -65,7 +66,7 @@ scene.add(landmarkBirchTreesMesh)
 // Models--------------------
 var mergedModelGeoms = []
 for (const model of models) {
-    console.log(model.type)
+    //console.log(model.type)
     for (const entry of model.models) {
         var newBox1 = new THREE.BoxGeometry(2, 2, 2)
         newBox1.translate(entry.x, entry.y, entry.z)
@@ -75,6 +76,19 @@ for (const model of models) {
 
 const modelsMesh = staticMergedMesh(mergedModelGeoms, landmarkMaterial)
 scene.add(modelsMesh)
+
+
+// Zones--------------------
+const ZONEHEIGHT = 20;
+var mergedZoneGeoms = []
+for (const zone of zones) {
+    //console.log(zone.name)
+    var newBox1 = new THREE.BoxGeometry(zone.sizeX, 2, zone.sizeZ)
+    newBox1.translate(zone.x, ZONEHEIGHT, zone.z)
+    mergedZoneGeoms.push(newBox1)
+}
+const zonesMesh = staticMergedMesh(mergedZoneGeoms, zoneMaterial)
+scene.add(zonesMesh)
 
 // lights
 const dirLight1 = new THREE.DirectionalLight(0xffffff)
