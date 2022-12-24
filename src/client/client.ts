@@ -22,8 +22,8 @@ const enum LAYERS {
     Landmarks,
     Models,
     Zones,
-    Trucks
-  }
+    Trucks,
+}
 var INTERSECTED: any //currently hovered item
 
 scene.background = new THREE.Color(0x444444)
@@ -137,7 +137,7 @@ for (const zone of zones) {
     //console.log(zone.name)
     var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
     newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
-    
+
     const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
@@ -178,13 +178,13 @@ window.addEventListener('resize', onWindowResize, false)
 document.addEventListener('mousemove', onPointerMove)
 
 const layers = {
-    'toggleZones': function () {
-        camera.layers.toggle( LAYERS.Zones );
+    toggleZones: function () {
+        camera.layers.toggle(LAYERS.Zones)
     },
-    'toggleTrucks': function () {
-        camera.layers.toggle( LAYERS.Trucks );
-    }
-};
+    toggleTrucks: function () {
+        camera.layers.toggle(LAYERS.Trucks)
+    },
+}
 
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
@@ -224,9 +224,10 @@ function animate() {
 function render() {
     // find intersections
     raycaster.setFromCamera(pointer, camera)
-    const objectsToCheck = scene.children // qqtas was scene.children
+    const objectsToCheck = scene.children
     raycaster.layers.set(LAYERS.Trucks)
     raycaster.layers.enable(LAYERS.Zones)
+
     const intersects = raycaster.intersectObjects(objectsToCheck, false)
     if (intersects.length > 0) {
         const intersectedItem = pickPriorityIntersection(intersects)
@@ -236,6 +237,15 @@ function render() {
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
             console.log(INTERSECTED.name)
+
+            // update info box
+            const infoElement = document.getElementById('info')
+            if (infoElement !== null) {
+                const allIntersects = intersects.reduce((acc, intersection) => {
+                    return acc.concat(`${intersection.object.name}\n`)
+                }, '')
+                infoElement.innerText = allIntersects
+            }
         }
     } else {
         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
@@ -248,8 +258,9 @@ animate()
 function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
     const testTruckLayers = new Layers()
     testTruckLayers.set(LAYERS.Trucks)
-    const truckIntersect = intersects.filter(intersection => intersection.object.layers.test(testTruckLayers))
+    const truckIntersect = intersects.filter((intersection) =>
+        intersection.object.layers.test(testTruckLayers)
+    )
 
-    return truckIntersect.length? truckIntersect[0].object : intersects[0].object
+    return truckIntersect.length ? truckIntersect[0].object : intersects[0].object
 }
-
