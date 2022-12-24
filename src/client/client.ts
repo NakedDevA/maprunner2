@@ -14,6 +14,10 @@ const {
 
 const scene = new THREE.Scene()
 
+const pointer = new THREE.Vector2()
+const raycaster = new THREE.Raycaster()
+var INTERSECTED: any //currently hovered item
+
 scene.background = new THREE.Color(0x444444)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 camera.position.set(600, 1200, 600)
@@ -138,6 +142,7 @@ for (const truck of trucks) {
     mergedTruckGeoms.push(newBox1)
 }
 const trucksMesh = staticMergedMesh(mergedTruckGeoms, truckMaterial)
+trucksMesh.name = 'trucks';
 scene.add(trucksMesh)
 
 // lights
@@ -152,7 +157,10 @@ scene.add(dirLight2)
 const ambientLight = new THREE.AmbientLight(0x222222)
 scene.add(ambientLight)
 
+console.log (scene.children)
+
 window.addEventListener('resize', onWindowResize, false)
+document.addEventListener('mousemove', onPointerMove)
 
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
@@ -161,7 +169,6 @@ layersFolder.add(modelsMesh, 'visible', true).name('Models')
 layersFolder.add(zonesMesh, 'visible', true).name('Zones')
 layersFolder.add(trucksMesh, 'visible', true).name('Trucks')
 layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
-
 layersFolder.open()
 
 function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
@@ -179,6 +186,11 @@ function onWindowResize() {
     render()
 }
 
+function onPointerMove(event: { clientX: number; clientY: number }) {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+}
+
 function animate() {
     requestAnimationFrame(animate)
     controls.update()
@@ -186,6 +198,23 @@ function animate() {
 }
 
 function render() {
+    // find intersections
+    raycaster.setFromCamera(pointer, camera)
+    const objectsToCheck = [trucksMesh] // qqtas was scene.children
+    const intersects = raycaster.intersectObjects(objectsToCheck, false)
+    if (intersects.length > 0) {
+        if (INTERSECTED != intersects[0].object) {
+            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
+
+            INTERSECTED = intersects[0].object
+            INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
+            INTERSECTED.material.emissive.setHex(0xff0000)
+        }
+    } else {
+        if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
+        INTERSECTED = null
+    }
+
     renderer.render(scene, camera)
 }
 animate()
