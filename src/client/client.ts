@@ -143,17 +143,18 @@ zonesMesh.visible = false
 scene.add(zonesMesh)
 
 // Trucks--------------------
-var mergedTruckGeoms = []
 for (const truck of trucks) {
     //console.log(zone.name)
     var newBox1 = new THREE.BoxGeometry(8, 4, 4)
     newBox1.translate(-truck.x, truck.y, truck.z)
-    mergedTruckGeoms.push(newBox1)
+
+    const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
+    mesh.updateMatrix()
+    mesh.matrixAutoUpdate = false
+    mesh.layers.set(LAYERS.Trucks)
+    mesh.name = truck.name
+    scene.add(mesh)
 }
-const trucksMesh = staticMergedMesh(mergedTruckGeoms, truckMaterial)
-trucksMesh.layers.set(LAYERS.Trucks)
-trucksMesh.name = 'trucks'
-scene.add(trucksMesh)
 
 // lights
 const dirLight1 = new THREE.DirectionalLight(0xffffff)
@@ -177,7 +178,7 @@ const layersFolder = gui.addFolder('Layers')
 layersFolder.add(landmarksMesh, 'visible', true).name('Landmarks')
 layersFolder.add(modelsMesh, 'visible', true).name('Models')
 layersFolder.add(zonesMesh, 'visible', true).name('Zones')
-layersFolder.add(trucksMesh, 'visible', true).name('Trucks')
+//layersFolder.add(trucksMesh, 'visible', true).name('Trucks') //qqtas layer visibility
 layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
 layersFolder.open()
 
@@ -210,17 +211,16 @@ function animate() {
 function render() {
     // find intersections
     raycaster.setFromCamera(pointer, camera)
-    const objectsToCheck = [trucksMesh] // qqtas was scene.children
+    const objectsToCheck = scene.children // qqtas was scene.children
     raycaster.layers.set(LAYERS.Trucks)
     const intersects = raycaster.intersectObjects(objectsToCheck, false)
     if (intersects.length > 0) {
         if (INTERSECTED != intersects[0].object) {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
-
             INTERSECTED = intersects[0].object
-            console.log(`INTERSECTED: ${INTERSECTED}`)
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
+            console.log(INTERSECTED.name)
         }
     } else {
         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
