@@ -37,4 +37,5 @@ export type LevelJson = {
     models: ModelCoords[]
     zones: ZoneCoords[]
     trucks: TruckCoords[]
+    heightMap: number[][]
 }

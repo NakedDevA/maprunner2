@@ -4,13 +4,19 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
 
-const { landmarks, models, zones, trucks }: LevelJson = require('./data/level_us_01_01.pak.json')
+const {
+    landmarks,
+    models,
+    zones,
+    trucks,
+    heightMap,
+}: LevelJson = require('./data/level_us_01_01.pak.json')
 
 const scene = new THREE.Scene()
 
 scene.background = new THREE.Color(0x444444)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
-camera.position.set(400, 200, 0)
+camera.position.set(400, 200, 500)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -22,7 +28,7 @@ controls.enableDamping = true // an animation loop is required when either dampi
 controls.dampingFactor = 0.05
 controls.screenSpacePanning = false
 controls.minDistance = 10
-controls.maxDistance = 999
+controls.maxDistance = 2000
 controls.maxPolarAngle = Math.PI / 2
 
 // world -----------------------
@@ -60,6 +66,29 @@ for (const landmark of landmarks) {
         } else mergedLandmarkGeoms.push(newBox1)
     }
 }
+// Draw Base terrain layer ------------------
+
+const combinePoints = heightMap.flat()
+const geometry = new THREE.PlaneGeometry(2000, 2000, heightMap.length - 1, heightMap[0].length - 1)
+//const geometry = new THREE.PlaneGeometry(2000, 2000, 99, 99)
+geometry.rotateX( - Math.PI / 2 );
+
+const vertices = geometry.attributes.position
+console.log(vertices.count)
+for (let i = 0; i < vertices.count; i++) {
+    //vertices.setY(i,Math.random()*30)
+    //console.log(combinePoints[i])
+    vertices.setY(i,combinePoints[i])
+    //if (i%100) console.log(`${vertices.getX(i)},${vertices.getY(i)},${vertices.getZ(i)}`)
+}
+
+const terrainMesh = new THREE.Mesh(geometry, truckMaterial)
+scene.add(terrainMesh)
+
+
+
+
+
 const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, landmarkMaterial)
 scene.add(landmarksMesh)
 
@@ -72,7 +101,7 @@ scene.add(landmarkBirchTreesMesh)
 // Models--------------------
 var mergedModelGeoms = []
 for (const model of models) {
-    console.log(model.type)
+    //console.log(model.type)
     for (const entry of model.models) {
         // some models correspond to the landmarks we're already drawing, don't duplicate
         if (!model.landmark.length) {
@@ -129,6 +158,7 @@ const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
 layersFolder.add(zonesMesh, 'visible', true)
 layersFolder.add(trucksMesh, 'visible', true)
+layersFolder.add(terrainMesh, 'visible', true)
 layersFolder.open()
 
 function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
