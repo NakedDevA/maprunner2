@@ -16,11 +16,20 @@ const scene = new THREE.Scene()
 
 const pointer = new THREE.Vector2()
 const raycaster = new THREE.Raycaster()
+const enum LAYERS {
+    Terrain = 1,
+    Landmarks,
+    Models,
+    Zones,
+    Trucks
+  }
 var INTERSECTED: any //currently hovered item
 
 scene.background = new THREE.Color(0x444444)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 camera.position.set(600, 1200, 600)
+
+camera.layers.enable(LAYERS.Trucks)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -142,7 +151,8 @@ for (const truck of trucks) {
     mergedTruckGeoms.push(newBox1)
 }
 const trucksMesh = staticMergedMesh(mergedTruckGeoms, truckMaterial)
-trucksMesh.name = 'trucks';
+trucksMesh.layers.set(LAYERS.Trucks)
+trucksMesh.name = 'trucks'
 scene.add(trucksMesh)
 
 // lights
@@ -157,7 +167,7 @@ scene.add(dirLight2)
 const ambientLight = new THREE.AmbientLight(0x222222)
 scene.add(ambientLight)
 
-console.log (scene.children)
+console.log(scene.children)
 
 window.addEventListener('resize', onWindowResize, false)
 document.addEventListener('mousemove', onPointerMove)
@@ -201,12 +211,14 @@ function render() {
     // find intersections
     raycaster.setFromCamera(pointer, camera)
     const objectsToCheck = [trucksMesh] // qqtas was scene.children
+    raycaster.layers.set(LAYERS.Trucks)
     const intersects = raycaster.intersectObjects(objectsToCheck, false)
     if (intersects.length > 0) {
         if (INTERSECTED != intersects[0].object) {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
 
             INTERSECTED = intersects[0].object
+            console.log(`INTERSECTED: ${INTERSECTED}`)
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
         }
