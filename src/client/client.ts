@@ -51,6 +51,11 @@ const zoneMaterial = new THREE.MeshPhongMaterial({
 })
 const truckMaterial = new THREE.MeshPhongMaterial({ color: 0xff0303, flatShading: true })
 
+const loader = new THREE.TextureLoader()
+const terrainMaterial = new THREE.MeshPhongMaterial({
+    map: loader.load('./level_us_01_01.pak.png'),
+})
+
 var mergedLandmarkGeoms = []
 var mergedSpruceTreeGeoms = []
 var mergedBirchTreeGeoms = []
@@ -90,7 +95,7 @@ for (let i = 0; i < vertices.count; i++) {
     vertices.setY(i, combinePoints[i] / MAGIC_SCALING_FACTOR)
 }
 
-const terrainMesh = new THREE.Mesh(geometry, truckMaterial)
+const terrainMesh = new THREE.Mesh(geometry, terrainMaterial)
 scene.add(terrainMesh)
 
 // Models--------------------
