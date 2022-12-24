@@ -40,8 +40,7 @@ document.body.appendChild(renderer.domElement)
 
 const controls = new MapControls(camera, renderer.domElement)
 
-controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
-controls.dampingFactor = 0.05
+controls.enableDamping = false // an animation loop is required when either damping or auto-rotation are enabled
 controls.screenSpacePanning = false
 controls.minDistance = 10
 controls.maxDistance = 2000
@@ -50,14 +49,35 @@ controls.maxPolarAngle = Math.PI / 2
 // world -----------------------
 
 // Landmarks--------------------
-const landmarkMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true })
+const landmarkMaterial = new THREE.MeshPhongMaterial({
+    color: 0xffffff,
+    flatShading: true,
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    wireframe: false,
+})
 const landmarkSpruceTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x188c37,
     flatShading: true,
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    wireframe: false,
 })
 const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
     color: 0x8c6f18,
     flatShading: true,
+    transparent: true,
+    depthTest: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -4,
+    wireframe: false,
 })
 const modelMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3c42, flatShading: true })
 const zoneMaterial = new THREE.MeshPhongMaterial({
@@ -80,24 +100,30 @@ for (const landmark of landmarks) {
     for (const entry of landmark.entries) {
         var newBox1 = new THREE.BoxGeometry(2, 2, 2)
         newBox1.translate(-entry.x, entry.y, entry.z)
-        if (landmark.name.includes('spruce_')) {
+        if (landmark.name.includes('spruce_') || landmark.name.includes('sugar_maple')) {
             mergedSpruceTreeGeoms.push(newBox1)
-        } else if (landmark.name.includes('birch_')) {
+        } else if (
+            landmark.name.includes('birch_') ||
+            landmark.name.includes('tsuga') ||
+            landmark.name.includes('aspen')
+        ) {
             mergedBirchTreeGeoms.push(newBox1)
         } else mergedLandmarkGeoms.push(newBox1)
     }
 }
 const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, landmarkMaterial)
+landmarksMesh.renderOrder = 999
 scene.add(landmarksMesh)
 
 const landmarkSpruceTreesMesh = staticMergedMesh(mergedSpruceTreeGeoms, landmarkSpruceTreeMaterial)
+landmarkSpruceTreesMesh.renderOrder = 900
 scene.add(landmarkSpruceTreesMesh)
 
 const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, landmarkBirchTreeMaterial)
+landmarkBirchTreesMesh.renderOrder = 940
 scene.add(landmarkBirchTreesMesh)
 
 // Draw Base terrain layer ------------------
-
 const combinePoints = heightMap.reverse().flat()
 const geometry = new THREE.PlaneGeometry(2000, 2000, heightMap.length - 1, heightMap[0].length - 1)
 
@@ -107,8 +133,8 @@ geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to th
 const vertices = geometry.attributes.position
 console.log(vertices.count)
 for (let i = 0; i < vertices.count; i++) {
-    const MAGIC_SCALING_FACTOR = 1.5
-    vertices.setY(i, combinePoints[i] / MAGIC_SCALING_FACTOR)
+    const MAGIC_SCALING_FACTOR = 0.7
+    vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
 }
 
 const terrainMesh = new THREE.Mesh(geometry, terrainMaterial)
@@ -150,7 +176,7 @@ for (const zone of zones) {
 // Trucks--------------------
 for (const truck of trucks) {
     //console.log(zone.name)
-    var newBox1 = new THREE.BoxGeometry(8, 4, 4)
+    var newBox1 = new THREE.BoxGeometry(16, 8, 8)
     newBox1.translate(-truck.x, truck.y, truck.z)
 
     const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
@@ -247,7 +273,7 @@ function render() {
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
             console.log(INTERSECTED.name)
-            
+
             // update info box
             const infoElement = document.getElementById('info')
             if (infoElement !== null) {
