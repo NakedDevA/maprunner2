@@ -4,6 +4,15 @@ import { Layers } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
+import {
+    unknownLandmarkMaterial,
+    greenTreeMaterial,
+    autumnTreeMaterial,
+    terrainMaterial,
+    modelMaterial,
+    zoneMaterial,
+    truckMaterial,
+} from './materials'
 
 const {
     landmarks,
@@ -47,51 +56,7 @@ controls.maxDistance = 2000
 controls.maxPolarAngle = Math.PI / 2
 
 // world -----------------------
-
 // Landmarks--------------------
-const landmarkMaterial = new THREE.MeshPhongMaterial({
-    color: 0xffffff,
-    flatShading: true,
-    transparent: true,
-    depthTest: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -4,
-    wireframe: false,
-})
-const landmarkSpruceTreeMaterial = new THREE.MeshPhongMaterial({
-    color: 0x188c37,
-    flatShading: true,
-    transparent: true,
-    depthTest: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -4,
-    wireframe: false,
-})
-const landmarkBirchTreeMaterial = new THREE.MeshPhongMaterial({
-    color: 0x8c6f18,
-    flatShading: true,
-    transparent: true,
-    depthTest: true,
-    depthWrite: false,
-    polygonOffset: true,
-    polygonOffsetFactor: -4,
-    wireframe: false,
-})
-const modelMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3c42, flatShading: true })
-const zoneMaterial = new THREE.MeshPhongMaterial({
-    color: 0xd007de,
-    opacity: 0.5,
-    transparent: true,
-})
-const truckMaterial = new THREE.MeshPhongMaterial({ color: 0xff0303, flatShading: true })
-
-const loader = new THREE.TextureLoader()
-const terrainMaterial = new THREE.MeshPhongMaterial({
-    map: loader.load('./level_us_01_01.pak.png'),
-})
-
 var mergedLandmarkGeoms = []
 var mergedSpruceTreeGeoms = []
 var mergedBirchTreeGeoms = []
@@ -111,16 +76,13 @@ for (const landmark of landmarks) {
         } else mergedLandmarkGeoms.push(newBox1)
     }
 }
-const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, landmarkMaterial)
-landmarksMesh.renderOrder = 999
+const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial)
 scene.add(landmarksMesh)
 
-const landmarkSpruceTreesMesh = staticMergedMesh(mergedSpruceTreeGeoms, landmarkSpruceTreeMaterial)
-landmarkSpruceTreesMesh.renderOrder = 900
+const landmarkSpruceTreesMesh = staticMergedMesh(mergedSpruceTreeGeoms, greenTreeMaterial)
 scene.add(landmarkSpruceTreesMesh)
 
-const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, landmarkBirchTreeMaterial)
-landmarkBirchTreesMesh.renderOrder = 940
+const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, autumnTreeMaterial)
 scene.add(landmarkBirchTreesMesh)
 
 // Draw Base terrain layer ------------------
@@ -131,7 +93,6 @@ geometry.rotateX(-Math.PI / 2) // flat plane
 geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
 
 const vertices = geometry.attributes.position
-console.log(vertices.count)
 for (let i = 0; i < vertices.count; i++) {
     const MAGIC_SCALING_FACTOR = 0.7
     vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
@@ -199,7 +160,6 @@ scene.add(dirLight2)
 const ambientLight = new THREE.AmbientLight(0x222222)
 scene.add(ambientLight)
 
-console.log(scene.children)
 
 window.addEventListener('resize', onWindowResize, false)
 document.addEventListener('mousemove', onPointerMove)
@@ -272,7 +232,6 @@ function render() {
             INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
-            console.log(INTERSECTED.name)
 
             // update info box
             const infoElement = document.getElementById('info')
