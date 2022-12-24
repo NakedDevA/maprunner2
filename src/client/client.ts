@@ -177,12 +177,21 @@ console.log(scene.children)
 window.addEventListener('resize', onWindowResize, false)
 document.addEventListener('mousemove', onPointerMove)
 
+const layers = {
+    'toggleZones': function () {
+        camera.layers.toggle( LAYERS.Zones );
+    },
+    'toggleTrucks': function () {
+        camera.layers.toggle( LAYERS.Trucks );
+    }
+};
+
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
 layersFolder.add(landmarksMesh, 'visible', true).name('Landmarks')
 layersFolder.add(modelsMesh, 'visible', true).name('Models')
-//layersFolder.add(zonesMesh, 'visible', true).name('Zones')
-//layersFolder.add(trucksMesh, 'visible', true).name('Trucks') //qqtas layer visibility
+layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
+layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
 layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
 layersFolder.open()
 
