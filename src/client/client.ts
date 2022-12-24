@@ -156,11 +156,12 @@ window.addEventListener('resize', onWindowResize, false)
 
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
-layersFolder.add(landmarksMesh, 'visible', true)
-layersFolder.add(modelsMesh, 'visible', true)
-layersFolder.add(zonesMesh, 'visible', true)
-layersFolder.add(trucksMesh, 'visible', true)
-layersFolder.add(terrainMesh, 'visible', true)
+layersFolder.add(landmarksMesh, 'visible', true).name('Landmarks')
+layersFolder.add(modelsMesh, 'visible', true).name('Models')
+layersFolder.add(zonesMesh, 'visible', true).name('Zones')
+layersFolder.add(trucksMesh, 'visible', true).name('Trucks')
+layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
+
 layersFolder.open()
 
 function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
