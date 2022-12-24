@@ -1,5 +1,6 @@
 import { GUI } from 'dat.gui'
 import * as THREE from 'three'
+import { Layers } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
@@ -30,6 +31,7 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 camera.position.set(600, 1200, 600)
 
 camera.layers.enable(LAYERS.Trucks)
+camera.layers.enable(LAYERS.Zones)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -131,16 +133,18 @@ scene.add(modelsMesh)
 
 // Zones--------------------
 const ZONEHEIGHT = 70
-var mergedZoneGeoms = []
 for (const zone of zones) {
     //console.log(zone.name)
     var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
     newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
-    mergedZoneGeoms.push(newBox1)
+    
+    const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
+    mesh.updateMatrix()
+    mesh.matrixAutoUpdate = false
+    mesh.layers.set(LAYERS.Zones)
+    mesh.name = zone.name
+    scene.add(mesh)
 }
-const zonesMesh = staticMergedMesh(mergedZoneGeoms, zoneMaterial)
-zonesMesh.visible = false
-scene.add(zonesMesh)
 
 // Trucks--------------------
 for (const truck of trucks) {
@@ -177,7 +181,7 @@ const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
 layersFolder.add(landmarksMesh, 'visible', true).name('Landmarks')
 layersFolder.add(modelsMesh, 'visible', true).name('Models')
-layersFolder.add(zonesMesh, 'visible', true).name('Zones')
+//layersFolder.add(zonesMesh, 'visible', true).name('Zones')
 //layersFolder.add(trucksMesh, 'visible', true).name('Trucks') //qqtas layer visibility
 layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
 layersFolder.open()
@@ -213,11 +217,13 @@ function render() {
     raycaster.setFromCamera(pointer, camera)
     const objectsToCheck = scene.children // qqtas was scene.children
     raycaster.layers.set(LAYERS.Trucks)
+    raycaster.layers.enable(LAYERS.Zones)
     const intersects = raycaster.intersectObjects(objectsToCheck, false)
     if (intersects.length > 0) {
-        if (INTERSECTED != intersects[0].object) {
+        const intersectedItem = pickPriorityIntersection(intersects)
+        if (INTERSECTED != intersectedItem) {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
-            INTERSECTED = intersects[0].object
+            INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
             console.log(INTERSECTED.name)
@@ -230,3 +236,11 @@ function render() {
     renderer.render(scene, camera)
 }
 animate()
+function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
+    const testTruckLayers = new Layers()
+    testTruckLayers.set(LAYERS.Trucks)
+    const truckIntersect = intersects.filter(intersection => intersection.object.layers.test(testTruckLayers))
+
+    return truckIntersect.length? truckIntersect[0].object : intersects[0].object
+}
+
