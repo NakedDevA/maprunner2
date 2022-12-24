@@ -9,30 +9,20 @@
                 overflow: hidden;
                 margin: 0px;
             }
-            #info-bar {
-                position: absolute;
-                top: 10px;
-                width: 100%;
-                text-align: center;
-                z-index: 100;
-                display: block;
-            }
             #info {
+                position: absolute;
                 background: #00000054;
                 color: white;
                 padding: 5px 20px;
                 font: message-box;
                 display: inline-block;
+                z-index: 100;
             }
-
         </style>
     </head>
 
     <body>
-        <div id="info-bar">
-            <div id="info">Hover on an object!</div>
-        </div>
-
+        <div id="info"></div>
         <script type="module" src="bundle.js"></script>
     </body>
 </html>

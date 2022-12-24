@@ -16,6 +16,7 @@ const {
 const scene = new THREE.Scene()
 
 const pointer = new THREE.Vector2()
+var cssPointerLocation: { clientX: number; clientY: number }
 const raycaster = new THREE.Raycaster()
 const enum LAYERS {
     Terrain = 1,
@@ -213,6 +214,13 @@ function onWindowResize() {
 function onPointerMove(event: { clientX: number; clientY: number }) {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1
     pointer.y = -(event.clientY / window.innerHeight) * 2 + 1
+    cssPointerLocation = event
+
+    const infoElement = document.getElementById('info')
+    if (infoElement !== null) {
+        infoElement.style.top = `${cssPointerLocation.clientY + 20}px`
+        infoElement.style.left = `${cssPointerLocation.clientX + 20}px`
+    }
 }
 
 function animate() {
@@ -228,6 +236,8 @@ function render() {
     raycaster.layers.set(LAYERS.Trucks)
     raycaster.layers.enable(LAYERS.Zones)
 
+    const infoElement = document.getElementById('info')
+
     const intersects = raycaster.intersectObjects(objectsToCheck, false)
     if (intersects.length > 0) {
         const intersectedItem = pickPriorityIntersection(intersects)
@@ -237,7 +247,7 @@ function render() {
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
             console.log(INTERSECTED.name)
-
+            
             // update info box
             const infoElement = document.getElementById('info')
             if (infoElement !== null) {
@@ -245,11 +255,13 @@ function render() {
                     return acc.concat(`${intersection.object.name}\n`)
                 }, '')
                 infoElement.innerText = allIntersects
+                infoElement.style.opacity = '1'
             }
         }
     } else {
         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
         INTERSECTED = null
+        if (infoElement) infoElement.style.opacity = '0'
     }
 
     renderer.render(scene, camera)
