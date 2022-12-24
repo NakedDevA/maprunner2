@@ -16,7 +16,7 @@ const scene = new THREE.Scene()
 
 scene.background = new THREE.Color(0x444444)
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
-camera.position.set(400, 200, 500)
+camera.position.set(600, 1200, 600)
 
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
@@ -66,29 +66,6 @@ for (const landmark of landmarks) {
         } else mergedLandmarkGeoms.push(newBox1)
     }
 }
-// Draw Base terrain layer ------------------
-
-const combinePoints = heightMap.flat()
-const geometry = new THREE.PlaneGeometry(2000, 2000, heightMap.length - 1, heightMap[0].length - 1)
-//const geometry = new THREE.PlaneGeometry(2000, 2000, 99, 99)
-geometry.rotateX( - Math.PI / 2 );
-
-const vertices = geometry.attributes.position
-console.log(vertices.count)
-for (let i = 0; i < vertices.count; i++) {
-    //vertices.setY(i,Math.random()*30)
-    //console.log(combinePoints[i])
-    vertices.setY(i,combinePoints[i])
-    //if (i%100) console.log(`${vertices.getX(i)},${vertices.getY(i)},${vertices.getZ(i)}`)
-}
-
-const terrainMesh = new THREE.Mesh(geometry, truckMaterial)
-scene.add(terrainMesh)
-
-
-
-
-
 const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, landmarkMaterial)
 scene.add(landmarksMesh)
 
@@ -97,6 +74,24 @@ scene.add(landmarkSpruceTreesMesh)
 
 const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, landmarkBirchTreeMaterial)
 scene.add(landmarkBirchTreesMesh)
+
+// Draw Base terrain layer ------------------
+
+const combinePoints = heightMap.reverse().flat()
+const geometry = new THREE.PlaneGeometry(2000, 2000, heightMap.length - 1, heightMap[0].length - 1)
+
+geometry.rotateX(-Math.PI / 2) // flat plane
+geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
+
+const vertices = geometry.attributes.position
+console.log(vertices.count)
+for (let i = 0; i < vertices.count; i++) {
+    const MAGIC_SCALING_FACTOR = 1.5
+    vertices.setY(i, combinePoints[i] / MAGIC_SCALING_FACTOR)
+}
+
+const terrainMesh = new THREE.Mesh(geometry, truckMaterial)
+scene.add(terrainMesh)
 
 // Models--------------------
 var mergedModelGeoms = []
@@ -156,6 +151,8 @@ window.addEventListener('resize', onWindowResize, false)
 
 const gui = new GUI()
 const layersFolder = gui.addFolder('Layers')
+layersFolder.add(landmarksMesh, 'visible', true)
+layersFolder.add(modelsMesh, 'visible', true)
 layersFolder.add(zonesMesh, 'visible', true)
 layersFolder.add(trucksMesh, 'visible', true)
 layersFolder.add(terrainMesh, 'visible', true)
