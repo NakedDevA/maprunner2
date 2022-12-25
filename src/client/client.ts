@@ -20,49 +20,53 @@ export const enum LAYERS {
     Trucks,
 }
 var INTERSECTED: any //currently hovered item
-
-scene.background = new THREE.Color(0x444444)
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
-camera.position.set(600, 1200, 600) // qqtas may be based on map size
-
-camera.layers.enable(LAYERS.Trucks)
-camera.layers.enable(LAYERS.Zones)
-
 const renderer = new THREE.WebGLRenderer({ antialias: true })
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
-
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
 
-controls.enableDamping = false // an animation loop is required when either damping or auto-rotation are enabled
-controls.screenSpacePanning = false
-controls.minDistance = 10
-controls.maxDistance = 2000
-controls.maxPolarAngle = Math.PI / 2
+init()
+animate()
 
-// world -----------------------
-setUpMeshesFromMap(scene, levelJson)
+function init() {
+    scene.background = new THREE.Color(0x444444)
+    camera.position.set(600, 1200, 600) // qqtas may be based on map size
 
-// lights
-setUpLights(scene)
+    camera.layers.enable(LAYERS.Trucks)
+    camera.layers.enable(LAYERS.Zones)
 
-window.addEventListener('resize', onWindowResize, false)
-document.addEventListener('mousemove', onPointerMove)
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
 
-const layers = {
-    toggleZones: function () {
-        camera.layers.toggle(LAYERS.Zones)
-    },
-    toggleTrucks: function () {
-        camera.layers.toggle(LAYERS.Trucks)
-    },
+    controls.enableDamping = false // an animation loop is required when either damping or auto-rotation are enabled
+    controls.screenSpacePanning = false
+    controls.minDistance = 10
+    controls.maxDistance = 2000
+    controls.maxPolarAngle = Math.PI / 2
+
+    // world -----------------------
+    setUpMeshesFromMap(scene, levelJson)
+
+    // lights
+    setUpLights(scene)
+
+    window.addEventListener('resize', onWindowResize, false)
+    document.addEventListener('mousemove', onPointerMove)
+
+    const layers = {
+        toggleZones: function () {
+            camera.layers.toggle(LAYERS.Zones)
+        },
+        toggleTrucks: function () {
+            camera.layers.toggle(LAYERS.Trucks)
+        },
+    }
+
+    const gui = new GUI()
+    const layersFolder = gui.addFolder('Layers')
+    layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
+    layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
+    layersFolder.open()
 }
-
-const gui = new GUI()
-const layersFolder = gui.addFolder('Layers')
-layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
-layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
-layersFolder.open()
 
 function setUpLights(scene: THREE.Scene) {
     const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
@@ -78,7 +82,6 @@ function setUpLights(scene: THREE.Scene) {
     ambientLight.intensity = 0.5
     scene.add(ambientLight)
 }
-
 
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight
@@ -107,10 +110,8 @@ function animate() {
 
 function render() {
     checkMouseIntersections()
-
     renderer.render(scene, camera)
 }
-animate()
 
 function checkMouseIntersections() {
     raycaster.setFromCamera(pointer, camera)
@@ -124,14 +125,12 @@ function checkMouseIntersections() {
     if (intersects.length > 0) {
         const intersectedItem = pickPriorityIntersection(intersects)
         if (INTERSECTED != intersectedItem) {
-            if (INTERSECTED)
-                INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
+            if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
             INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
             INTERSECTED.material.emissive.setHex(0xff0000)
 
             // update info box
-            const infoElement = document.getElementById('info')
             if (infoElement !== null) {
                 const allIntersects = intersects.reduce((acc, intersection) => {
                     return acc.concat(`${intersection.object.name}\n`)
@@ -141,11 +140,9 @@ function checkMouseIntersections() {
             }
         }
     } else {
-        if (INTERSECTED)
-            INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
+        if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
         INTERSECTED = null
-        if (infoElement)
-            infoElement.style.opacity = '0'
+        if (infoElement) infoElement.style.opacity = '0'
     }
 }
 
