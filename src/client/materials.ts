@@ -5,12 +5,14 @@ export const unknownLandmarkMaterial = new THREE.MeshPhongMaterial({
     flatShading: true,
 })
 export const greenTreeMaterial = new THREE.MeshPhongMaterial({
-    color: 0x188c37,
+    color: 0x202e09,
     flatShading: true,
+    shininess:0.1
 })
 export const autumnTreeMaterial = new THREE.MeshPhongMaterial({
-    color: 0x8c6f18,
+    color: 0x7e3a28,
     flatShading: true,
+    shininess:0.1
 })
 export const modelMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3c42, flatShading: true })
 export const zoneMaterial = new THREE.MeshPhongMaterial({
@@ -21,5 +23,5 @@ export const zoneMaterial = new THREE.MeshPhongMaterial({
 export const truckMaterial = new THREE.MeshPhongMaterial({ color: 0xff0303, flatShading: true })
 const loader = new THREE.TextureLoader()
 export const terrainMaterial = new THREE.MeshPhongMaterial({
-    map: loader.load('./level_us_01_01.pak.png'),
+    map: loader.load('./us1HD.jpg')
 })

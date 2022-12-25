@@ -58,31 +58,31 @@ controls.maxPolarAngle = Math.PI / 2
 // world -----------------------
 // Landmarks--------------------
 var mergedLandmarkGeoms = []
-var mergedSpruceTreeGeoms = []
-var mergedBirchTreeGeoms = []
+var mergedGreenTreeGeoms = []
+var mergedAutumnTreeGeoms = []
 for (const landmark of landmarks) {
     //console.log(landmark.name)
     for (const entry of landmark.entries) {
-        var newBox1 = new THREE.BoxGeometry(2, 2, 2)
+        var newBox1 = new THREE.BoxGeometry(3, 2, 3)
         newBox1.translate(-entry.x, entry.y, entry.z)
-        if (landmark.name.includes('spruce_') || landmark.name.includes('sugar_maple')) {
-            mergedSpruceTreeGeoms.push(newBox1)
+        if (landmark.name.includes('spruce_') || landmark.name.includes('tsuga')) {
+            mergedGreenTreeGeoms.push(newBox1)
         } else if (
             landmark.name.includes('birch_') ||
-            landmark.name.includes('tsuga') ||
-            landmark.name.includes('aspen')
+            landmark.name.includes('aspen') ||
+            landmark.name.includes('sugar_maple')
         ) {
-            mergedBirchTreeGeoms.push(newBox1)
+            mergedAutumnTreeGeoms.push(newBox1)
         } else mergedLandmarkGeoms.push(newBox1)
     }
 }
 const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial)
 scene.add(landmarksMesh)
 
-const landmarkSpruceTreesMesh = staticMergedMesh(mergedSpruceTreeGeoms, greenTreeMaterial)
+const landmarkSpruceTreesMesh = staticMergedMesh(mergedGreenTreeGeoms, greenTreeMaterial)
 scene.add(landmarkSpruceTreesMesh)
 
-const landmarkBirchTreesMesh = staticMergedMesh(mergedBirchTreeGeoms, autumnTreeMaterial)
+const landmarkBirchTreesMesh = staticMergedMesh(mergedAutumnTreeGeoms, autumnTreeMaterial)
 scene.add(landmarkBirchTreesMesh)
 
 // Draw Base terrain layer ------------------
@@ -149,17 +149,18 @@ for (const truck of trucks) {
 }
 
 // lights
-const dirLight1 = new THREE.DirectionalLight(0xffffff)
-dirLight1.position.set(1, 1, 1)
+const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
+dirLight1.position.set(0.5, 1, 0)
+dirLight1.intensity = 0.8
 scene.add(dirLight1)
 
-const dirLight2 = new THREE.DirectionalLight(0xc4a704)
+const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
 dirLight2.position.set(-1, -1, -1)
 scene.add(dirLight2)
 
-const ambientLight = new THREE.AmbientLight(0x222222)
+const ambientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
+ambientLight.intensity = 0.5
 scene.add(ambientLight)
-
 
 window.addEventListener('resize', onWindowResize, false)
 document.addEventListener('mousemove', onPointerMove)
