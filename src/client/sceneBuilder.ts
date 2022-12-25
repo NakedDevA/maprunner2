@@ -95,8 +95,9 @@ function addTerrain(
     terrainPath: string,
     scene: THREE.Scene
 ) {
-    const pointsToReverse = heightMap
+    const pointsToReverse = [...heightMap] // reversing the array mutates the original, so we copy
     const combinePoints = pointsToReverse.reverse().flat()
+
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
         mapSize.mapZ,
