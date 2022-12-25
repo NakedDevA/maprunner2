@@ -14,7 +14,6 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
     const { landmarks, models, zones, trucks, mapSize, heightMap } = levelJson
-
     addLandmarks(landmarks, scene)
     addTerrain(heightMap, mapSize, terrainPath, scene)
     addModels(models, scene)
