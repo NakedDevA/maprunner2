@@ -27,7 +27,7 @@ const controls = new MapControls(camera, renderer.domElement)
 
 init()
 animate()
-setUpMeshesFromMap(scene, us_01_01Json)
+setUpMeshesFromMap(scene, us_01_01Json, './us1HD.jpg' )
 
 //-----------------------
 function init() {
@@ -62,10 +62,10 @@ function init() {
     }
     const maps = {
         us_01_01: function () {
-            setUpMeshesFromMap(scene, us_01_01Json)
+            setUpMeshesFromMap(scene, us_01_01Json, './us1HD.jpg' )
         },
         us_01_02: function () {
-            setUpMeshesFromMap(scene, us_01_02Json)
+            setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
         },
         clear: function () {
             clearScene(scene)
@@ -175,9 +175,8 @@ function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<
 function clearScene(scene: THREE.Scene) {
     for( var i = scene.children.length - 1; i >= 0; i--) { 
         var obj = scene.children[i];
-        
+        console.log(`removing ${obj.name}`)
         scene.remove(obj); 
    }
-   alert('removed all kinda')
    setUpLights(scene)
 }
