@@ -5,7 +5,8 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
-const levelJson: LevelJson = require('./data/level_us_01_01.pak.json')
+const us_01_01Json: LevelJson = require('./data/level_us_01_01.pak.json')
+const us_01_02Json: LevelJson = require('./data/level_us_01_02.pak.json')
 
 const scene = new THREE.Scene()
 
@@ -26,7 +27,9 @@ const controls = new MapControls(camera, renderer.domElement)
 
 init()
 animate()
+setUpMeshesFromMap(scene, us_01_01Json)
 
+//-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
     camera.position.set(600, 1200, 600) // qqtas may be based on map size
@@ -43,9 +46,6 @@ function init() {
     controls.maxDistance = 2000
     controls.maxPolarAngle = Math.PI / 2
 
-    // world -----------------------
-    setUpMeshesFromMap(scene, levelJson)
-
     // lights
     setUpLights(scene)
 
@@ -60,12 +60,28 @@ function init() {
             camera.layers.toggle(LAYERS.Trucks)
         },
     }
+    const maps = {
+        us_01_01: function () {
+            setUpMeshesFromMap(scene, us_01_01Json)
+        },
+        us_01_02: function () {
+            setUpMeshesFromMap(scene, us_01_02Json)
+        },
+        clear: function () {
+            clearScene(scene)
+        },
+    }
 
     const gui = new GUI()
     const layersFolder = gui.addFolder('Layers')
+    const mapsFolder = gui.addFolder('Maps')
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
     layersFolder.open()
+    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
+    mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
+    mapsFolder.add(maps, 'clear', true).name('Clear Map')
+    mapsFolder.open()
 }
 
 function setUpLights(scene: THREE.Scene) {
@@ -154,4 +170,14 @@ function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<
     )
 
     return truckIntersect.length ? truckIntersect[0].object : intersects[0].object
+}
+
+function clearScene(scene: THREE.Scene) {
+    for( var i = scene.children.length - 1; i >= 0; i--) { 
+        var obj = scene.children[i];
+        
+        scene.remove(obj); 
+   }
+   alert('removed all kinda')
+   setUpLights(scene)
 }
