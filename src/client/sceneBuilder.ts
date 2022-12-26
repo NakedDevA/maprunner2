@@ -99,7 +99,7 @@ function addTerrain(
     const listToReverse = [...heightMapList]
     const reversedList = listToReverse.reverse()
     const chunked = chunk(reversedList, mapSize.pointsX)
-    const reverseChunk = chunked.map(row => row.reverse()).flat()
+    const reverseChunk = chunked.map((row) => row.reverse()).flat()
 
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
@@ -114,7 +114,7 @@ function addTerrain(
 
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
-        const MAGIC_SCALING_FACTOR = 0.7
+        const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
         vertices.setY(i, reverseChunk[i] * MAGIC_SCALING_FACTOR)
     }
 
