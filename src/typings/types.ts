@@ -37,6 +37,7 @@ type TruckCoords = {
 }
 
 export type MapSize = {
+    mapHeight: number
     mapX: number
     mapZ: number
     pointsX: number
