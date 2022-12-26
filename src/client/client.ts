@@ -7,6 +7,8 @@ import { setUpMeshesFromMap } from './sceneBuilder'
 
 const us_01_01Json: LevelJson = require('./data/level_us_01_01.pak.json')
 const us_01_02Json: LevelJson = require('./data/level_us_01_02.pak.json')
+const us_01_03Json: LevelJson = require('./data/level_us_01_03.pak.json')
+const us_01_04Json: LevelJson = require('./data/level_us_01_04_new.pak.json')
 
 const scene = new THREE.Scene()
 
@@ -69,6 +71,14 @@ function init() {
             clearScene(scene)
             setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
         },
+        us_01_03: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_03Json, './level_us_01_03_map.png')
+        },
+        us_01_04: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_04Json, './level_us_01_04_new_map.png')
+        },
         clear: function () {
             clearScene(scene)
         },
@@ -82,7 +92,8 @@ function init() {
     layersFolder.open()
     mapsFolder.add(maps, 'us_01_01', true).name('Black River')
     mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
-    mapsFolder.add(maps, 'clear', true).name('Clear Map')
+    mapsFolder.add(maps, 'us_01_03', true).name('Island Lake (yes its broken)')
+    mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
     mapsFolder.open()
 }
 
