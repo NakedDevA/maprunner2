@@ -6,6 +6,7 @@ type LandmarkCoords = {
         z: number
     }[]
 }
+
 type ModelCoords = {
     type: string
     landmark: string
@@ -15,6 +16,7 @@ type ModelCoords = {
         z: number
     }[]
 }
+
 type ZoneCoords = {
     name: string
     x: number
@@ -25,6 +27,7 @@ type ZoneCoords = {
     sizeX: number
     sizeZ: number
 }
+
 type TruckCoords = {
     name: string
     x: number
@@ -33,16 +36,18 @@ type TruckCoords = {
     task: string
 }
 
-type MapSize = {
+export type MapSize = {
     mapX: number
     mapZ: number
+    pointsX: number
+    pointsZ: number
 }
+
 export type LevelJson = {
     landmarks: LandmarkCoords[]
     models: ModelCoords[]
     zones: ZoneCoords[]
     trucks: TruckCoords[]
     mapSize: MapSize
-    heightMap: number[][]
     heightMapList: number[]
 }
