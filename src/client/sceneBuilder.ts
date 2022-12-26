@@ -21,10 +21,18 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
+
+    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
+    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
+    const listToReverse = [...heightMapList]
+    const reversedList = listToReverse.reverse()
+    const chunked = chunk(reversedList, mapSize.pointsX)
+    const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
+
     addLandmarks(landmarks, scene)
-    addTerrain(mapSize, terrainPath, scene, heightMapList)
+    addTerrain(mapSize, terrainPath, scene, fixedHeightMap)
     addModels(models, scene)
-    addZones(zones, scene, heightMapList, mapSize)
+    addZones(zones, scene, fixedHeightMap, mapSize)
     addTrucks(trucks, scene)
 }
 
@@ -61,13 +69,10 @@ function addZones(
     heightMapList: number[],
     mapSize: MapSize
 ) {
-    const listToReverse = [...heightMapList]
-    const reversedList = listToReverse.reverse()
-    const chunked = chunk(reversedList, mapSize.pointsX)
-    const reverseChunk = chunked.map((row) => row.reverse()).flat()
     for (const zone of zones) {
         //console.log(zone.name)
         var newBox1 = new THREE.BoxGeometry(zone.sizeX, 20, zone.sizeZ)
+
         // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
         const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
@@ -79,17 +84,10 @@ function addZones(
             0, 0, 0, 1)
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
-        newBox1.translate(-zone.x, 0, zone.z)
-
-        const absoluteZoneX = zone.x + mapSize.mapX / 2
-        const absoluteZoneZ = zone.z + mapSize.mapZ / 2
-        const approxColumn = Math.floor((mapSize.pointsX * absoluteZoneX) / mapSize.mapX)
-        const approxRow =
-            mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteZoneZ) / mapSize.mapZ)
-        const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
-        const approxHeight = reverseChunk[approxIndexInArray] *mapSize.mapHeight / 256
-        newBox1.translate(0, approxHeight, 0)
-
+        
+        const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
+        newBox1.translate(-zone.x, approxHeight, zone.z)
+        
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
@@ -97,6 +95,21 @@ function addZones(
         mesh.name = zone.name
         scene.add(mesh)
     }
+}
+
+function approxTerrainHeightAtPoint(objectX:number, objectZ:number, mapSize: MapSize, heightMapList: number[]) {
+    // Coords are around the centre of the map by default, centre them about 0 instead
+    const absoluteObjectX = objectX+ mapSize.mapX / 2
+    const absoluteObjectZ = objectZ + mapSize.mapZ / 2
+
+    // If the heightMap is a 2d array, find the approximate column and row out object coordinates would be in
+    const approxColumn = Math.floor((mapSize.pointsX * absoluteObjectX) / mapSize.mapX)
+    const approxRow = mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
+
+    // Get the value at this location in the 2d array
+    const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
+    const approxHeight = heightMapList[approxIndexInArray] * mapSize.mapHeight / 256
+    return approxHeight
 }
 
 function addModels(models: ModelCoords[], scene: THREE.Scene) {
@@ -123,12 +136,6 @@ function addTerrain(
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
-    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
-    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
-    const listToReverse = [...heightMapList]
-    const reversedList = listToReverse.reverse()
-    const chunked = chunk(reversedList, mapSize.pointsX)
-    const reverseChunk = chunked.map((row) => row.reverse()).flat()
 
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
@@ -144,7 +151,7 @@ function addTerrain(
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
         const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
-        vertices.setY(i, reverseChunk[i] * MAGIC_SCALING_FACTOR)
+        vertices.setY(i, heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
 
     const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
