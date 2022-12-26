@@ -7,7 +7,7 @@ import {
     modelMaterial,
     zoneMaterial,
     truckMaterial,
-    terrainFromFileMaterial as terrainMaterialFromFile,
+    terrainFromFileMaterial
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
@@ -114,7 +114,7 @@ function addTerrain(
         vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
     }
 
-    const terrainMesh = new THREE.Mesh(geometry, terrainMaterialFromFile(terrainPath))
+    const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
     terrainMesh.name = terrainPath + 'mesh'
     scene.add(terrainMesh)
 }
