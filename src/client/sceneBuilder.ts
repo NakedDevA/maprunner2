@@ -1,5 +1,12 @@
 import * as THREE from 'three'
-import { LevelJson, MapSize } from '../typings/types'
+import {
+    LandmarkCoords,
+    LevelJson,
+    MapSize,
+    ModelCoords,
+    TruckCoords,
+    ZoneCoords,
+} from '../typings/types'
 import {
     unknownLandmarkMaterial,
     greenTreeMaterial,
@@ -21,10 +28,7 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, ter
     addTrucks(trucks, scene)
 }
 
-function addTrucks(
-    trucks: { name: string; x: number; y: number; z: number; task: string }[],
-    scene: THREE.Scene
-) {
+function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
     for (const truck of trucks) {
         //console.log(zone.name)
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
@@ -39,23 +43,22 @@ function addTrucks(
     }
 }
 
-function addZones(
-    zones: {
-        name: string
-        x: number
-        y: number
-        z: number
-        angleA: number
-        angleB: number
-        sizeX: number
-        sizeZ: number
-    }[],
-    scene: THREE.Scene
-) {
+function addZones(zones: ZoneCoords[], scene: THREE.Scene) {
     const ZONEHEIGHT = 70
     for (const zone of zones) {
         //console.log(zone.name)
-        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
+        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 100, zone.sizeZ)
+        // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
+        const quaternion = new THREE.Quaternion()
+        const matrix = new THREE.Matrix4()
+        matrix.set(
+            zone.angleA, 0, zone.angleB, 0, 
+            0, 1, 0, 0, 
+            -zone.angleB, 0, zone.angleA, 0, 
+            0, 0, 0, 1)
+        quaternion.setFromRotationMatrix(matrix)
+        newBox1.applyQuaternion(quaternion)
+
         newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
 
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
@@ -67,10 +70,7 @@ function addZones(
     }
 }
 
-function addModels(
-    models: { type: string; landmark: string; models: { x: number; y: number; z: number }[] }[],
-    scene: THREE.Scene
-) {
+function addModels(models: ModelCoords[], scene: THREE.Scene) {
     var mergedModelGeoms = []
     for (const model of models) {
         //console.log(model.type)
@@ -123,10 +123,7 @@ function addTerrain(
     scene.add(terrainMesh)
 }
 
-function addLandmarks(
-    landmarks: { name: string; entries: { x: number; y: number; z: number }[] }[],
-    scene: THREE.Scene
-) {
+function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
     var mergedLandmarkGeoms = []
     var mergedGreenTreeGeoms = []
     var mergedAutumnTreeGeoms = []

@@ -1,4 +1,4 @@
-type LandmarkCoords = {
+export type LandmarkCoords = {
     name: string
     entries: {
         x: number
@@ -7,7 +7,7 @@ type LandmarkCoords = {
     }[]
 }
 
-type ModelCoords = {
+export type ModelCoords = {
     type: string
     landmark: string
     models: {
@@ -17,7 +17,7 @@ type ModelCoords = {
     }[]
 }
 
-type ZoneCoords = {
+export type ZoneCoords = {
     name: string
     x: number
     y: number
@@ -28,7 +28,7 @@ type ZoneCoords = {
     sizeZ: number
 }
 
-type TruckCoords = {
+export type TruckCoords = {
     name: string
     x: number
     y: number
