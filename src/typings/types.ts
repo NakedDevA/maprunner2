@@ -32,10 +32,16 @@ type TruckCoords = {
     z: number
     task: string
 }
+
+type MapSize = {
+    mapX: number
+    mapZ: number
+}
 export type LevelJson = {
     landmarks: LandmarkCoords[]
     models: ModelCoords[]
     zones: ZoneCoords[]
     trucks: TruckCoords[]
+    mapSize: MapSize
     heightMap: number[][]
 }

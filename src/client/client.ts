@@ -2,32 +2,20 @@ import { GUI } from 'dat.gui'
 import * as THREE from 'three'
 import { Layers } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
-import {
-    unknownLandmarkMaterial,
-    greenTreeMaterial,
-    autumnTreeMaterial,
-    terrainMaterial,
-    modelMaterial,
-    zoneMaterial,
-    truckMaterial,
-} from './materials'
+import { setUpMeshesFromMap } from './sceneBuilder'
 
-const {
-    landmarks,
-    models,
-    zones,
-    trucks,
-    heightMap,
-}: LevelJson = require('./data/level_us_01_01.pak.json')
+const us_01_01Json: LevelJson = require('./data/level_us_01_01.pak.json')
+const us_01_02Json: LevelJson = require('./data/level_us_01_02.pak.json')
+const us_01_03Json: LevelJson = require('./data/level_us_01_03.pak.json')
+const us_01_04Json: LevelJson = require('./data/level_us_01_04_new.pak.json')
 
 const scene = new THREE.Scene()
 
 const pointer = new THREE.Vector2()
 var cssPointerLocation: { clientX: number; clientY: number }
 const raycaster = new THREE.Raycaster()
-const enum LAYERS {
+export const enum LAYERS {
     Terrain = 1,
     Landmarks,
     Models,
@@ -35,160 +23,93 @@ const enum LAYERS {
     Trucks,
 }
 var INTERSECTED: any //currently hovered item
-
-scene.background = new THREE.Color(0x444444)
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
-camera.position.set(600, 1200, 600)
-
-camera.layers.enable(LAYERS.Trucks)
-camera.layers.enable(LAYERS.Zones)
-
 const renderer = new THREE.WebGLRenderer({ antialias: true })
-renderer.setSize(window.innerWidth, window.innerHeight)
-document.body.appendChild(renderer.domElement)
-
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
 
-controls.enableDamping = false // an animation loop is required when either damping or auto-rotation are enabled
-controls.screenSpacePanning = false
-controls.minDistance = 10
-controls.maxDistance = 2000
-controls.maxPolarAngle = Math.PI / 2
+init()
+animate()
+setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
 
-// world -----------------------
-// Landmarks--------------------
-var mergedLandmarkGeoms = []
-var mergedGreenTreeGeoms = []
-var mergedAutumnTreeGeoms = []
-for (const landmark of landmarks) {
-    //console.log(landmark.name)
-    for (const entry of landmark.entries) {
-        var newBox1 = new THREE.BoxGeometry(3, 2, 3)
-        newBox1.translate(-entry.x, entry.y, entry.z)
-        if (landmark.name.includes('spruce_') || landmark.name.includes('tsuga')) {
-            mergedGreenTreeGeoms.push(newBox1)
-        } else if (
-            landmark.name.includes('birch_') ||
-            landmark.name.includes('aspen') ||
-            landmark.name.includes('sugar_maple')
-        ) {
-            mergedAutumnTreeGeoms.push(newBox1)
-        } else mergedLandmarkGeoms.push(newBox1)
+//-----------------------
+function init() {
+    scene.background = new THREE.Color(0x444444)
+    camera.position.set(0, 800, -900) // qqtas may be based on map size
+
+    camera.layers.enable(LAYERS.Trucks)
+    camera.layers.enable(LAYERS.Zones)
+
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    controls.enableDamping = false // an animation loop is required when either damping or auto-rotation are enabled
+    controls.screenSpacePanning = false
+    controls.minDistance = 10
+    controls.maxDistance = 2000
+    controls.maxPolarAngle = Math.PI / 2
+
+    // lights
+    setUpLights(scene)
+
+    window.addEventListener('resize', onWindowResize, false)
+    document.addEventListener('mousemove', onPointerMove)
+
+    const layers = {
+        toggleZones: function () {
+            camera.layers.toggle(LAYERS.Zones)
+        },
+        toggleTrucks: function () {
+            camera.layers.toggle(LAYERS.Trucks)
+        },
     }
-}
-const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial)
-scene.add(landmarksMesh)
-
-const landmarkSpruceTreesMesh = staticMergedMesh(mergedGreenTreeGeoms, greenTreeMaterial)
-scene.add(landmarkSpruceTreesMesh)
-
-const landmarkBirchTreesMesh = staticMergedMesh(mergedAutumnTreeGeoms, autumnTreeMaterial)
-scene.add(landmarkBirchTreesMesh)
-
-// Draw Base terrain layer ------------------
-const combinePoints = heightMap.reverse().flat()
-const geometry = new THREE.PlaneGeometry(2000, 2000, heightMap.length - 1, heightMap[0].length - 1)
-
-geometry.rotateX(-Math.PI / 2) // flat plane
-geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
-
-const vertices = geometry.attributes.position
-for (let i = 0; i < vertices.count; i++) {
-    const MAGIC_SCALING_FACTOR = 0.7
-    vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
-}
-
-const terrainMesh = new THREE.Mesh(geometry, terrainMaterial)
-scene.add(terrainMesh)
-
-// Models--------------------
-var mergedModelGeoms = []
-for (const model of models) {
-    //console.log(model.type)
-    for (const entry of model.models) {
-        // some models correspond to the landmarks we're already drawing, don't duplicate
-        if (!model.landmark.length) {
-            var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-            newBox1.translate(-entry.x, entry.y, entry.z)
-            mergedModelGeoms.push(newBox1)
-        }
+    const maps = {
+        us_01_01: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
+        },
+        us_01_02: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
+        },
+        us_01_03: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_03Json, './level_us_01_03_map.png')
+        },
+        us_01_04: function () {
+            clearScene(scene)
+            setUpMeshesFromMap(scene, us_01_04Json, './level_us_01_04_new_map.png')
+        },
+        clear: function () {
+            clearScene(scene)
+        },
     }
+
+    const gui = new GUI()
+    const layersFolder = gui.addFolder('Layers')
+    const mapsFolder = gui.addFolder('Maps')
+    layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
+    layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
+    layersFolder.open()
+    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
+    mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
+    mapsFolder.add(maps, 'us_01_03', true).name('Island Lake (yes its broken)')
+    mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
+    mapsFolder.open()
 }
 
-const modelsMesh = staticMergedMesh(mergedModelGeoms, modelMaterial)
-modelsMesh.renderOrder = 99
-scene.add(modelsMesh)
+function setUpLights(scene: THREE.Scene) {
+    const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
+    dirLight1.position.set(0.5, 1, 0)
+    dirLight1.intensity = 0.8
+    scene.add(dirLight1)
 
-// Zones--------------------
-const ZONEHEIGHT = 70
-for (const zone of zones) {
-    //console.log(zone.name)
-    var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
-    newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
+    const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
+    dirLight2.position.set(-1, -1, -1)
+    scene.add(dirLight2)
 
-    const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
-    mesh.updateMatrix()
-    mesh.matrixAutoUpdate = false
-    mesh.layers.set(LAYERS.Zones)
-    mesh.name = zone.name
-    scene.add(mesh)
-}
-
-// Trucks--------------------
-for (const truck of trucks) {
-    //console.log(zone.name)
-    var newBox1 = new THREE.BoxGeometry(16, 8, 8)
-    newBox1.translate(-truck.x, truck.y, truck.z)
-
-    const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
-    mesh.updateMatrix()
-    mesh.matrixAutoUpdate = false
-    mesh.layers.set(LAYERS.Trucks)
-    mesh.name = truck.name
-    scene.add(mesh)
-}
-
-// lights
-const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
-dirLight1.position.set(0.5, 1, 0)
-dirLight1.intensity = 0.8
-scene.add(dirLight1)
-
-const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
-dirLight2.position.set(-1, -1, -1)
-scene.add(dirLight2)
-
-const ambientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
-ambientLight.intensity = 0.5
-scene.add(ambientLight)
-
-window.addEventListener('resize', onWindowResize, false)
-document.addEventListener('mousemove', onPointerMove)
-
-const layers = {
-    toggleZones: function () {
-        camera.layers.toggle(LAYERS.Zones)
-    },
-    toggleTrucks: function () {
-        camera.layers.toggle(LAYERS.Trucks)
-    },
-}
-
-const gui = new GUI()
-const layersFolder = gui.addFolder('Layers')
-layersFolder.add(landmarksMesh, 'visible', true).name('Landmarks')
-layersFolder.add(modelsMesh, 'visible', true).name('Models')
-layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
-layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
-layersFolder.add(terrainMesh, 'visible', true).name('Terrain')
-layersFolder.open()
-
-function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
-    var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
-    const mesh = new THREE.Mesh(mergedBoxes, material)
-    mesh.updateMatrix()
-    mesh.matrixAutoUpdate = false
-    return mesh
+    const ambientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
+    ambientLight.intensity = 0.5
+    scene.add(ambientLight)
 }
 
 function onWindowResize() {
@@ -217,7 +138,11 @@ function animate() {
 }
 
 function render() {
-    // find intersections
+    checkMouseIntersections()
+    renderer.render(scene, camera)
+}
+
+function checkMouseIntersections() {
     raycaster.setFromCamera(pointer, camera)
     const objectsToCheck = scene.children
     raycaster.layers.set(LAYERS.Trucks)
@@ -235,7 +160,6 @@ function render() {
             INTERSECTED.material.emissive.setHex(0xff0000)
 
             // update info box
-            const infoElement = document.getElementById('info')
             if (infoElement !== null) {
                 const allIntersects = intersects.reduce((acc, intersection) => {
                     return acc.concat(`${intersection.object.name}\n`)
@@ -249,10 +173,8 @@ function render() {
         INTERSECTED = null
         if (infoElement) infoElement.style.opacity = '0'
     }
-
-    renderer.render(scene, camera)
 }
-animate()
+
 function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<THREE.Event>>[]) {
     const testTruckLayers = new Layers()
     testTruckLayers.set(LAYERS.Trucks)
@@ -261,4 +183,13 @@ function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<
     )
 
     return truckIntersect.length ? truckIntersect[0].object : intersects[0].object
+}
+
+function clearScene(scene: THREE.Scene) {
+    for (var i = scene.children.length - 1; i >= 0; i--) {
+        var obj = scene.children[i]
+        //console.log(`removing ${obj.name}`)
+        scene.remove(obj)
+    }
+    setUpLights(scene)
 }
