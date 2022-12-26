@@ -33,6 +33,17 @@ export type TruckCoords = {
     x: number
     y: number
     z: number
+    rotation: {
+        a1: number
+        a2: number
+        a3: number
+        b1: number
+        b2: number
+        b3: number
+        c1: number
+        c2: number
+        c3: number
+    }
     task: string
 }
 

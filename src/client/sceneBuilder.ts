@@ -31,7 +31,18 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, ter
 function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
     for (const truck of trucks) {
         //console.log(zone.name)
+        const {a1, a2, a3, b1, b2, b3, c1, c2, c3} = truck.rotation
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
+        const quaternion = new THREE.Quaternion()
+        const matrix = new THREE.Matrix4()
+        matrix.set(
+            a1, a2, a3, 0, 
+            b1, b2, b3, 0, 
+            c1, c2, c3, 0, 
+            0, 0, 0, 1)
+        quaternion.setFromRotationMatrix(matrix)
+        newBox1.applyQuaternion(quaternion)
+
         newBox1.translate(-truck.x, truck.y, truck.z)
 
         const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
