@@ -24,7 +24,7 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, ter
     addLandmarks(landmarks, scene)
     addTerrain(mapSize, terrainPath, scene, heightMapList)
     addModels(models, scene)
-    addZones(zones, scene)
+    addZones(zones, scene, heightMapList, mapSize)
     addTrucks(trucks, scene)
 }
 
@@ -55,11 +55,19 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
     }
 }
 
-function addZones(zones: ZoneCoords[], scene: THREE.Scene) {
-    const ZONEHEIGHT = 70
+function addZones(
+    zones: ZoneCoords[],
+    scene: THREE.Scene,
+    heightMapList: number[],
+    mapSize: MapSize
+) {
+    const listToReverse = [...heightMapList]
+    const reversedList = listToReverse.reverse()
+    const chunked = chunk(reversedList, mapSize.pointsX)
+    const reverseChunk = chunked.map((row) => row.reverse()).flat()
     for (const zone of zones) {
         //console.log(zone.name)
-        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 100, zone.sizeZ)
+        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 20, zone.sizeZ)
         // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
         const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
@@ -71,8 +79,16 @@ function addZones(zones: ZoneCoords[], scene: THREE.Scene) {
             0, 0, 0, 1)
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
+        newBox1.translate(-zone.x, 0, zone.z)
 
-        newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
+        const absoluteZoneX = zone.x + mapSize.mapX / 2
+        const absoluteZoneZ = zone.z + mapSize.mapZ / 2
+        const approxColumn = Math.floor((mapSize.pointsX * absoluteZoneX) / mapSize.mapX)
+        const approxRow =
+            mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteZoneZ) / mapSize.mapZ)
+        const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
+        const approxHeight = reverseChunk[approxIndexInArray] *mapSize.mapHeight / 256
+        newBox1.translate(0, approxHeight, 0)
 
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
         mesh.updateMatrix()
@@ -132,7 +148,7 @@ function addTerrain(
     }
 
     const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
-    terrainMesh.name = terrainPath + 'mesh'
+    terrainMesh.name = 'terrainMesh'
     scene.add(terrainMesh)
 }
 
