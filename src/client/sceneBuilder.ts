@@ -20,6 +20,7 @@ import {
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { Scene } from 'three'
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
@@ -134,8 +135,7 @@ function addModels(models: ModelCoords[], scene: THREE.Scene) {
         }
     }
 
-    const modelsMesh = staticMergedMesh(mergedModelGeoms, modelMaterial)
-    scene.add(modelsMesh)
+    const modelsMesh = addStaticMergedMesh(mergedModelGeoms, modelMaterial, scene)
 }
 
 function addTerrain(
@@ -173,7 +173,7 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
     var mergedBrownGeoms = []
     var mergedGreyGeoms = []
     for (const landmark of landmarks) {
-        console.log(`${landmark.name} x ${landmark.entries.length}`)
+        //console.log(`${landmark.name} x ${landmark.entries.length}`)
         for (const entry of landmark.entries) {
             var newBox1 = new THREE.BoxGeometry(3, 2, 3)
             newBox1.translate(-entry.x, entry.y, entry.z)
@@ -192,28 +192,32 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
             } else mergedLandmarkGeoms.push(newBox1)
         }
     }
-    const landmarksMesh = staticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial)
-    scene.add(landmarksMesh)
-
-    const landmarkSpruceTreesMesh = staticMergedMesh(mergedGreenTreeGeoms, greenTreeMaterial)
-    scene.add(landmarkSpruceTreesMesh)
-
-    const landmarkBirchTreesMesh = staticMergedMesh(mergedAutumnTreeGeoms, autumnTreeMaterial)
-    scene.add(landmarkBirchTreesMesh)
-
-    const landmarkBrownsMesh = staticMergedMesh(mergedBrownGeoms, brownsMaterial)
-    scene.add(landmarkBrownsMesh)
-
-    const landmarkGreysMesh = staticMergedMesh(mergedGreyGeoms, greysMaterial)
-    scene.add(landmarkGreysMesh)
+    const landmarksMesh = addStaticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial, scene)
+    const landmarkSpruceTreesMesh = addStaticMergedMesh(
+        mergedGreenTreeGeoms,
+        greenTreeMaterial,
+        scene
+    )
+    const landmarkBirchTreesMesh = addStaticMergedMesh(
+        mergedAutumnTreeGeoms,
+        autumnTreeMaterial,
+        scene
+    )
+    const landmarkBrownsMesh = addStaticMergedMesh(mergedBrownGeoms, brownsMaterial, scene)
+    const landmarkGreysMesh = addStaticMergedMesh(mergedGreyGeoms, greysMaterial, scene)
 }
 
-function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
+function addStaticMergedMesh(
+    mergedGeoms: THREE.BufferGeometry[],
+    material: THREE.MeshPhongMaterial,
+    scene: THREE.Scene
+) {
+    if (!mergedGeoms.length) return
     var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
     const mesh = new THREE.Mesh(mergedBoxes, material)
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
-    return mesh
+    scene.add(mesh)
 }
 
 function chunk<T>(array: T[], chunkSize: number): T[][] {
