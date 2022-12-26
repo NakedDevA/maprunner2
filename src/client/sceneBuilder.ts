@@ -1,5 +1,12 @@
 import * as THREE from 'three'
-import { LevelJson, MapSize } from '../typings/types'
+import {
+    LandmarkCoords,
+    LevelJson,
+    MapSize,
+    ModelCoords,
+    TruckCoords,
+    ZoneCoords,
+} from '../typings/types'
 import {
     unknownLandmarkMaterial,
     greenTreeMaterial,
@@ -14,20 +21,37 @@ import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUti
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
+
+    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
+    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
+    const listToReverse = [...heightMapList]
+    const reversedList = listToReverse.reverse()
+    const chunked = chunk(reversedList, mapSize.pointsX)
+    const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
+
     addLandmarks(landmarks, scene)
-    addTerrain(mapSize, terrainPath, scene, heightMapList)
+    addTerrain(mapSize, terrainPath, scene, fixedHeightMap)
     addModels(models, scene)
-    addZones(zones, scene)
+    addZones(zones, scene, fixedHeightMap, mapSize)
     addTrucks(trucks, scene)
 }
 
-function addTrucks(
-    trucks: { name: string; x: number; y: number; z: number; task: string }[],
-    scene: THREE.Scene
-) {
+function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
     for (const truck of trucks) {
         //console.log(zone.name)
+        const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = truck.rotation
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
+        const quaternion = new THREE.Quaternion()
+        const matrix = new THREE.Matrix4()
+        // prettier-ignore
+        matrix.set(
+            a1, a2, a3, 0, 
+            b1, b2, b3, 0, 
+            c1, c2, c3, 0, 
+            0, 0, 0, 1)
+        quaternion.setFromRotationMatrix(matrix)
+        newBox1.applyQuaternion(quaternion)
+
         newBox1.translate(-truck.x, truck.y, truck.z)
 
         const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
@@ -40,24 +64,30 @@ function addTrucks(
 }
 
 function addZones(
-    zones: {
-        name: string
-        x: number
-        y: number
-        z: number
-        angleA: number
-        angleB: number
-        sizeX: number
-        sizeZ: number
-    }[],
-    scene: THREE.Scene
+    zones: ZoneCoords[],
+    scene: THREE.Scene,
+    heightMapList: number[],
+    mapSize: MapSize
 ) {
-    const ZONEHEIGHT = 70
     for (const zone of zones) {
         //console.log(zone.name)
-        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 30, zone.sizeZ)
-        newBox1.translate(-zone.x, ZONEHEIGHT, zone.z)
+        var newBox1 = new THREE.BoxGeometry(zone.sizeX, 20, zone.sizeZ)
 
+        // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
+        const quaternion = new THREE.Quaternion()
+        const matrix = new THREE.Matrix4()
+        // prettier-ignore
+        matrix.set(
+            zone.angleA, 0, zone.angleB, 0, 
+            0, 1, 0, 0, 
+            -zone.angleB, 0, zone.angleA, 0, 
+            0, 0, 0, 1)
+        quaternion.setFromRotationMatrix(matrix)
+        newBox1.applyQuaternion(quaternion)
+        
+        const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
+        newBox1.translate(-zone.x, approxHeight, zone.z)
+        
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
@@ -67,10 +97,22 @@ function addZones(
     }
 }
 
-function addModels(
-    models: { type: string; landmark: string; models: { x: number; y: number; z: number }[] }[],
-    scene: THREE.Scene
-) {
+function approxTerrainHeightAtPoint(objectX:number, objectZ:number, mapSize: MapSize, heightMapList: number[]) {
+    // Coords are around the centre of the map by default, centre them about 0 instead
+    const absoluteObjectX = objectX+ mapSize.mapX / 2
+    const absoluteObjectZ = objectZ + mapSize.mapZ / 2
+
+    // If the heightMap is a 2d array, find the approximate column and row out object coordinates would be in
+    const approxColumn = Math.floor((mapSize.pointsX * absoluteObjectX) / mapSize.mapX)
+    const approxRow = mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
+
+    // Get the value at this location in the 2d array
+    const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
+    const approxHeight = heightMapList[approxIndexInArray] * mapSize.mapHeight / 256
+    return approxHeight
+}
+
+function addModels(models: ModelCoords[], scene: THREE.Scene) {
     var mergedModelGeoms = []
     for (const model of models) {
         //console.log(model.type)
@@ -94,12 +136,6 @@ function addTerrain(
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
-    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
-    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
-    const listToReverse = [...heightMapList]
-    const reversedList = listToReverse.reverse()
-    const chunked = chunk(reversedList, mapSize.pointsX)
-    const reverseChunk = chunked.map((row) => row.reverse()).flat()
 
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
@@ -115,18 +151,15 @@ function addTerrain(
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
         const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
-        vertices.setY(i, reverseChunk[i] * MAGIC_SCALING_FACTOR)
+        vertices.setY(i, heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
 
     const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
-    terrainMesh.name = terrainPath + 'mesh'
+    terrainMesh.name = 'terrainMesh'
     scene.add(terrainMesh)
 }
 
-function addLandmarks(
-    landmarks: { name: string; entries: { x: number; y: number; z: number }[] }[],
-    scene: THREE.Scene
-) {
+function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
     var mergedLandmarkGeoms = []
     var mergedGreenTreeGeoms = []
     var mergedAutumnTreeGeoms = []
