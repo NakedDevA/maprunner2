@@ -15,6 +15,8 @@ import {
     zoneMaterial,
     truckMaterial,
     terrainFromFileMaterial,
+    brownsMaterial,
+    greysMaterial,
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
@@ -84,10 +86,10 @@ function addZones(
             0, 0, 0, 1)
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
-        
+
         const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
         newBox1.translate(-zone.x, approxHeight, zone.z)
-        
+
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
@@ -97,18 +99,24 @@ function addZones(
     }
 }
 
-function approxTerrainHeightAtPoint(objectX:number, objectZ:number, mapSize: MapSize, heightMapList: number[]) {
+function approxTerrainHeightAtPoint(
+    objectX: number,
+    objectZ: number,
+    mapSize: MapSize,
+    heightMapList: number[]
+) {
     // Coords are around the centre of the map by default, centre them about 0 instead
-    const absoluteObjectX = objectX+ mapSize.mapX / 2
+    const absoluteObjectX = objectX + mapSize.mapX / 2
     const absoluteObjectZ = objectZ + mapSize.mapZ / 2
 
     // If the heightMap is a 2d array, find the approximate column and row out object coordinates would be in
     const approxColumn = Math.floor((mapSize.pointsX * absoluteObjectX) / mapSize.mapX)
-    const approxRow = mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
+    const approxRow =
+        mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
 
     // Get the value at this location in the 2d array
     const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
-    const approxHeight = heightMapList[approxIndexInArray] * mapSize.mapHeight / 256
+    const approxHeight = (heightMapList[approxIndexInArray] * mapSize.mapHeight) / 256
     return approxHeight
 }
 
@@ -136,7 +144,6 @@ function addTerrain(
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
-
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
         mapSize.mapZ,
@@ -163,8 +170,10 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
     var mergedLandmarkGeoms = []
     var mergedGreenTreeGeoms = []
     var mergedAutumnTreeGeoms = []
+    var mergedBrownGeoms = []
+    var mergedGreyGeoms = []
     for (const landmark of landmarks) {
-        //console.log(landmark.name)
+        console.log(`${landmark.name} x ${landmark.entries.length}`)
         for (const entry of landmark.entries) {
             var newBox1 = new THREE.BoxGeometry(3, 2, 3)
             newBox1.translate(-entry.x, entry.y, entry.z)
@@ -176,6 +185,10 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
                 landmark.name.includes('sugar_maple')
             ) {
                 mergedAutumnTreeGeoms.push(newBox1)
+            } else if (landmark.name.includes('swamp_')) {
+                mergedBrownGeoms.push(newBox1)
+            } else if (landmark.name.includes('concrete') || landmark.name.includes('rock')) {
+                mergedGreyGeoms.push(newBox1)
             } else mergedLandmarkGeoms.push(newBox1)
         }
     }
@@ -187,6 +200,12 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
 
     const landmarkBirchTreesMesh = staticMergedMesh(mergedAutumnTreeGeoms, autumnTreeMaterial)
     scene.add(landmarkBirchTreesMesh)
+
+    const landmarkBrownsMesh = staticMergedMesh(mergedBrownGeoms, brownsMaterial)
+    scene.add(landmarkBrownsMesh)
+
+    const landmarkGreysMesh = staticMergedMesh(mergedGreyGeoms, greysMaterial)
+    scene.add(landmarkGreysMesh)
 }
 
 function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.MeshPhongMaterial) {
