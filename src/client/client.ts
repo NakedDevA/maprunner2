@@ -80,8 +80,9 @@ const controls = new MapControls(camera, renderer.domElement)
 
 init()
 animate()
+
+// load initial map:
 maps.us_02_01()
-setUpMeshesFromMap(scene, us_02_01Json, './level_us_02_01_map.png')
 
 //-----------------------
 function init() {
