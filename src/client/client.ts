@@ -92,7 +92,7 @@ function init() {
     layersFolder.open()
     mapsFolder.add(maps, 'us_01_01', true).name('Black River')
     mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
-    mapsFolder.add(maps, 'us_01_03', true).name('Island Lake (yes its broken)')
+    mapsFolder.add(maps, 'us_01_03', true).name('Island Lake')
     mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
     mapsFolder.open()
 }
