@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { LevelJson } from '../typings/types'
+import { LevelJson, MapSize } from '../typings/types'
 import {
     unknownLandmarkMaterial,
     greenTreeMaterial,
@@ -7,15 +7,15 @@ import {
     modelMaterial,
     zoneMaterial,
     truckMaterial,
-    terrainFromFileMaterial
+    terrainFromFileMaterial,
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
-    const { landmarks, models, zones, trucks, mapSize, heightMap } = levelJson
+    const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
     addLandmarks(landmarks, scene)
-    addTerrain(heightMap, mapSize, terrainPath, scene)
+    addTerrain(mapSize, terrainPath, scene, heightMapList)
     addModels(models, scene)
     addZones(zones, scene)
     addTrucks(trucks, scene)
@@ -89,19 +89,23 @@ function addModels(
 }
 
 function addTerrain(
-    heightMap: number[][],
-    mapSize: { mapX: number; mapZ: number },
+    mapSize: MapSize,
     terrainPath: string,
-    scene: THREE.Scene
+    scene: THREE.Scene,
+    heightMapList: number[]
 ) {
-    const pointsToReverse = [...heightMap] // reversing the array mutates the original, so we copy
-    const combinePoints = pointsToReverse.reverse().flat()
+    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
+    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
+    const listToReverse = [...heightMapList]
+    const reversedList = listToReverse.reverse()
+    const chunked = chunk(reversedList, mapSize.pointsX)
+    const reverseChunk = chunked.map((row) => row.reverse()).flat()
 
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
         mapSize.mapZ,
-        pointsToReverse.length - 1,
-        pointsToReverse[0].length - 1
+        mapSize.pointsX - 1,
+        mapSize.pointsZ - 1
     )
     geometry.name = terrainPath + 'terraingeom'
 
@@ -110,8 +114,8 @@ function addTerrain(
 
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
-        const MAGIC_SCALING_FACTOR = 0.7
-        vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
+        const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
+        vertices.setY(i, reverseChunk[i] * MAGIC_SCALING_FACTOR)
     }
 
     const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
@@ -158,4 +162,11 @@ function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.M
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
     return mesh
+}
+
+function chunk<T>(array: T[], chunkSize: number): T[][] {
+    const R = []
+    for (let i = 0, len = array.length; i < len; i += chunkSize)
+        R.push(array.slice(i, i + chunkSize))
+    return R
 }
