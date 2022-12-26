@@ -7,15 +7,15 @@ import {
     modelMaterial,
     zoneMaterial,
     truckMaterial,
-    terrainFromFileMaterial
+    terrainFromFileMaterial,
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 
 export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
-    const { landmarks, models, zones, trucks, mapSize, heightMap } = levelJson
+    const { landmarks, models, zones, trucks, mapSize, heightMap, heightMapList } = levelJson
     addLandmarks(landmarks, scene)
-    addTerrain(heightMap, mapSize, terrainPath, scene)
+    addTerrain(heightMap, mapSize, terrainPath, scene, heightMapList)
     addModels(models, scene)
     addZones(zones, scene)
     addTrucks(trucks, scene)
@@ -92,16 +92,27 @@ function addTerrain(
     heightMap: number[][],
     mapSize: { mapX: number; mapZ: number },
     terrainPath: string,
-    scene: THREE.Scene
+    scene: THREE.Scene,
+    heightMapList: number[]
 ) {
     const pointsToReverse = [...heightMap] // reversing the array mutates the original, so we copy
     const combinePoints = pointsToReverse.reverse().flat()
 
+    //new way
+    const listToReverse = [...heightMapList]
+    const reversedList = listToReverse.reverse()
+    const xPointCount = 589
+    //const yPointCount = 295
+    const yPointCount = 589
+    const chunked = chunk(reversedList, xPointCount)
+    const reverseChunk = chunked.map(row => row.reverse()).flat()
+
+
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
         mapSize.mapZ,
-        pointsToReverse.length - 1,
-        pointsToReverse[0].length - 1
+        xPointCount - 1,
+        yPointCount - 1
     )
     geometry.name = terrainPath + 'terraingeom'
 
@@ -111,7 +122,8 @@ function addTerrain(
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
         const MAGIC_SCALING_FACTOR = 0.7
-        vertices.setY(i, combinePoints[i] * MAGIC_SCALING_FACTOR)
+        vertices.setY(i, reverseChunk[i] * MAGIC_SCALING_FACTOR)
+        //if (i>58900) vertices.setY(i, 20)
     }
 
     const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
@@ -158,4 +170,11 @@ function staticMergedMesh(mergedGeoms: THREE.BufferGeometry[], material: THREE.M
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
     return mesh
+}
+
+function chunk<T>(array: T[], chunkSize: number): T[][] {
+    const R = []
+    for (let i = 0, len = array.length; i < len; i += chunkSize)
+        R.push(array.slice(i, i + chunkSize))
+    return R
 }

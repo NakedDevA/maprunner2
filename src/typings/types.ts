@@ -44,4 +44,5 @@ export type LevelJson = {
     trucks: TruckCoords[]
     mapSize: MapSize
     heightMap: number[][]
+    heightMapList: number[]
 }
