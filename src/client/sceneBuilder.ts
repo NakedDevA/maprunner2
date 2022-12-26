@@ -31,10 +31,11 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, ter
 function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
     for (const truck of trucks) {
         //console.log(zone.name)
-        const {a1, a2, a3, b1, b2, b3, c1, c2, c3} = truck.rotation
+        const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = truck.rotation
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
         const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
+        // prettier-ignore
         matrix.set(
             a1, a2, a3, 0, 
             b1, b2, b3, 0, 
@@ -62,6 +63,7 @@ function addZones(zones: ZoneCoords[], scene: THREE.Scene) {
         // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
         const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
+        // prettier-ignore
         matrix.set(
             zone.angleA, 0, zone.angleB, 0, 
             0, 1, 0, 0, 
