@@ -5,61 +5,35 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
-//qqtas are these on demand or are we serving a colossal bundle all the time
-const us_01_01Json: LevelJson = require('./data/level_us_01_01.pak.json')
-const us_01_02Json: LevelJson = require('./data/level_us_01_02.pak.json')
-const us_01_03Json: LevelJson = require('./data/level_us_01_03.pak.json')
-const us_01_04Json: LevelJson = require('./data/level_us_01_04_new.pak.json')
-
-const us_02_01Json: LevelJson = require('./data/level_us_02_01.pak.json')
-const us_02_02Json: LevelJson = require('./data/level_us_02_02_new.pak.json')
-const us_02_03Json: LevelJson = require('./data/level_us_02_03_new.pak.json')
-const us_02_04Json: LevelJson = require('./data/level_us_02_04_new.pak.json')
-
 const maps = {
-    us_01_01: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
-        setUpLights(scene, false)
+    us_01_01: async function () {
+        await switchToLevel('./data/level_us_01_01.pak.json', './level_us_01_01_map.png', false)
     },
-    us_01_02: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
-        setUpLights(scene, false)
+    us_01_02: async function () {
+        await switchToLevel('./data/level_us_01_02.pak.json', './level_us_01_02_map.png', false)
     },
-    us_01_03: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_01_03Json, './level_us_01_03_map.png')
-        setUpLights(scene, false)
+    us_01_03: async function () {
+        await switchToLevel('./data/level_us_01_03.pak.json', './level_us_01_03_map.png', false)
     },
-    us_01_04: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_01_04Json, './level_us_01_04_new_map.png')
-        setUpLights(scene, false)
+    us_01_04: async function () {
+        await switchToLevel('./data/level_us_01_04_new.pak.json', './level_us_01_04_new_map.png', false)
     },
-    us_02_01: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_02_01Json, './level_us_02_01_map.png')
-        setUpLights(scene, true)
+    us_02_01: async function () {
+        await switchToLevel('./data/level_us_02_01.pak.json', './level_us_02_01_map.png', true)
     },
-    us_02_02: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_02_02Json, './level_us_02_02_new_map.png')
-        setUpLights(scene, true)
+    us_02_02: async function () {
+        await switchToLevel('./data/level_us_02_02_new.pak.json', './level_us_02_02_new_map.png', true)
     },
-    us_02_03: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_02_03Json, './level_us_02_03_new_map.png')
-        setUpLights(scene, true)
+    us_02_03: async function () {
+        await switchToLevel('./data/level_us_02_03_new.pak.json', './level_us_02_03_new_map.png', true)
     },
-    us_02_04: function () {
-        clearScene(scene)
-        setUpMeshesFromMap(scene, us_02_04Json, './level_us_02_04_new_map.png')
-        setUpLights(scene, true)
+    us_02_04: async function () {
+        await switchToLevel('./data/level_us_02_04_new.pak.json', './level_us_02_04_new_map.png', true)
     },
     clear: function () {
         clearScene(scene)
     },
+    
 }
 const scene = new THREE.Scene()
 
@@ -82,7 +56,14 @@ init()
 animate()
 
 // load initial map:
-maps.us_02_01()
+maps.us_01_01()
+
+async function switchToLevel(levelJsonPath: string, terrainImagePath: string, isSnow: boolean) {
+    const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
+    clearScene(scene)
+    setUpMeshesFromMap(scene, levelJson, terrainImagePath)
+    setUpLights(scene, isSnow)
+}
 
 //-----------------------
 function init() {
@@ -127,7 +108,7 @@ function init() {
     mapsFolder.add(maps, 'us_02_01', true).name('North Port')
     mapsFolder.add(maps, 'us_02_02', true).name('Mountain River')
     mapsFolder.add(maps, 'us_02_03', true).name('White Valley')
-    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')
+    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay') 
     mapsFolder.open()
 }
 
@@ -231,5 +212,25 @@ function clearScene(scene: THREE.Scene) {
         var obj = scene.children[i]
         //console.log(`removing ${obj.name}`)
         scene.remove(obj)
+    }
+}
+
+async function fetchLevelJson(path: string): Promise<LevelJson> {
+    const response = await window.fetch(path)
+
+    type JSONResponse = {
+        data?: any
+        errors?: Array<{ message: string }>
+    }
+    //const { data, errors }: JSONResponse = await response.json()
+    const errors: any[] = []
+    const json: LevelJson = await response.json()
+    if (response.ok) {
+        console.log('ok')
+
+        return json
+    } else {
+        const error = new Error(errors?.map((e) => e.message).join('\n') ?? 'unknown')
+        return Promise.reject(error)
     }
 }
