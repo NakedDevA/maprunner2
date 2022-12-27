@@ -5,11 +5,62 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
+//qqtas are these on demand or are we serving a colossal bundle all the time
 const us_01_01Json: LevelJson = require('./data/level_us_01_01.pak.json')
 const us_01_02Json: LevelJson = require('./data/level_us_01_02.pak.json')
 const us_01_03Json: LevelJson = require('./data/level_us_01_03.pak.json')
 const us_01_04Json: LevelJson = require('./data/level_us_01_04_new.pak.json')
 
+const us_02_01Json: LevelJson = require('./data/level_us_02_01.pak.json')
+const us_02_02Json: LevelJson = require('./data/level_us_02_02_new.pak.json')
+const us_02_03Json: LevelJson = require('./data/level_us_02_03_new.pak.json')
+const us_02_04Json: LevelJson = require('./data/level_us_02_04_new.pak.json')
+
+const maps = {
+    us_01_01: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
+        setUpLights(scene, false)
+    },
+    us_01_02: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
+        setUpLights(scene, false)
+    },
+    us_01_03: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_01_03Json, './level_us_01_03_map.png')
+        setUpLights(scene, false)
+    },
+    us_01_04: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_01_04Json, './level_us_01_04_new_map.png')
+        setUpLights(scene, false)
+    },
+    us_02_01: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_02_01Json, './level_us_02_01_map.png')
+        setUpLights(scene, true)
+    },
+    us_02_02: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_02_02Json, './level_us_02_02_new_map.png')
+        setUpLights(scene, true)
+    },
+    us_02_03: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_02_03Json, './level_us_02_03_new_map.png')
+        setUpLights(scene, true)
+    },
+    us_02_04: function () {
+        clearScene(scene)
+        setUpMeshesFromMap(scene, us_02_04Json, './level_us_02_04_new_map.png')
+        setUpLights(scene, true)
+    },
+    clear: function () {
+        clearScene(scene)
+    },
+}
 const scene = new THREE.Scene()
 
 const pointer = new THREE.Vector2()
@@ -29,7 +80,9 @@ const controls = new MapControls(camera, renderer.domElement)
 
 init()
 animate()
-setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
+
+// load initial map:
+maps.us_02_01()
 
 //-----------------------
 function init() {
@@ -48,9 +101,6 @@ function init() {
     controls.maxDistance = 2000
     controls.maxPolarAngle = Math.PI / 2
 
-    // lights
-    setUpLights(scene)
-
     window.addEventListener('resize', onWindowResize, false)
     document.addEventListener('mousemove', onPointerMove)
 
@@ -60,27 +110,6 @@ function init() {
         },
         toggleTrucks: function () {
             camera.layers.toggle(LAYERS.Trucks)
-        },
-    }
-    const maps = {
-        us_01_01: function () {
-            clearScene(scene)
-            setUpMeshesFromMap(scene, us_01_01Json, './level_us_01_01_map.png')
-        },
-        us_01_02: function () {
-            clearScene(scene)
-            setUpMeshesFromMap(scene, us_01_02Json, './level_us_01_02_map.png')
-        },
-        us_01_03: function () {
-            clearScene(scene)
-            setUpMeshesFromMap(scene, us_01_03Json, './level_us_01_03_map.png')
-        },
-        us_01_04: function () {
-            clearScene(scene)
-            setUpMeshesFromMap(scene, us_01_04Json, './level_us_01_04_new_map.png')
-        },
-        clear: function () {
-            clearScene(scene)
         },
     }
 
@@ -94,22 +123,34 @@ function init() {
     mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
     mapsFolder.add(maps, 'us_01_03', true).name('Island Lake')
     mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
+
+    mapsFolder.add(maps, 'us_02_01', true).name('North Port')
+    mapsFolder.add(maps, 'us_02_02', true).name('Mountain River')
+    mapsFolder.add(maps, 'us_02_03', true).name('White Valley')
+    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')
     mapsFolder.open()
 }
 
-function setUpLights(scene: THREE.Scene) {
+function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
     dirLight1.position.set(0.5, 1, 0)
-    dirLight1.intensity = 0.8
+    dirLight1.intensity = isWinter ? 0.7 : 0.85 // avoid blowing eyes out on snow
     scene.add(dirLight1)
 
     const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
     dirLight2.position.set(-1, -1, -1)
+    dirLight2.intensity = 0.2
     scene.add(dirLight2)
 
-    const ambientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
-    ambientLight.intensity = 0.5
-    scene.add(ambientLight)
+    if (isWinter) {
+        const alaskaAmbient = new THREE.AmbientLight(0x209edf)
+        alaskaAmbient.intensity = 0.1 // tinge of blue. Not sure how to make snow look good really
+        scene.add(alaskaAmbient)
+    } else {
+        const michiganAmbientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
+        michiganAmbientLight.intensity = 0.5
+        scene.add(michiganAmbientLight)
+    }
 }
 
 function onWindowResize() {
@@ -191,5 +232,4 @@ function clearScene(scene: THREE.Scene) {
         //console.log(`removing ${obj.name}`)
         scene.remove(obj)
     }
-    setUpLights(scene)
 }

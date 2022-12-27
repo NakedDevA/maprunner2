@@ -14,19 +14,19 @@ export const autumnTreeMaterial = new THREE.MeshPhongMaterial({
     flatShading: true,
     shininess: 0.1,
 })
-export const brownsMaterial  = new THREE.MeshPhongMaterial({
-    color: 0x5C4033,
+export const brownsMaterial = new THREE.MeshPhongMaterial({
+    color: 0x5c4033,
     flatShading: true,
     shininess: 0.1,
 })
-export const greysMaterial  = new THREE.MeshPhongMaterial({
-    color: 0x90A4AE,
+export const greysMaterial = new THREE.MeshPhongMaterial({
+    color: 0x90a4ae,
     flatShading: true,
     shininess: 0.1,
 })
 export const modelMaterial = new THREE.MeshPhongMaterial({ color: 0x3a3c42, flatShading: true })
 export const zoneMaterial = new THREE.MeshPhongMaterial({
-    //pink 
+    //pink
     color: 0xd007de,
     opacity: 0.7,
     transparent: true,
