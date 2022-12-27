@@ -187,13 +187,13 @@ function checkMouseIntersections() {
                     return acc.concat(`${intersection.object.name}\n`)
                 }, '')
                 infoElement.innerText = allIntersects
-                infoElement.style.opacity = '1'
+                infoElement.style.display = 'inline-block'
             }
         }
     } else {
         if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
         INTERSECTED = null
-        if (infoElement) infoElement.style.opacity = '0'
+        if (infoElement) infoElement.style.display = 'none'
     }
 }
 
@@ -217,20 +217,11 @@ function clearScene(scene: THREE.Scene) {
 
 async function fetchLevelJson(path: string): Promise<LevelJson> {
     const response = await window.fetch(path)
-
-    type JSONResponse = {
-        data?: any
-        errors?: Array<{ message: string }>
-    }
-    //const { data, errors }: JSONResponse = await response.json()
-    const errors: any[] = []
     const json: LevelJson = await response.json()
     if (response.ok) {
-        console.log('ok')
-
         return json
     } else {
-        const error = new Error(errors?.map((e) => e.message).join('\n') ?? 'unknown')
+        const error = new Error(`Failed to fetch level JSON from path ${path}, ${response.statusText}` )
         return Promise.reject(error)
     }
 }
