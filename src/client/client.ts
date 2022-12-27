@@ -7,28 +7,28 @@ import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
     us_01_01: async function () {
-        await switchToLevel('./data/level_us_01_01.pak.json', './level_us_01_01_map.png', false)
+        await switchToLevel('./leveljson/level_us_01_01.pak.json', './terrainimages/level_us_01_01_map.png', false)
     },
     us_01_02: async function () {
-        await switchToLevel('./data/level_us_01_02.pak.json', './level_us_01_02_map.png', false)
+        await switchToLevel('./leveljson/level_us_01_02.pak.json', './terrainimages/level_us_01_02_map.png', false)
     },
     us_01_03: async function () {
-        await switchToLevel('./data/level_us_01_03.pak.json', './level_us_01_03_map.png', false)
+        await switchToLevel('./leveljson/level_us_01_03.pak.json', './terrainimages/level_us_01_03_map.png', false)
     },
     us_01_04: async function () {
-        await switchToLevel('./data/level_us_01_04_new.pak.json', './level_us_01_04_new_map.png', false)
+        await switchToLevel('./leveljson/level_us_01_04_new.pak.json', './terrainimages/level_us_01_04_new_map.png', false)
     },
     us_02_01: async function () {
-        await switchToLevel('./data/level_us_02_01.pak.json', './level_us_02_01_map.png', true)
+        await switchToLevel('./leveljson/level_us_02_01.pak.json', './terrainimages/level_us_02_01_map.png', true)
     },
     us_02_02: async function () {
-        await switchToLevel('./data/level_us_02_02_new.pak.json', './level_us_02_02_new_map.png', true)
+        await switchToLevel('./leveljson/level_us_02_02_new.pak.json', './terrainimages/level_us_02_02_new_map.png', true)
     },
     us_02_03: async function () {
-        await switchToLevel('./data/level_us_02_03_new.pak.json', './level_us_02_03_new_map.png', true)
+        await switchToLevel('./leveljson/level_us_02_03_new.pak.json', './terrainimages/level_us_02_03_new_map.png', true)
     },
     us_02_04: async function () {
-        await switchToLevel('./data/level_us_02_04_new.pak.json', './level_us_02_04_new_map.png', true)
+        await switchToLevel('./leveljson/level_us_02_04_new.pak.json', './terrainimages/level_us_02_04_new_map.png', true)
     },
     clear: function () {
         clearScene(scene)
