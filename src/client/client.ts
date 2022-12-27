@@ -6,6 +6,7 @@ import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
+    //michigan
     us_01_01: async function () {
         await switchToLevel(
             './leveljson/level_us_01_01.pak.json',
@@ -34,6 +35,7 @@ const maps = {
             false
         )
     },
+    //alaska
     us_02_01: async function () {
         await switchToLevel(
             './leveljson/level_us_02_01.pak.json',
@@ -62,8 +64,175 @@ const maps = {
             true
         )
     },
-    clear: function () {
-        clearScene(scene)
+    // taymyr
+    ru_02_01: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_02_01_crop.pak.json',
+            './terrainimages/level_ru_02_01_crop_map.png',
+            false
+        )
+    },
+    ru_02_02: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_02_02.pak.json',
+            './terrainimages/level_ru_02_02_map.png',
+            false
+        )
+    },
+    ru_02_03: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_02_03.pak.json',
+            './terrainimages/level_ru_02_03_map.png',
+            false
+        )
+    },
+    ru_02_04: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_02_04.pak.json',
+            './terrainimages/level_ru_02_04_map.png',
+            false
+        )
+    },
+    // kola
+    ru_03_01: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_03_01.pak.json',
+            './terrainimages/level_ru_03_01_crop_map.png',
+            true
+        )
+    },
+    ru_03_02: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_03_02.pak.json',
+            './terrainimages/level_ru_03_02_map.png',
+            true
+        )
+    },
+    // amur
+    ru_04_01: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_04_01.pak.json',
+            './terrainimages/level_ru_04_01_crop_map.png',
+            true
+        )
+    },
+    ru_04_02: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_04_02.pak.json',
+            './terrainimages/level_ru_04_02_map.png',
+            true
+        )
+    },
+    ru_04_03: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_04_03.pak.json',
+            './terrainimages/level_ru_04_03_map.png',
+            true
+        )
+    },
+    ru_04_04: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_04_04.pak.json',
+            './terrainimages/level_ru_04_04_map.png',
+            true
+        )
+    },
+    // don
+    ru_05_01: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_05_01.pak.json',
+            './terrainimages/level_ru_05_01_crop_map.png',
+            false
+        )
+    },
+    ru_05_02: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_05_02.pak.json',
+            './terrainimages/level_ru_05_02_map.png',
+            false
+        )
+    },
+    // belozersk
+    ru_08_01: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_08_01.pak.json',
+            './terrainimages/level_ru_08_01_crop_map.png',
+            false
+        )
+    },
+    ru_08_02: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_08_02.pak.json',
+            './terrainimages/level_ru_08_02_map.png',
+            false
+        )
+    },
+    ru_08_03: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_08_03.pak.json',
+            './terrainimages/level_ru_08_03_map.png',
+            false
+        )
+    },
+    ru_08_04: async function () {
+        await switchToLevel(
+            './leveljson/level_ru_08_04.pak.json',
+            './terrainimages/level_ru_08_04_map.png',
+            false
+        )
+    },
+    //wisconsin
+    us_03_01: async function () {
+        await switchToLevel(
+            './leveljson/level_us_03_01.pak.json',
+            './terrainimages/level_us_03_01_map.png',
+            false
+        )
+    },
+    us_03_02: async function () {
+        await switchToLevel(
+            './leveljson/level_us_03_02.pak.json',
+            './terrainimages/level_us_03_02_map.png',
+            false
+        )
+    },
+    //yukon
+    us_04_01: async function () {
+        await switchToLevel(
+            './leveljson/level_us_04_01.pak.json',
+            './terrainimages/level_us_04_01_map.png',
+            false
+        )
+    },
+    us_04_02: async function () {
+        await switchToLevel(
+            './leveljson/level_us_04_02.pak.json',
+            './terrainimages/level_us_04_02_map.png',
+            true
+        )
+    },
+    //Maine
+    us_06_01: async function () {
+        await switchToLevel(
+            './leveljson/level_us_06_01.pak.json',
+            './terrainimages/level_us_06_01_map.png',
+            false
+        )
+    },
+    us_06_02: async function () {
+        await switchToLevel(
+            './leveljson/level_us_06_02.pak.json',
+            './terrainimages/level_us_06_02_map.png',
+            true
+        )
+    },
+    //Tennessee
+    us_07_01: async function () {
+        await switchToLevel(
+            './leveljson/level_us_07_01.pak.json',
+            './terrainimages/level_us_07_01_map.png',
+            false
+        )
     },
 }
 const scene = new THREE.Scene()
@@ -126,7 +295,13 @@ function init() {
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
     layersFolder.open()
-    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
+
+    const allMapFunctionNames = Object.getOwnPropertyNames(maps)
+    for (const functionName of allMapFunctionNames) {
+        mapsFolder.add(maps, functionName, true)
+        
+    }
+/*    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
     mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
     mapsFolder.add(maps, 'us_01_03', true).name('Island Lake')
     mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
@@ -134,7 +309,7 @@ function init() {
     mapsFolder.add(maps, 'us_02_01', true).name('North Port')
     mapsFolder.add(maps, 'us_02_02', true).name('Mountain River')
     mapsFolder.add(maps, 'us_02_03', true).name('White Valley')
-    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')
+    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')*/
     mapsFolder.open()
 }
 
