@@ -14,7 +14,6 @@ import {
     modelMaterial,
     zoneMaterial,
     truckMaterial,
-    terrainFromFileMaterial,
     brownsMaterial,
     greysMaterial,
 } from './materials'
@@ -22,18 +21,18 @@ import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { Scene } from 'three'
 
-export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, terrainPath: string) {
+export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, levelTexture:THREE.Texture) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
     //SR map points run bottom to top, right to left. So we have to reverse points in both axes
-    // All the coordinate weirdness is done here so we can be in sane happy land for objects ON the map
+    // All the coordinate weirdness is done to the terrain mesh so we can be in sane happy land for objects ON the map
     const listToReverse = [...heightMapList]
     const reversedList = listToReverse.reverse()
     const chunked = chunk(reversedList, mapSize.pointsX)
     const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
 
     addLandmarks(landmarks, scene)
-    addTerrain(mapSize, terrainPath, scene, fixedHeightMap)
+    addTerrain(mapSize, levelTexture, scene, fixedHeightMap)
     addModels(models, scene)
     addZones(zones, scene, fixedHeightMap, mapSize)
     addTrucks(trucks, scene)
@@ -140,7 +139,7 @@ function addModels(models: ModelCoords[], scene: THREE.Scene) {
 
 function addTerrain(
     mapSize: MapSize,
-    terrainPath: string,
+    levelTexture: THREE.Texture,
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
@@ -150,7 +149,7 @@ function addTerrain(
         mapSize.pointsX - 1,
         mapSize.pointsZ - 1
     )
-    geometry.name = terrainPath + 'terraingeom'
+    geometry.name = 'terraingeom'
 
     geometry.rotateX(-Math.PI / 2) // flat plane
     geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
@@ -161,7 +160,11 @@ function addTerrain(
         vertices.setY(i, heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
 
-    const terrainMesh = new THREE.Mesh(geometry, terrainFromFileMaterial(terrainPath))
+    const material =  new THREE.MeshPhongMaterial({
+        name: 'terrainMaterial',
+        map: levelTexture,
+    })
+    const terrainMesh = new THREE.Mesh(geometry, material)
     terrainMesh.name = 'terrainMesh'
     scene.add(terrainMesh)
 }

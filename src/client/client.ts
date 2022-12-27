@@ -7,33 +7,64 @@ import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
     us_01_01: async function () {
-        await switchToLevel('./leveljson/level_us_01_01.pak.json', './terrainimages/level_us_01_01_map.png', false)
+        await switchToLevel(
+            './leveljson/level_us_01_01.pak.json',
+            './terrainimages/level_us_01_01_map.png',
+            false
+        )
     },
     us_01_02: async function () {
-        await switchToLevel('./leveljson/level_us_01_02.pak.json', './terrainimages/level_us_01_02_map.png', false)
+        await switchToLevel(
+            './leveljson/level_us_01_02.pak.json',
+            './terrainimages/level_us_01_02_map.png',
+            false
+        )
     },
     us_01_03: async function () {
-        await switchToLevel('./leveljson/level_us_01_03.pak.json', './terrainimages/level_us_01_03_map.png', false)
+        await switchToLevel(
+            './leveljson/level_us_01_03.pak.json',
+            './terrainimages/level_us_01_03_map.png',
+            false
+        )
     },
     us_01_04: async function () {
-        await switchToLevel('./leveljson/level_us_01_04_new.pak.json', './terrainimages/level_us_01_04_new_map.png', false)
+        await switchToLevel(
+            './leveljson/level_us_01_04_new.pak.json',
+            './terrainimages/level_us_01_04_new_map.png',
+            false
+        )
     },
     us_02_01: async function () {
-        await switchToLevel('./leveljson/level_us_02_01.pak.json', './terrainimages/level_us_02_01_map.png', true)
+        await switchToLevel(
+            './leveljson/level_us_02_01.pak.json',
+            './terrainimages/level_us_02_01_map.png',
+            true
+        )
     },
     us_02_02: async function () {
-        await switchToLevel('./leveljson/level_us_02_02_new.pak.json', './terrainimages/level_us_02_02_new_map.png', true)
+        await switchToLevel(
+            './leveljson/level_us_02_02_new.pak.json',
+            './terrainimages/level_us_02_02_new_map.png',
+            true
+        )
     },
     us_02_03: async function () {
-        await switchToLevel('./leveljson/level_us_02_03_new.pak.json', './terrainimages/level_us_02_03_new_map.png', true)
+        await switchToLevel(
+            './leveljson/level_us_02_03_new.pak.json',
+            './terrainimages/level_us_02_03_new_map.png',
+            true
+        )
     },
     us_02_04: async function () {
-        await switchToLevel('./leveljson/level_us_02_04_new.pak.json', './terrainimages/level_us_02_04_new_map.png', true)
+        await switchToLevel(
+            './leveljson/level_us_02_04_new.pak.json',
+            './terrainimages/level_us_02_04_new_map.png',
+            true
+        )
     },
     clear: function () {
         clearScene(scene)
     },
-    
 }
 const scene = new THREE.Scene()
 
@@ -58,12 +89,7 @@ animate()
 // load initial map:
 maps.us_01_01()
 
-async function switchToLevel(levelJsonPath: string, terrainImagePath: string, isSnow: boolean) {
-    const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
-    clearScene(scene)
-    setUpMeshesFromMap(scene, levelJson, terrainImagePath)
-    setUpLights(scene, isSnow)
-}
+
 
 //-----------------------
 function init() {
@@ -108,7 +134,7 @@ function init() {
     mapsFolder.add(maps, 'us_02_01', true).name('North Port')
     mapsFolder.add(maps, 'us_02_02', true).name('Mountain River')
     mapsFolder.add(maps, 'us_02_03', true).name('White Valley')
-    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay') 
+    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')
     mapsFolder.open()
 }
 
@@ -215,13 +241,53 @@ function clearScene(scene: THREE.Scene) {
     }
 }
 
+//---------------- fetchies:
+async function switchToLevel(levelJsonPath: string, terrainImagePath: string, isSnow: boolean) {
+    const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
+    const levelTexture = await fetchLevelTexture(terrainImagePath)
+    clearScene(scene)
+    setUpMeshesFromMap(scene, levelJson, levelTexture)
+    setUpLights(scene, isSnow)
+}
+
 async function fetchLevelJson(path: string): Promise<LevelJson> {
     const response = await window.fetch(path)
     const json: LevelJson = await response.json()
     if (response.ok) {
         return json
     } else {
-        const error = new Error(`Failed to fetch level JSON from path ${path}, ${response.statusText}` )
+        const error = new Error(
+            `Failed to fetch level JSON from path ${path}, ${response.statusText}`
+        )
         return Promise.reject(error)
     }
+}
+
+async function fetchLevelTexture(terrainImagePath: string) {
+    const loadManager = new THREE.LoadingManager()
+    const loader = new THREE.TextureLoader(loadManager)
+
+    const loadingSpinner = document.getElementById('loading-spinner')
+    loadManager.onError = () => {
+        //console.log('error')
+    }
+    loadManager.onLoad = () => {
+        //console.log('load')
+        if (loadingSpinner !== null) {
+            loadingSpinner.style.display = 'none'
+        }
+    }
+    loadManager.onStart = () => {
+        //console.log('start')
+        if (loadingSpinner !== null) {
+            loadingSpinner.style.display = 'block'
+        }
+    }
+    loadManager.onProgress = () => {
+        //console.log('progress')
+    }
+
+    const levelTexture = await loader.loadAsync(terrainImagePath)
+    levelTexture.flipY = false
+    return levelTexture
 }
