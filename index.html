@@ -15,14 +15,24 @@
                 color: white;
                 padding: 5px 20px;
                 font: message-box;
-                display: inline-block;
-                z-index: 100;
+                display: none;
+                z-index: 10;
+            }
+            #loading-spinner {
+                position: absolute;
+                background: #fc010154;
+                color: white;
+                padding: 5px 20px;
+                font: message-box;
+                width: 100%;
+                text-align: center;
             }
         </style>
     </head>
 
     <body>
         <div id="info"></div>
+        <div id="loading-spinner">Loading...</div>
         <script type="module" src="bundle.js"></script>
     </body>
 </html>
