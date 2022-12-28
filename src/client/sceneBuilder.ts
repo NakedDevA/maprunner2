@@ -21,7 +21,7 @@ import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { Scene } from 'three'
 
-export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, levelTexture:THREE.Texture) {
+export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, levelTexture:THREE.Texture, tintTexture:THREE.Texture) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
     //SR map points run bottom to top, right to left. So we have to reverse points in both axes
@@ -32,7 +32,7 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, lev
     const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
 
     addLandmarks(landmarks, scene)
-    addTerrain(mapSize, levelTexture, scene, fixedHeightMap)
+    addTerrain(mapSize, levelTexture,tintTexture, scene, fixedHeightMap)
     addModels(models, scene)
     addZones(zones, scene, fixedHeightMap, mapSize)
     addTrucks(trucks, scene)
@@ -140,6 +140,7 @@ function addModels(models: ModelCoords[], scene: THREE.Scene) {
 function addTerrain(
     mapSize: MapSize,
     levelTexture: THREE.Texture,
+    tintTexture: THREE.Texture,
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
@@ -163,6 +164,8 @@ function addTerrain(
     const material =  new THREE.MeshPhongMaterial({
         name: 'terrainMaterial',
         map: levelTexture,
+        specularMap:tintTexture,
+        shininess: 50
     })
     const terrainMesh = new THREE.Mesh(geometry, material)
     terrainMesh.name = 'terrainMesh'
