@@ -21,7 +21,12 @@ import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { Scene } from 'three'
 
-export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, levelTexture:THREE.Texture, tintTexture:THREE.Texture) {
+export function setUpMeshesFromMap(
+    scene: THREE.Scene,
+    levelJson: LevelJson,
+    levelTexture: THREE.Texture,
+    tintTexture: THREE.Texture
+) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
     //SR map points run bottom to top, right to left. So we have to reverse points in both axes
@@ -32,7 +37,7 @@ export function setUpMeshesFromMap(scene: THREE.Scene, levelJson: LevelJson, lev
     const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
 
     addLandmarks(landmarks, scene)
-    addTerrain(mapSize, levelTexture,tintTexture, scene, fixedHeightMap)
+    addTerrain(mapSize, levelTexture, tintTexture, scene, fixedHeightMap)
     addModels(models, scene)
     addZones(zones, scene, fixedHeightMap, mapSize)
     addTrucks(trucks, scene)
@@ -126,6 +131,7 @@ function addModels(models: ModelCoords[], scene: THREE.Scene) {
         //console.log(model.type)
         for (const entry of model.models) {
             // some models correspond to the landmarks we're already drawing, don't duplicate
+            // qqtas will revisit this when we want to rotate models- landmarks have no rotation so we'll want to overdraw the model
             if (!model.landmark.length) {
                 var newBox1 = new THREE.BoxGeometry(2, 2, 2)
                 newBox1.translate(-entry.x, entry.y, entry.z)
@@ -161,14 +167,17 @@ function addTerrain(
         vertices.setY(i, heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
 
-    const material =  new THREE.MeshPhongMaterial({
+    const material = new THREE.MeshPhongMaterial({
         name: 'terrainMaterial',
         map: levelTexture,
-        specularMap:tintTexture,
-        shininess: 50
+        specularMap: tintTexture,
+        shininess: 50,
+        //wireframe:true
     })
     const terrainMesh = new THREE.Mesh(geometry, material)
     terrainMesh.name = 'terrainMesh'
+    terrainMesh.castShadow = true
+    terrainMesh.receiveShadow = true
     scene.add(terrainMesh)
 }
 

@@ -10,28 +10,32 @@ const maps = {
     us_01_01: async function () {
         await switchToLevel(
             './leveljson/level_us_01_01.pak.json',
-            './terrainimages/level_us_01_01_map.png', './tint/level_us_01_01_tint_map__cmp.png',
+            './terrainimages/level_us_01_01_map.png',
+            './tint/level_us_01_01_tint_map__cmp.png',
             false
         )
     },
     us_01_02: async function () {
         await switchToLevel(
             './leveljson/level_us_01_02.pak.json',
-            './terrainimages/level_us_01_02_map.png', './tint/level_us_01_02_tint_map__cmp.png',
+            './terrainimages/level_us_01_02_map.png',
+            './tint/level_us_01_02_tint_map__cmp.png',
             false
         )
     },
     us_01_03: async function () {
         await switchToLevel(
             './leveljson/level_us_01_03.pak.json',
-            './terrainimages/level_us_01_03_map.png', './tint/level_us_01_03_tint_map__cmp.png',
+            './terrainimages/level_us_01_03_map.png',
+            './tint/level_us_01_03_tint_map__cmp.png',
             false
         )
     },
     us_01_04: async function () {
         await switchToLevel(
             './leveljson/level_us_01_04_new.pak.json',
-            './terrainimages/level_us_01_04_new_map.png', './tint/level_us_01_04_new_tint_map__cmp.png',
+            './terrainimages/level_us_01_04_new_map.png',
+            './tint/level_us_01_04_new_tint_map__cmp.png',
             false
         )
     },
@@ -39,28 +43,32 @@ const maps = {
     us_02_01: async function () {
         await switchToLevel(
             './leveljson/level_us_02_01.pak.json',
-            './terrainimages/level_us_02_01_map.png', './tint/level_us_02_01_tint_map__cmp.png',
+            './terrainimages/level_us_02_01_map.png',
+            './tint/level_us_02_01_tint_map__cmp.png',
             true
         )
     },
     us_02_02: async function () {
         await switchToLevel(
             './leveljson/level_us_02_02_new.pak.json',
-            './terrainimages/level_us_02_02_new_map.png', './tint/level_us_02_02_new_tint_map__cmp.png',
+            './terrainimages/level_us_02_02_new_map.png',
+            './tint/level_us_02_02_new_tint_map__cmp.png',
             true
         )
     },
     us_02_03: async function () {
         await switchToLevel(
             './leveljson/level_us_02_03_new.pak.json',
-            './terrainimages/level_us_02_03_new_map.png', './tint/level_us_02_03_new_tint_map__cmp.png',
+            './terrainimages/level_us_02_03_new_map.png',
+            './tint/level_us_02_03_new_tint_map__cmp.png',
             true
         )
     },
     us_02_04: async function () {
         await switchToLevel(
             './leveljson/level_us_02_04_new.pak.json',
-            './terrainimages/level_us_02_04_new_map.png', './tint/level_us_02_04_new_tint_map__cmp.png',
+            './terrainimages/level_us_02_04_new_map.png',
+            './tint/level_us_02_04_new_tint_map__cmp.png',
             true
         )
     },
@@ -68,28 +76,32 @@ const maps = {
     ru_02_01: async function () {
         await switchToLevel(
             './leveljson/level_ru_02_01_crop.pak.json',
-            './terrainimages/level_ru_02_01_crop_map.png', './tint/level_ru_02_01_crop_tint_map__cmp.png',
+            './terrainimages/level_ru_02_01_crop_map.png',
+            './tint/level_ru_02_01_crop_tint_map__cmp.png',
             false
         )
     },
     ru_02_02: async function () {
         await switchToLevel(
             './leveljson/level_ru_02_02.pak.json',
-            './terrainimages/level_ru_02_02_map.png', './tint/level_ru_02_02_tint_map__cmp.png',
+            './terrainimages/level_ru_02_02_map.png',
+            './tint/level_ru_02_02_tint_map__cmp.png',
             false
         )
     },
     ru_02_03: async function () {
         await switchToLevel(
             './leveljson/level_ru_02_03.pak.json',
-            './terrainimages/level_ru_02_03_map.png', './tint/level_ru_02_03_tint_map__cmp.png',
+            './terrainimages/level_ru_02_03_map.png',
+            './tint/level_ru_02_03_tint_map__cmp.png',
             false
         )
     },
     ru_02_04: async function () {
         await switchToLevel(
             './leveljson/level_ru_02_04.pak.json',
-            './terrainimages/level_ru_02_04_map.png', './tint/level_ru_02_04_tint_map__cmp.png',
+            './terrainimages/level_ru_02_04_map.png',
+            './tint/level_ru_02_04_tint_map__cmp.png',
             false
         )
     },
@@ -97,14 +109,16 @@ const maps = {
     ru_03_01: async function () {
         await switchToLevel(
             './leveljson/level_ru_03_01.pak.json',
-            './terrainimages/level_ru_03_01_map.png', './tint/level_ru_03_01_tint_map__cmp.png',
+            './terrainimages/level_ru_03_01_map.png',
+            './tint/level_ru_03_01_tint_map__cmp.png',
             true
         )
     },
     ru_03_02: async function () {
         await switchToLevel(
             './leveljson/level_ru_03_02.pak.json',
-            './terrainimages/level_ru_03_02_map.png', './tint/level_ru_03_02_tint_map__cmp.png',
+            './terrainimages/level_ru_03_02_map.png',
+            './tint/level_ru_03_02_tint_map__cmp.png',
             true
         )
     },
@@ -112,28 +126,32 @@ const maps = {
     ru_04_01: async function () {
         await switchToLevel(
             './leveljson/level_ru_04_01.pak.json',
-            './terrainimages/level_ru_04_01_map.png', './tint/level_ru_04_01_tint_map__cmp.png',
+            './terrainimages/level_ru_04_01_map.png',
+            './tint/level_ru_04_01_tint_map__cmp.png',
             true
         )
     },
     ru_04_02: async function () {
         await switchToLevel(
             './leveljson/level_ru_04_02.pak.json',
-            './terrainimages/level_ru_04_02_map.png', './tint/level_ru_04_02_tint_map__cmp.png',
+            './terrainimages/level_ru_04_02_map.png',
+            './tint/level_ru_04_02_tint_map__cmp.png',
             true
         )
     },
     ru_04_03: async function () {
         await switchToLevel(
             './leveljson/level_ru_04_03.pak.json',
-            './terrainimages/level_ru_04_03_map.png', './tint/level_ru_04_03_tint_map__cmp.png',
+            './terrainimages/level_ru_04_03_map.png',
+            './tint/level_ru_04_03_tint_map__cmp.png',
             true
         )
     },
     ru_04_04: async function () {
         await switchToLevel(
             './leveljson/level_ru_04_04.pak.json',
-            './terrainimages/level_ru_04_04_map.png', './tint/level_ru_04_04_tint_map__cmp.png',
+            './terrainimages/level_ru_04_04_map.png',
+            './tint/level_ru_04_04_tint_map__cmp.png',
             true
         )
     },
@@ -141,14 +159,16 @@ const maps = {
     ru_05_01: async function () {
         await switchToLevel(
             './leveljson/level_ru_05_01.pak.json',
-            './terrainimages/level_ru_05_01_map.png', './tint/level_ru_05_01_tint_map__cmp.png',
+            './terrainimages/level_ru_05_01_map.png',
+            './tint/level_ru_05_01_tint_map__cmp.png',
             false
         )
     },
     ru_05_02: async function () {
         await switchToLevel(
             './leveljson/level_ru_05_02.pak.json',
-            './terrainimages/level_ru_05_02_map.png', './tint/level_ru_05_02_tint_map__cmp.png',
+            './terrainimages/level_ru_05_02_map.png',
+            './tint/level_ru_05_02_tint_map__cmp.png',
             false
         )
     },
@@ -156,28 +176,32 @@ const maps = {
     ru_08_01: async function () {
         await switchToLevel(
             './leveljson/level_ru_08_01.pak.json',
-            './terrainimages/level_ru_08_01_map.png', './tint/level_ru_08_01_tint_map__cmp.png',
+            './terrainimages/level_ru_08_01_map.png',
+            './tint/level_ru_08_01_tint_map__cmp.png',
             false
         )
     },
     ru_08_02: async function () {
         await switchToLevel(
             './leveljson/level_ru_08_02.pak.json',
-            './terrainimages/level_ru_08_02_map.png', './tint/level_ru_08_02_tint_map__cmp.png',
+            './terrainimages/level_ru_08_02_map.png',
+            './tint/level_ru_08_02_tint_map__cmp.png',
             false
         )
     },
     ru_08_03: async function () {
         await switchToLevel(
             './leveljson/level_ru_08_03.pak.json',
-            './terrainimages/level_ru_08_03_map.png', './tint/level_ru_08_03_tint_map__cmp.png',
+            './terrainimages/level_ru_08_03_map.png',
+            './tint/level_ru_08_03_tint_map__cmp.png',
             false
         )
     },
     ru_08_04: async function () {
         await switchToLevel(
             './leveljson/level_ru_08_04.pak.json',
-            './terrainimages/level_ru_08_04_map.png', './tint/level_ru_08_04_tint_map__cmp.png',
+            './terrainimages/level_ru_08_04_map.png',
+            './tint/level_ru_08_04_tint_map__cmp.png',
             false
         )
     },
@@ -185,14 +209,16 @@ const maps = {
     us_03_01: async function () {
         await switchToLevel(
             './leveljson/level_us_03_01.pak.json',
-            './terrainimages/level_us_03_01_map.png', './tint/level_us_03_01_tint_map__cmp.png',
+            './terrainimages/level_us_03_01_map.png',
+            './tint/level_us_03_01_tint_map__cmp.png',
             false
         )
     },
     us_03_02: async function () {
         await switchToLevel(
             './leveljson/level_us_03_02.pak.json',
-            './terrainimages/level_us_03_02_map.png', './tint/level_us_03_02_tint_map__cmp.png',
+            './terrainimages/level_us_03_02_map.png',
+            './tint/level_us_03_02_tint_map__cmp.png',
             false
         )
     },
@@ -200,14 +226,16 @@ const maps = {
     us_04_01: async function () {
         await switchToLevel(
             './leveljson/level_us_04_01.pak.json',
-            './terrainimages/level_us_04_01_map.png', './tint/level_us_04_01_tint_map__cmp.png',
+            './terrainimages/level_us_04_01_map.png',
+            './tint/level_us_04_01_tint_map__cmp.png',
             false
         )
     },
     us_04_02: async function () {
         await switchToLevel(
             './leveljson/level_us_04_02.pak.json',
-            './terrainimages/level_us_04_02_map.png', './tint/level_us_04_02_tint_map__cmp.png',
+            './terrainimages/level_us_04_02_map.png',
+            './tint/level_us_04_02_tint_map__cmp.png',
             true
         )
     },
@@ -215,14 +243,16 @@ const maps = {
     us_06_01: async function () {
         await switchToLevel(
             './leveljson/level_us_06_01.pak.json',
-            './terrainimages/level_us_06_01_map.png', './tint/level_us_06_01_tint_map__cmp.png',
+            './terrainimages/level_us_06_01_map.png',
+            './tint/level_us_06_01_tint_map__cmp.png',
             false
         )
     },
     us_06_02: async function () {
         await switchToLevel(
             './leveljson/level_us_06_02.pak.json',
-            './terrainimages/level_us_06_02_map.png', './tint/level_us_06_02_tint_map__cmp.png',
+            './terrainimages/level_us_06_02_map.png',
+            './tint/level_us_06_02_tint_map__cmp.png',
             true
         )
     },
@@ -230,7 +260,8 @@ const maps = {
     us_07_01: async function () {
         await switchToLevel(
             './leveljson/level_us_07_01.pak.json',
-            './terrainimages/level_us_07_01_map.png', './tint/level_us_07_01_tint_map__cmp.png',
+            './terrainimages/level_us_07_01_map.png',
+            './tint/level_us_07_01_tint_map__cmp.png',
             false
         )
     },
@@ -249,6 +280,9 @@ export const enum LAYERS {
 }
 var INTERSECTED: any //currently hovered item
 const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
 
@@ -258,12 +292,11 @@ animate()
 // load initial map:
 maps.us_01_01()
 
-
-
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
-    camera.position.set(0, 800, -900) // qqtas may be based on map size
+    //camera.position.set(0, 800, -900) // qqtas may be based on map size
+    camera.position.set(-625, 182, -329) // shadow debug position on br
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
@@ -299,9 +332,8 @@ function init() {
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
     for (const functionName of allMapFunctionNames) {
         mapsFolder.add(maps, functionName, true)
-        
     }
-/*    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
+    /*    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
     mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
     mapsFolder.add(maps, 'us_01_03', true).name('Island Lake')
     mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
@@ -315,9 +347,30 @@ function init() {
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
-    dirLight1.position.set(0.5, 1, 0)
-    dirLight1.intensity = isWinter ? 0.7 : 0.85 // avoid blowing eyes out on snow
+    dirLight1.position.set(2000, 750, 0)
+    dirLight1.intensity = isWinter ? 0.7 : 0.95 // avoid blowing eyes out on snow
+    dirLight1.castShadow = true
+    const r=40
+    const d=1000
+    const mapSize=2000
+    dirLight1.shadow.radius = r;
+    dirLight1.shadow.mapSize.width = mapSize;
+    dirLight1.shadow.mapSize.height = mapSize;
+    dirLight1.shadow.camera.top = dirLight1.shadow.camera.right = d;
+    dirLight1.shadow.camera.bottom = dirLight1.shadow.camera.left = -d;
+    dirLight1.shadow.camera.near = 1;
+    dirLight1.shadow.camera.far = 20000;
+    dirLight1.shadow.blurSamples = 8
+    dirLight1.shadow.bias = 0.0005
+    //dirLight1.shadow.normalBias = 2.5 // 2.5 removes all banding
+   // dirLight1.shadow.camera.visible = true;
+   scene.add(new THREE.DirectionalLightHelper(dirLight1))
+
+
+
     scene.add(dirLight1)
+
+    //scene.add( new THREE.CameraHelper( dirLight1.shadow.camera ) )
 
     const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
     dirLight2.position.set(-1, -1, -1)
@@ -417,7 +470,13 @@ function clearScene(scene: THREE.Scene) {
 }
 
 //---------------- fetchies:
-async function switchToLevel(levelJsonPath: string, terrainImagePath: string, tintImagePath: string, isSnow: boolean) {
+async function switchToLevel(
+    levelJsonPath: string,
+    terrainImagePath: string,
+    tintImagePath: string,
+    isSnow: boolean
+) {
+    console.log(camera.position)
     const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
     const levelTexture = await fetchLevelTexture(terrainImagePath)
     const tintTexture = await fetchLevelTexture(tintImagePath)
