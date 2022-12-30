@@ -521,8 +521,14 @@ async function fetchLevelTexture(terrainImagePath: string) {
     loadManager.onProgress = () => {
         //console.log('progress')
     }
-
-    const levelTexture = await loader.loadAsync(terrainImagePath)
-    levelTexture.flipY = false
-    return levelTexture
+    try {
+        const levelTexture = await loader.loadAsync(terrainImagePath)
+        levelTexture.flipY = false
+        console.log(levelTexture?.name)
+        return levelTexture
+    } catch (error) {
+        console.log ('Failed to load texture! Have you set the filenames correctly?')
+        console.log (error)
+        return new THREE.Texture()
+    }
 }
