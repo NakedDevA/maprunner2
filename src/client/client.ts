@@ -6,6 +6,88 @@ import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
+
+    //trials:
+    trial_01_01: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_01_01.pak.json',
+            './terrainimages/level_trial_01_01_map.png',
+            './tint/level_trial_01_01_tint_map__cmp.png',
+            false
+        )
+    },
+    trial_01_02: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_01_02.pak.json',
+            './terrainimages/level_trial_01_02_map.png',
+            './tint/level_trial_01_02_tint_map__cmp.png',
+            false
+        )
+    },
+    trial_02_01: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_02_01.pak.json',
+            './terrainimages/level_trial_02_01_map.png',
+            './tint/level_trial_02_01_tint_map__cmp.png',
+            true
+        )
+    },
+    trial_02_02: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_02_02.pak.json',
+            './terrainimages/level_trial_02_02_map.png',
+            './tint/level_trial_02_02_tint_map__cmp.png',
+            true
+        )
+    },
+    trial_03_01: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_03_01.pak.json',
+            './terrainimages/level_trial_03_01_map.png',
+            './tint/level_trial_03_01_tint_map__cmp.png',
+            true
+        )
+    },
+    trial_03_02: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_03_02.pak.json',
+            './terrainimages/level_trial_03_02_map.png',
+            './tint/level_trial_03_02_tint_map__cmp.png',
+            false
+        )
+    },
+    trial_03_03: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_03_03.pak.json',
+            './terrainimages/level_trial_03_03_map.png',
+            './tint/level_trial_03_03_tint_map__cmp.png',
+            false
+        )
+    },
+    trial_04_01: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_04_01.pak.json',
+            './terrainimages/level_trial_04_01_map.png',
+            './tint/level_trial_04_01_tint_map__cmp.png',
+            false
+        )
+    },
+    trial_04_02: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_04_02.pak.json',
+            './terrainimages/level_trial_04_02_map.png',
+            './tint/level_trial_04_02_tint_map__cmp.png',
+            true
+        )
+    },
+    trial_05_01: async function () {
+        await switchToLevel(
+            './leveljson/level_trial_05_01.pak.json',
+            './terrainimages/level_trial_05_01_map.png',
+            './tint/level_trial_05_01_tint_map__cmp.png',
+            false
+        )
+    },
     //michigan
     us_01_01: async function () {
         await switchToLevel(
