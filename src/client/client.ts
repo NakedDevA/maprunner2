@@ -6,15 +6,6 @@ import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
-    //polygon
-    polygon: async function() {
-        await switchToLevel(
-            './leveljson/level_ru_test_polygon.pak.json',
-            './terrainimages/level_ru_test_polygon_map.png',
-            './tint/level_ru_test_polygon_map__cmp.png',
-            false
-        )        
-    },
     //michigan
     us_01_01: async function () {
         await switchToLevel(
@@ -304,7 +295,6 @@ maps.us_01_01()
 function init() {
     scene.background = new THREE.Color(0x444444)
     camera.position.set(0, 800, -900) // qqtas may be based on map size
-    //camera.position.set(-625, 182, -329) // shadow debug position on br
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
@@ -341,22 +331,13 @@ function init() {
     for (const functionName of allMapFunctionNames) {
         mapsFolder.add(maps, functionName, true)
     }
-    /*    mapsFolder.add(maps, 'us_01_01', true).name('Black River')
-    mapsFolder.add(maps, 'us_01_02', true).name('Smithville Dam')
-    mapsFolder.add(maps, 'us_01_03', true).name('Island Lake')
-    mapsFolder.add(maps, 'us_01_04', true).name('Drummond Island')
-
-    mapsFolder.add(maps, 'us_02_01', true).name('North Port')
-    mapsFolder.add(maps, 'us_02_02', true).name('Mountain River')
-    mapsFolder.add(maps, 'us_02_03', true).name('White Valley')
-    mapsFolder.add(maps, 'us_02_04', true).name('Pedro Bay')*/
     mapsFolder.open()
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
-    dirLight1.position.set(2000, 750, 0)
-    dirLight1.intensity = isWinter ? 0.9 : 1.95 // avoid blowing eyes out on snow
+    dirLight1.position.set(2000, 1250, 0)
+    dirLight1.intensity = isWinter ? 0.9 : 1.2 // avoid blowing eyes out on snow
     dirLight1.castShadow = true
     const r = 3
     const d = 1000
@@ -371,24 +352,17 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     dirLight1.shadow.blurSamples = 16
     dirLight1.shadow.bias = 0.0005
     //dirLight1.shadow.normalBias = 2.5 // 2.5 removes all banding
-    // dirLight1.shadow.camera.visible = true;
-    scene.add(new THREE.DirectionalLightHelper(dirLight1))
-
+    //scene.add(new THREE.DirectionalLightHelper(dirLight1))
     scene.add(dirLight1)
-
     //scene.add( new THREE.CameraHelper( dirLight1.shadow.camera ) )
 
-    const dirLight2 = new THREE.DirectionalLight(0xc44a04) // a sunsetty orange from the bottom corner. Not thought through at all
-    dirLight2.position.set(-1, -1, -1)
-    dirLight2.intensity = 0.2
-    scene.add(dirLight2)
 
     if (isWinter) {
-        const alaskaAmbient = new THREE.AmbientLight(0xffffff)
+        const alaskaAmbient = new THREE.AmbientLight(0xAAEDFF)
         alaskaAmbient.intensity = 0.2 // tinge of blue. Not sure how to make snow look good really
         scene.add(alaskaAmbient)
     } else {
-        const michiganAmbientLight = new THREE.AmbientLight(0xFFADAD) //slightly red - colour corrects mud to brown rather than sickly green
+        const michiganAmbientLight = new THREE.AmbientLight(0xFFADAD) //slightly yellow - colour corrects mud to brown rather than sickly green
         michiganAmbientLight.intensity = 0.5
         scene.add(michiganAmbientLight)
     }

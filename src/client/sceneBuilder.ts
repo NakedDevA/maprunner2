@@ -171,11 +171,11 @@ function addTerrain(
         map: levelTexture,
         specularMap: tintTexture,
         shininess: 50,
-        color:0xFFDADA
+        //color:0xFFDADA //qqtas color correct michigan like this on-demand. Maybe handpicked colour per map?
         //wireframe:true
     })
     const terrainMesh = new THREE.Mesh(geometry, material)
-    
+
     terrainMesh.name = 'terrainMesh'
     terrainMesh.castShadow = true
     terrainMesh.receiveShadow = true
@@ -212,27 +212,32 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
     const landmarkSpruceTreesMesh = addStaticMergedMesh(
         mergedGreenTreeGeoms,
         greenTreeMaterial,
-        scene
+        scene,
+        true
     )
     const landmarkBirchTreesMesh = addStaticMergedMesh(
         mergedAutumnTreeGeoms,
         autumnTreeMaterial,
-        scene
+        scene,
+        true
     )
-    const landmarkBrownsMesh = addStaticMergedMesh(mergedBrownGeoms, brownsMaterial, scene)
-    const landmarkGreysMesh = addStaticMergedMesh(mergedGreyGeoms, greysMaterial, scene)
+    const landmarkBrownsMesh = addStaticMergedMesh(mergedBrownGeoms, brownsMaterial, scene, true)
+    const landmarkGreysMesh = addStaticMergedMesh(mergedGreyGeoms, greysMaterial, scene, true)
 }
 
 function addStaticMergedMesh(
     mergedGeoms: THREE.BufferGeometry[],
     material: THREE.MeshPhongMaterial,
-    scene: THREE.Scene
+    scene: THREE.Scene,
+    castShadow = false
 ) {
     if (!mergedGeoms.length) return
     var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
     const mesh = new THREE.Mesh(mergedBoxes, material)
     mesh.updateMatrix()
     mesh.matrixAutoUpdate = false
+    mesh.castShadow = castShadow
+    mesh.receiveShadow = false
     scene.add(mesh)
 }
 
