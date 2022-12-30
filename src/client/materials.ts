@@ -39,6 +39,6 @@ export const terrainFromFileMaterial = (path: string) => {
     texture.flipY = false
     return new THREE.MeshPhongMaterial({
         name: path,
-        map: texture,
+        map: texture
     })
 }
