@@ -19,7 +19,6 @@ import {
 } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
-import { Scene } from 'three'
 
 export function setUpMeshesFromMap(
     scene: THREE.Scene,
@@ -172,9 +171,11 @@ function addTerrain(
         map: levelTexture,
         specularMap: tintTexture,
         shininess: 50,
+        color:0xFFDADA
         //wireframe:true
     })
     const terrainMesh = new THREE.Mesh(geometry, material)
+    
     terrainMesh.name = 'terrainMesh'
     terrainMesh.castShadow = true
     terrainMesh.receiveShadow = true

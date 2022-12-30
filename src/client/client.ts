@@ -6,6 +6,15 @@ import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
+    //polygon
+    polygon: async function() {
+        await switchToLevel(
+            './leveljson/level_ru_test_polygon.pak.json',
+            './terrainimages/level_ru_test_polygon_map.png',
+            './tint/level_ru_test_polygon_map__cmp.png',
+            false
+        )        
+    },
     //michigan
     us_01_01: async function () {
         await switchToLevel(
@@ -281,7 +290,6 @@ export const enum LAYERS {
 var INTERSECTED: any //currently hovered item
 const renderer = new THREE.WebGLRenderer({ antialias: true })
 renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
@@ -295,8 +303,8 @@ maps.us_01_01()
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
-    //camera.position.set(0, 800, -900) // qqtas may be based on map size
-    camera.position.set(-625, 182, -329) // shadow debug position on br
+    camera.position.set(0, 800, -900) // qqtas may be based on map size
+    //camera.position.set(-625, 182, -329) // shadow debug position on br
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
@@ -348,25 +356,23 @@ function init() {
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
     dirLight1.position.set(2000, 750, 0)
-    dirLight1.intensity = isWinter ? 0.7 : 0.95 // avoid blowing eyes out on snow
+    dirLight1.intensity = isWinter ? 0.9 : 1.95 // avoid blowing eyes out on snow
     dirLight1.castShadow = true
-    const r=40
-    const d=1000
-    const mapSize=2000
-    dirLight1.shadow.radius = r;
-    dirLight1.shadow.mapSize.width = mapSize;
-    dirLight1.shadow.mapSize.height = mapSize;
-    dirLight1.shadow.camera.top = dirLight1.shadow.camera.right = d;
-    dirLight1.shadow.camera.bottom = dirLight1.shadow.camera.left = -d;
-    dirLight1.shadow.camera.near = 1;
-    dirLight1.shadow.camera.far = 20000;
-    dirLight1.shadow.blurSamples = 8
+    const r = 3
+    const d = 1000
+    const mapSize = 4000
+    dirLight1.shadow.radius = r
+    dirLight1.shadow.mapSize.width = mapSize
+    dirLight1.shadow.mapSize.height = mapSize
+    dirLight1.shadow.camera.top = dirLight1.shadow.camera.right = d
+    dirLight1.shadow.camera.bottom = dirLight1.shadow.camera.left = -d
+    dirLight1.shadow.camera.near = 1
+    dirLight1.shadow.camera.far = 20000
+    dirLight1.shadow.blurSamples = 16
     dirLight1.shadow.bias = 0.0005
     //dirLight1.shadow.normalBias = 2.5 // 2.5 removes all banding
-   // dirLight1.shadow.camera.visible = true;
-   scene.add(new THREE.DirectionalLightHelper(dirLight1))
-
-
+    // dirLight1.shadow.camera.visible = true;
+    scene.add(new THREE.DirectionalLightHelper(dirLight1))
 
     scene.add(dirLight1)
 
@@ -378,11 +384,11 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     scene.add(dirLight2)
 
     if (isWinter) {
-        const alaskaAmbient = new THREE.AmbientLight(0x209edf)
-        alaskaAmbient.intensity = 0.1 // tinge of blue. Not sure how to make snow look good really
+        const alaskaAmbient = new THREE.AmbientLight(0xffffff)
+        alaskaAmbient.intensity = 0.2 // tinge of blue. Not sure how to make snow look good really
         scene.add(alaskaAmbient)
     } else {
-        const michiganAmbientLight = new THREE.AmbientLight(0xf57373) //slightly red - colour corrects mud to brown rather than sickly green
+        const michiganAmbientLight = new THREE.AmbientLight(0xFFADAD) //slightly red - colour corrects mud to brown rather than sickly green
         michiganAmbientLight.intensity = 0.5
         scene.add(michiganAmbientLight)
     }
