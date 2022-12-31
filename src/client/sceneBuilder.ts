@@ -193,12 +193,17 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
         for (const entry of landmark.entries) {
             var newBox1 = new THREE.BoxGeometry(3, 2, 3)
             newBox1.translate(-entry.x, entry.y, entry.z)
-            if (landmark.name.includes('spruce_') || landmark.name.includes('tsuga')) {
+            if (
+                landmark.name.includes('spruce_') ||
+                landmark.name.includes('tsuga') ||
+                landmark.name.includes('pine')||
+                landmark.name.includes('larch')
+            ) {
                 mergedGreenTreeGeoms.push(newBox1)
             } else if (
                 landmark.name.includes('birch_') ||
                 landmark.name.includes('aspen') ||
-                landmark.name.includes('sugar_maple')
+                landmark.name.includes('sugar_maple') 
             ) {
                 mergedAutumnTreeGeoms.push(newBox1)
             } else if (landmark.name.includes('swamp_')) {

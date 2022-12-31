@@ -10,12 +10,17 @@ export const greenTreeMaterial = new THREE.MeshPhongMaterial({
     shininess: 0.1,
 })
 export const autumnTreeMaterial = new THREE.MeshPhongMaterial({
-    color: 0x7e3a28,
+    color: '#7e3a28',
+    flatShading: true,
+    shininess: 0.1,
+})
+export const larchTreeMaterial = new THREE.MeshPhongMaterial({
+    color: '#d1910d',
     flatShading: true,
     shininess: 0.1,
 })
 export const brownsMaterial = new THREE.MeshPhongMaterial({
-    color: 0x5c4033,
+    color: '#5c4033',
     flatShading: true,
     shininess: 0.1,
 })
