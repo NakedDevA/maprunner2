@@ -3,7 +3,9 @@ import * as THREE from 'three'
 import { Box3, Layers, Vector3 } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
+import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
+import { setZoneMenu } from './menu'
 
 const maps = {
     //trials:
@@ -372,6 +374,9 @@ animate()
 // load initial map:
 maps.us_01_01()
 
+//set zone menu:
+setZoneMenu('./mapZones/mapzoneslevel_us_01_01.sso.json')
+
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
@@ -553,6 +558,7 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene) {
 }
 
 //---------------- fetchies:
+
 async function switchToLevel(
     levelJsonPath: string,
     terrainImagePath: string,
@@ -560,7 +566,7 @@ async function switchToLevel(
     isSnow: boolean
 ) {
     console.log(camera.position)
-    const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
+    const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath)
     const levelTexture = await fetchLevelTexture(terrainImagePath)
     const tintTexture = await fetchLevelTexture(tintImagePath)
     clearScene(scene)
@@ -568,9 +574,9 @@ async function switchToLevel(
     setUpLights(scene, isSnow)
 }
 
-async function fetchLevelJson(path: string): Promise<LevelJson> {
+export async function fetchJson<T>(path: string): Promise<T> {
     const response = await window.fetch(path)
-    const json: LevelJson = await response.json()
+    const json: T = await response.json()
     if (response.ok) {
         return json
     } else {

@@ -27,6 +27,7 @@
   "dependencies": {
     "dat.gui": "^0.7.9",
     "express": "^4.18.2",
-    "gh-pages": "^4.0.0"
+    "gh-pages": "^4.0.0",
+    "render-jsx": "^0.2.4"
   }
 }
