@@ -92,9 +92,8 @@ function addZones(
         newBox1.applyQuaternion(quaternion)
 
         const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
-        newBox1.translate(-zone.x, approxHeight, zone.z)
-
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
+        mesh.position.set(-zone.x, approxHeight, zone.z) // NB MIRRORED
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Zones)

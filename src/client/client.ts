@@ -1,12 +1,11 @@
 import { GUI } from 'dat.gui'
 import * as THREE from 'three'
-import { Layers } from 'three'
+import { Box3, Layers, Vector3 } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { setUpMeshesFromMap } from './sceneBuilder'
 
 const maps = {
-
     //trials:
     trial_01_01: async function () {
         await switchToLevel(
@@ -414,6 +413,11 @@ function init() {
         mapsFolder.add(maps, functionName, true)
     }
     mapsFolder.open()
+    const movebutton = document.getElementById('movebutton')
+    if (movebutton)
+        movebutton.onclick = () => {
+            moveCameraToZone('US_01_01_W6', scene)
+        }
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
@@ -438,13 +442,12 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     scene.add(dirLight1)
     //scene.add( new THREE.CameraHelper( dirLight1.shadow.camera ) )
 
-
     if (isWinter) {
-        const alaskaAmbient = new THREE.AmbientLight(0xAAEDFF)
+        const alaskaAmbient = new THREE.AmbientLight(0xaaedff)
         alaskaAmbient.intensity = 0.2 // tinge of blue. Not sure how to make snow look good really
         scene.add(alaskaAmbient)
     } else {
-        const michiganAmbientLight = new THREE.AmbientLight(0xFFADAD) //slightly yellow - colour corrects mud to brown rather than sickly green
+        const michiganAmbientLight = new THREE.AmbientLight(0xffadad) //slightly yellow - colour corrects mud to brown rather than sickly green
         michiganAmbientLight.intensity = 0.5
         scene.add(michiganAmbientLight)
     }
@@ -530,6 +533,19 @@ function clearScene(scene: THREE.Scene) {
         scene.remove(obj)
     }
 }
+export function moveCameraToZone(zoneName: string, scene: THREE.Scene) {
+    const object = scene.getObjectByName(zoneName)
+    if (!object) return
+    //centre controls around our obj
+    const __box = new Box3().setFromObject(object)
+    const center = __box.getCenter(new Vector3())
+    controls.target = center
+
+    // focus camera to obj
+    camera.lookAt(object.position)
+    // position camera offset from object. NB the flipped coords are starting to mount up here.
+    camera.position.set(object.position.x + 150, object.position.y + 250, object.position.z - 250)
+}
 
 //---------------- fetchies:
 async function switchToLevel(
@@ -589,8 +605,8 @@ async function fetchLevelTexture(terrainImagePath: string) {
         console.log(levelTexture?.name)
         return levelTexture
     } catch (error) {
-        console.log ('Failed to load texture! Have you set the filenames correctly?')
-        console.log (error)
+        console.log('Failed to load texture! Have you set the filenames correctly?')
+        console.log(error)
         return new THREE.Texture()
     }
 }
