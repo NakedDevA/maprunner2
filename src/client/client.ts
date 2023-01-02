@@ -416,7 +416,12 @@ function init() {
     const movebutton = document.getElementById('movebutton')
     if (movebutton)
         movebutton.onclick = () => {
-            moveCameraToZone('US_01_01_W6', scene)
+            moveCameraToObject('US_01_01_W6', scene)
+        }
+    const truckbutton = document.getElementById('truckbutton')
+    if (truckbutton)
+        truckbutton.onclick = () => {
+            moveCameraToObject('FUEL_FACTORY', scene)
         }
 }
 
@@ -503,7 +508,7 @@ function checkMouseIntersections() {
             // update info box
             if (infoElement !== null) {
                 const allIntersects = intersects.reduce((acc, intersection) => {
-                    return acc.concat(`${intersection.object.name}\n`)
+                    return acc.concat(`${intersection.object.userData.displayName}\n`)
                 }, '')
                 infoElement.innerText = allIntersects
                 infoElement.style.display = 'inline-block'
@@ -533,8 +538,8 @@ function clearScene(scene: THREE.Scene) {
         scene.remove(obj)
     }
 }
-export function moveCameraToZone(zoneName: string, scene: THREE.Scene) {
-    const object = scene.getObjectByName(zoneName)
+export function moveCameraToObject(objName: string, scene: THREE.Scene) {
+    const object = scene.getObjectByName(objName)
     if (!object) return
     //centre controls around our obj
     const __box = new Box3().setFromObject(object)
