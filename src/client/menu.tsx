@@ -6,10 +6,12 @@ import './menu.scss'
 const renderer = new CommonDOMRenderer()
 
 export const renderMenu = async (path: string, goToZone: (zoneName: string) => void) => {
-    const zoneJson = await fetchJson<MapZonesJson>(path)
-    const zoneIDList = Object.keys(zoneJson.zoneDesc).sort()
     const menuElement = document.getElementById('menu')
     if (!menuElement) return
+    menuElement.firstChild?.remove()
+    
+    const zoneJson = await fetchJson<MapZonesJson>(path)
+    const zoneIDList = Object.keys(zoneJson.zoneDesc).sort()
 
     const jsx = (
         <div class="container">
@@ -57,7 +59,6 @@ export const renderMenu = async (path: string, goToZone: (zoneName: string) => v
             </div>
         </div>
     )
-    menuElement.firstChild?.remove()
     return renderer.render(jsx).on(menuElement)
 }
 

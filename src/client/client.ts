@@ -6,347 +6,143 @@ import { LevelJson } from '../typings/types'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
 import { renderMenu } from './menu'
+import { levelJsonPath, terrainImagePath, tintImagePath, mapZonesJsonPath } from './pathUtils'
 
 const maps = {
     //trials:
     trial_01_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_01_01.pak.json',
-            './terrainimages/level_trial_01_01_map.png',
-            './tint/level_trial_01_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_01_01', false)
     },
     trial_01_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_01_02.pak.json',
-            './terrainimages/level_trial_01_02_map.png',
-            './tint/level_trial_01_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_01_02', false)
     },
     trial_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_02_01.pak.json',
-            './terrainimages/level_trial_02_01_map.png',
-            './tint/level_trial_02_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_02_01', true)
     },
     trial_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_02_02.pak.json',
-            './terrainimages/level_trial_02_02_map.png',
-            './tint/level_trial_02_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_02_02', true)
     },
     trial_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_01.pak.json',
-            './terrainimages/level_trial_03_01_map.png',
-            './tint/level_trial_03_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_03_01', true)
     },
     trial_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_02.pak.json',
-            './terrainimages/level_trial_03_02_map.png',
-            './tint/level_trial_03_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_03_02', false)
     },
     trial_03_03: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_03.pak.json',
-            './terrainimages/level_trial_03_03_map.png',
-            './tint/level_trial_03_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_03_03', false)
     },
     trial_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_04_01.pak.json',
-            './terrainimages/level_trial_04_01_map.png',
-            './tint/level_trial_04_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_04_01', false)
     },
     trial_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_04_02.pak.json',
-            './terrainimages/level_trial_04_02_map.png',
-            './tint/level_trial_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_04_02', true)
     },
     trial_05_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_05_01.pak.json',
-            './terrainimages/level_trial_05_01_map.png',
-            './tint/level_trial_05_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_05_01', false)
     },
     //michigan
     us_01_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_01.pak.json',
-            './terrainimages/level_us_01_01_map.png',
-            './tint/level_us_01_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_01', false)
     },
     us_01_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_02.pak.json',
-            './terrainimages/level_us_01_02_map.png',
-            './tint/level_us_01_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_02', false)
     },
     us_01_03: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_03.pak.json',
-            './terrainimages/level_us_01_03_map.png',
-            './tint/level_us_01_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_03', false)
     },
     us_01_04: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_04_new.pak.json',
-            './terrainimages/level_us_01_04_new_map.png',
-            './tint/level_us_01_04_new_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_04_new', false)
     },
     //alaska
     us_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_01.pak.json',
-            './terrainimages/level_us_02_01_map.png',
-            './tint/level_us_02_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_01', true)
     },
     us_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_02_new.pak.json',
-            './terrainimages/level_us_02_02_new_map.png',
-            './tint/level_us_02_02_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_02_new', true)
     },
     us_02_03: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_03_new.pak.json',
-            './terrainimages/level_us_02_03_new_map.png',
-            './tint/level_us_02_03_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_03_new', true)
     },
     us_02_04: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_04_new.pak.json',
-            './terrainimages/level_us_02_04_new_map.png',
-            './tint/level_us_02_04_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_04_new', true)
     },
     // taymyr
     ru_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_01_crop.pak.json',
-            './terrainimages/level_ru_02_01_crop_map.png',
-            './tint/level_ru_02_01_crop_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_01_crop', false)
     },
     ru_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_02.pak.json',
-            './terrainimages/level_ru_02_02_map.png',
-            './tint/level_ru_02_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_02', false)
     },
     ru_02_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_03.pak.json',
-            './terrainimages/level_ru_02_03_map.png',
-            './tint/level_ru_02_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_03', false)
     },
     ru_02_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_04.pak.json',
-            './terrainimages/level_ru_02_04_map.png',
-            './tint/level_ru_02_04_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_04', false)
     },
     // kola
     ru_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_03_01.pak.json',
-            './terrainimages/level_ru_03_01_map.png',
-            './tint/level_ru_03_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_03_01', true)
     },
     ru_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_03_02.pak.json',
-            './terrainimages/level_ru_03_02_map.png',
-            './tint/level_ru_03_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_03_02', true)
     },
     // amur
     ru_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_01.pak.json',
-            './terrainimages/level_ru_04_01_map.png',
-            './tint/level_ru_04_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_01', true)
     },
     ru_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_02.pak.json',
-            './terrainimages/level_ru_04_02_map.png',
-            './tint/level_ru_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_02', true)
     },
     ru_04_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_03.pak.json',
-            './terrainimages/level_ru_04_03_map.png',
-            './tint/level_ru_04_03_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_03', true)
     },
     ru_04_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_04.pak.json',
-            './terrainimages/level_ru_04_04_map.png',
-            './tint/level_ru_04_04_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_04', true)
     },
     // don
     ru_05_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_05_01.pak.json',
-            './terrainimages/level_ru_05_01_map.png',
-            './tint/level_ru_05_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_05_01', false)
     },
     ru_05_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_05_02.pak.json',
-            './terrainimages/level_ru_05_02_map.png',
-            './tint/level_ru_05_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_05_02', false)
     },
     // belozersk
     ru_08_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_01.pak.json',
-            './terrainimages/level_ru_08_01_map.png',
-            './tint/level_ru_08_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_01', false)
     },
     ru_08_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_02.pak.json',
-            './terrainimages/level_ru_08_02_map.png',
-            './tint/level_ru_08_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_02', false)
     },
     ru_08_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_03.pak.json',
-            './terrainimages/level_ru_08_03_map.png',
-            './tint/level_ru_08_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_03', false)
     },
     ru_08_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_04.pak.json',
-            './terrainimages/level_ru_08_04_map.png',
-            './tint/level_ru_08_04_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_04', false)
     },
     //wisconsin
     us_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_03_01.pak.json',
-            './terrainimages/level_us_03_01_map.png',
-            './tint/level_us_03_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_03_01', false)
     },
     us_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_03_02.pak.json',
-            './terrainimages/level_us_03_02_map.png',
-            './tint/level_us_03_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_03_02', false)
     },
     //yukon
     us_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_04_01.pak.json',
-            './terrainimages/level_us_04_01_map.png',
-            './tint/level_us_04_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_04_01', false)
     },
     us_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_04_02.pak.json',
-            './terrainimages/level_us_04_02_map.png',
-            './tint/level_us_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_04_02', true)
     },
     //Maine
     us_06_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_06_01.pak.json',
-            './terrainimages/level_us_06_01_map.png',
-            './tint/level_us_06_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_06_01', false)
     },
     us_06_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_06_02.pak.json',
-            './terrainimages/level_us_06_02_map.png',
-            './tint/level_us_06_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_06_02', true)
     },
     //Tennessee
     us_07_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_07_01.pak.json',
-            './terrainimages/level_us_07_01_map.png',
-            './tint/level_us_07_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_07_01', false)
     },
 }
 const scene = new THREE.Scene()
@@ -552,23 +348,18 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene) {
 
 //---------------- fetchies:
 
-async function switchToLevel(
-    levelJsonPath: string,
-    terrainImagePath: string,
-    tintImagePath: string,
-    isSnow: boolean
-) {
+async function switchToLevel(levelFileName: string, isSnow: boolean) {
     console.log(camera.position)
-    const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath)
-    const levelTexture = await fetchLevelTexture(terrainImagePath)
-    const tintTexture = await fetchLevelTexture(tintImagePath)
+    const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath(levelFileName))
+    const levelTexture = await fetchLevelTexture(terrainImagePath(levelFileName))
+    const tintTexture = await fetchLevelTexture(tintImagePath(levelFileName))
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
 
     const goToObject = (zoneName: string) => moveCameraToObject(zoneName, scene)
     //set zone menu:
-    renderMenu('./mapZones/mapzoneslevel_us_01_01.sso.json', goToObject)
+    if (mapZonesJsonPath) renderMenu(mapZonesJsonPath(levelFileName), goToObject)
 }
 
 export async function fetchJson<T>(path: string): Promise<T> {
