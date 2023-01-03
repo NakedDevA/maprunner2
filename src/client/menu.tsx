@@ -1,7 +1,7 @@
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { fetchJson } from './client'
 import { CommonDOMRenderer } from 'render-jsx/dom'
-import './menu.css'
+import './menu.scss'
 
 const renderer = new CommonDOMRenderer()
 
