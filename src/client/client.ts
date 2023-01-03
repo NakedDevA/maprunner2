@@ -374,10 +374,9 @@ animate()
 // load initial map:
 maps.us_01_01()
 
-const goToObject = (zoneName:string) => moveCameraToObject(zoneName, scene)
+const goToObject = (zoneName: string) => moveCameraToObject(zoneName, scene)
 //set zone menu:
 setZoneMenu('./mapZones/mapzoneslevel_us_01_01.sso.json', goToObject)
-
 
 //-----------------------
 function init() {
@@ -420,11 +419,7 @@ function init() {
         mapsFolder.add(maps, functionName, true)
     }
     mapsFolder.open()
-    const movebutton = document.getElementById('movebutton')
-    if (movebutton)
-        movebutton.onclick = () => {
-            moveCameraToObject('US_01_01_W6', scene)
-        }
+
     const truckbutton = document.getElementById('truckbutton')
     if (truckbutton)
         truckbutton.onclick = () => {

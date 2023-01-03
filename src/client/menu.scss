@@ -3,9 +3,31 @@ ul {
     list-style: none;
     padding: 0;
     overflow-y: auto;
+    overflow-x: hidden;
+    color: white;
     button {
+        color: inherit;
         background: initial;
         border: none;
         font: message-box;
+        font-size: 13px;
+
+        &:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    }
+    li {
+        p.zoneInfoBox {
+            max-height: 0px;
+            margin: 0;
+            overflow: hidden;
+
+            &.zone-info-open {
+                max-height: 100px;
+
+                transition: max-height 0.5s;
+            }
+        }
     }
 }

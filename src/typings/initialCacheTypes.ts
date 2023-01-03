@@ -115,57 +115,59 @@ export type ObjectivesFileJson = {
     [key: string]: ContractSettings | ContractSettingsLookup
   }
 }
+
 // Zone data files
 
 export type MapZonesJson = {
   zoneDesc: {
     [key: string]: {
-      props: {
-        ZonePropertyUnloadingCargo?: {}
-        ZonePropertyCargoLoading?: {
-          cargosSettings?: {
-            name: string // "CargoBricks"
-            count?: number
-          }[]
-          platformId?: string //  "US_01_01_WAREHOUSE_MANUAL"
-        }
-        ZonePropertyManualLoading?: {}
-        ZonePropertyFuelStation?: {
-          pricePerLiter: number
-        }
-        ZonePropertyGateway?: {
-          levelZoneLink: string //"level_us_01_02 || MAP_TRANSITION_01_01"
-        }
-        ZonePropertyWatchpoint?: {
-          range: number
-        }
-        ZonePropertyUpgradesGiver?: {
-          upgrades: string[] //"ru_truck_modern_engine_1"
-        }
-        ZonePropertyTrailerAttach?: {}
-        ZonePropertyObjectiveZoneToVisit?: {}
-        ZonePropertyGarageEntrance?: {}
-        ZonePropertyGarageExit?: {}
-        ZonePropertyResupplyRepairParts?: {}
-        ZonePropertyAutoRepairAndRestore?: {}
-        ZonePropertyStorehouseCraft?: {
-          craftSettings: {
-            name: string //"CargoMetalPlanks"
-            cargoComponents: {
-              name: string //  "CargoMetalRoll"
-              count: number
-            }[]
-          }[]
-          platformId: string
-        }
-        ZonePropertyFarmingArea?: {}
-
-        ZonePropertyRecovery?: {} //trials
-        ZonePropertyEnergy?: {}
-        ZonePropertyLivingArea?: {}
-        ZonePropertyCoopTaskGiver?: {}
-        __type: "ZoneSettings"
-      }
+      props: ZoneSettings
     }
   }
+}
+
+export type ZoneSettings = {
+  ZonePropertyUnloadingCargo?: {}
+  ZonePropertyCargoLoading?: {
+    cargosSettings?: {
+      name: string // "CargoBricks"
+      count?: number
+    }[]
+    platformId?: string //  "US_01_01_WAREHOUSE_MANUAL"
+  }
+  ZonePropertyManualLoading?: {}
+  ZonePropertyFuelStation?: {
+    pricePerLiter: number
+  }
+  ZonePropertyGateway?: {
+    levelZoneLink: string //"level_us_01_02 || MAP_TRANSITION_01_01"
+  }
+  ZonePropertyWatchpoint?: {
+    range: number
+  }
+  ZonePropertyUpgradesGiver?: {
+    upgrades: string[] //"ru_truck_modern_engine_1"
+  }
+  ZonePropertyTrailerAttach?: {}
+  ZonePropertyObjectiveZoneToVisit?: {}
+  ZonePropertyGarageEntrance?: {}
+  ZonePropertyGarageExit?: {}
+  ZonePropertyResupplyRepairParts?: {}
+  ZonePropertyAutoRepairAndRestore?: {}
+  ZonePropertyStorehouseCraft?: {
+    craftSettings: {
+      name: string //"CargoMetalPlanks"
+      cargoComponents: {
+        name: string //  "CargoMetalRoll"
+        count: number
+      }[]
+    }[]
+    platformId: string
+  }
+  ZonePropertyFarmingArea?: {}
+  ZonePropertyRecovery?: {} //trials
+  ZonePropertyEnergy?: {}
+  ZonePropertyLivingArea?: {}
+  ZonePropertyCoopTaskGiver?: {}
+  __type: "ZoneSettings"
 }
