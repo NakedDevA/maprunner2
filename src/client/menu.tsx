@@ -5,14 +5,14 @@ import './menu.scss'
 
 const renderer = new CommonDOMRenderer()
 
-export const setZoneMenu = async (path: string, goToZone: (zoneName: string) => void) => {
+export const renderMenu = async (path: string, goToZone: (zoneName: string) => void) => {
     const zoneJson = await fetchJson<MapZonesJson>(path)
     const zoneIDList = Object.keys(zoneJson.zoneDesc).sort()
-    const zoneListElement = document.getElementById('zoneList')
-    if (!zoneListElement) return
+    const menuElement = document.getElementById('menu')
+    if (!menuElement) return
 
     const jsx = (
-        <>
+        <div class="container">
             <div id={'headings'}>
                 <h2
                     id={'tabHeading-zones'}
@@ -25,7 +25,6 @@ export const setZoneMenu = async (path: string, goToZone: (zoneName: string) => 
                     Trucks
                 </h2>
             </div>
-
             <div class={'tab'} id={'tab-zones'}>
                 <input
                     type={Text}
@@ -53,12 +52,13 @@ export const setZoneMenu = async (path: string, goToZone: (zoneName: string) => 
                     })}
                 </ul>
             </div>
-            <div class={'tab'} id={'tab-trucks'}>
+            <div class={['tab', 'hidden']} id={'tab-trucks'}>
                 truck truck truck
             </div>
-        </>
+        </div>
     )
-    return renderer.render(jsx).on(zoneListElement)
+    menuElement.firstChild?.remove()
+    return renderer.render(jsx).on(menuElement)
 }
 
 const zoneDescription = (zoneProps: ZoneSettings): string => {
@@ -70,15 +70,20 @@ const zoneDescription = (zoneProps: ZoneSettings): string => {
 }
 
 const toggleInfoBox = (zoneId: string) => {
-    const zoneInfoBox = document.querySelector(`#zoneEntry-${zoneId}`)
-    if (!zoneInfoBox) return
+    const clickedZoneInfo = document.querySelector(`#zoneEntry-${zoneId}`)
+    if (!clickedZoneInfo) return
+    
+    //close this one if it's already open
+    if (clickedZoneInfo.classList.contains('zone-info-open')) {
+        return clickedZoneInfo.classList.remove('zone-info-open')
+    }
 
-    const otherInfoBoxes = document.querySelectorAll('.zone-info-open')
-    otherInfoBoxes.forEach((box) => {
-        box.classList.remove('zone-info-open')
+    //else close all and open the chosen one
+    const openZoneInfos = document.querySelectorAll('.zone-info-open')
+    openZoneInfos.forEach((element) => {
+        element.classList.remove('zone-info-open')
     })
-
-    zoneInfoBox.classList.add('zone-info-open')
+    clickedZoneInfo.classList.add('zone-info-open')
 }
 
 const filterZones = (input: string, zoneIDList: string[]) => {
@@ -99,12 +104,11 @@ const onTabClicked = (tabName: string) => {
     })
     const selectedHeading = document.querySelector(`#tabHeading-${tabName}`)
     selectedHeading?.classList.add('selected')
-    
-    
+
     const allTabs = document.querySelectorAll('.tab')
     allTabs.forEach((tab) => {
-        tab.setAttribute('hidden', 'true')
+        tab.classList.add('hidden')
     })
     const selectedTab = document.querySelector(`#tab-${tabName}`)
-    selectedTab?.removeAttribute('hidden')
+    selectedTab?.classList.remove('hidden')
 }

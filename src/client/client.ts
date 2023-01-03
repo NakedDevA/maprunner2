@@ -5,7 +5,7 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
-import { setZoneMenu } from './menu'
+import { renderMenu } from './menu'
 
 const maps = {
     //trials:
@@ -374,10 +374,6 @@ animate()
 // load initial map:
 maps.us_01_01()
 
-const goToObject = (zoneName: string) => moveCameraToObject(zoneName, scene)
-//set zone menu:
-setZoneMenu('./mapZones/mapzoneslevel_us_01_01.sso.json', goToObject)
-
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
@@ -569,6 +565,10 @@ async function switchToLevel(
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
+
+    const goToObject = (zoneName: string) => moveCameraToObject(zoneName, scene)
+    //set zone menu:
+    renderMenu('./mapZones/mapzoneslevel_us_01_01.sso.json', goToObject)
 }
 
 export async function fetchJson<T>(path: string): Promise<T> {
