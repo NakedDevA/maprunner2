@@ -1,5 +1,4 @@
 import { MapZonesJson, ZoneSettings } from '../typings/initialCacheTypes'
-import { fetchJson } from './client'
 import { CommonDOMRenderer } from 'render-jsx/dom'
 import './menu.scss'
 import { TruckCoords } from '../typings/types'
@@ -17,6 +16,14 @@ export const renderMenu = async (
 
     const zoneIDList = Object.keys(zonesJson.zoneDesc).sort()
 
+    // truck names aren't unique and they don't have ids, so we use the fixed index in the file
+    const trucksWithIds = trucks
+        .map((truck, index) => {
+            return { ...truck, id: `${truck.name}_${index}` }
+        })
+        .sort((a, b) => (a.name > b.name ? 1 : -1))
+
+    const truckIDList = trucksWithIds.map((truck) => truck.id)
     const jsx = (
         <div class="container">
             <div id={'headings'}>
@@ -36,7 +43,7 @@ export const renderMenu = async (
                     type={Text}
                     placeholder={'filter'}
                     oninput={(e: { target: HTMLInputElement }) =>
-                        filterZones(e.target.value, zoneIDList)
+                        filterEntries(e.target.value, zoneIDList, 'zoneEntry')
                     }
                 ></input>
                 <ul>
@@ -59,20 +66,28 @@ export const renderMenu = async (
                 </ul>
             </div>
             <div class={['tab', 'hidden']} id={'tab-trucks'}>
+                <input
+                    type={Text}
+                    placeholder={'filter'}
+                    oninput={(e: { target: HTMLInputElement }) =>
+                        filterEntries(e.target.value, truckIDList, 'truckEntry')
+                    }
+                ></input>
                 <ul>
-                    {trucks.map((truck, index) => {
-                        const uniqueTruckId = `${truck.name}_${index}` // truck names aren't unique and they don't have ids, so we use the fixed index in the file
+                    {trucksWithIds.map((truck, index) => {
                         return (
-                            <li id={`truckEntry-${uniqueTruckId}`}>
+                            <li class={'truckEntry'} id={`truckEntry-${truck.id}`}>
                                 <button
                                     onclick={() => {
-                                        toggleInfoBox(`truckEntry-${uniqueTruckId}`)
-                                        goToObject(uniqueTruckId)
+                                        toggleInfoBox(`truckEntry-${truck.id}`)
+                                        goToObject(truck.id)
                                     }}
                                 >
                                     {truck.name}
                                 </button>
-                                <p class={'infoBox'}>Task name: {truck.task? truck.task: 'none'}</p>
+                                <p class={'infoBox'}>
+                                    Task name: {truck.task ? truck.task : 'none'}
+                                </p>
                             </li>
                         )
                     })}
@@ -108,13 +123,13 @@ const toggleInfoBox = (clickedId: string) => {
     clickedZoneInfo.classList.add('info-open')
 }
 
-const filterZones = (input: string, zoneIDList: string[]) => {
-    for (const zoneId of zoneIDList) {
-        const zoneEntry = document.querySelector(`#zoneEntry-${zoneId}`)
-        if (zoneId.toLowerCase().includes(input.toLowerCase())) {
-            zoneEntry?.removeAttribute('hidden')
+const filterEntries = (input: string, IDList: string[], candidateIDPrefix: string) => {
+    for (const truckId of IDList) {
+        const entry = document.querySelector(`#${candidateIDPrefix}-${truckId}`)
+        if (truckId.toLowerCase().includes(input.toLowerCase())) {
+            entry?.removeAttribute('hidden')
         } else {
-            zoneEntry?.setAttribute('hidden', 'true')
+            entry?.setAttribute('hidden', 'true')
         }
     }
 }
