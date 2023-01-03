@@ -349,7 +349,7 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene) {
 //---------------- fetchies:
 
 async function switchToLevel(levelFileName: string, isSnow: boolean) {
-    console.log(camera.position)
+    //qqtas awaitall for loading spinner
     const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath(levelFileName))
     const levelTexture = await fetchLevelTexture(terrainImagePath(levelFileName))
     const tintTexture = await fetchLevelTexture(tintImagePath(levelFileName))

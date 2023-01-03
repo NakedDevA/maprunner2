@@ -27,6 +27,11 @@ div.container {
         &.hidden {
             display: none;
         }
+        input {
+            &:focus-visible {
+                outline: none;
+            }
+        }
         ul {
             height: 100%;
             list-style: none;
@@ -56,6 +61,7 @@ div.container {
                 }
                 &.info-open {
                     background: #00000075;
+                    padding-top: 5px;
                     button {
                         text-decoration: underline;
                     }
