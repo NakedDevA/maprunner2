@@ -13,31 +13,49 @@ export const setZoneMenu = async (path: string, goToZone: (zoneName: string) => 
 
     const jsx = (
         <>
-            <input
-                type={Text}
-                placeholder={'filter'}
-                oninput={(e: { target: HTMLInputElement }) =>
-                    filterZones(e.target.value, zoneIDList)
-                }
-            ></input>
-            <ul>
-                {zoneIDList.map((zoneId) => {
-                    const thisInfo = zoneDescription(zoneJson.zoneDesc[zoneId].props)
-                    return (
-                        <li class={'zoneEntry'} id={`zoneEntry-${zoneId}`}>
-                            <button
-                                onclick={() => {
-                                    toggleInfoBox(zoneId)
-                                    goToZone(zoneId)
-                                }}
-                            >
-                                {zoneId}
-                            </button>
-                            <p class={'zoneInfoBox'}>{thisInfo}</p>
-                        </li>
-                    )
-                })}
-            </ul>
+            <div id={'headings'}>
+                <h2
+                    id={'tabHeading-zones'}
+                    class={'selected'}
+                    onclick={() => onTabClicked('zones')}
+                >
+                    Zones
+                </h2>
+                <h2 id={'tabHeading-trucks'} onclick={() => onTabClicked('trucks')}>
+                    Trucks
+                </h2>
+            </div>
+
+            <div class={'tab'} id={'tab-zones'}>
+                <input
+                    type={Text}
+                    placeholder={'filter'}
+                    oninput={(e: { target: HTMLInputElement }) =>
+                        filterZones(e.target.value, zoneIDList)
+                    }
+                ></input>
+                <ul>
+                    {zoneIDList.map((zoneId) => {
+                        const thisInfo = zoneDescription(zoneJson.zoneDesc[zoneId].props)
+                        return (
+                            <li class={'zoneEntry'} id={`zoneEntry-${zoneId}`}>
+                                <button
+                                    onclick={() => {
+                                        toggleInfoBox(zoneId)
+                                        goToZone(zoneId)
+                                    }}
+                                >
+                                    {zoneId}
+                                </button>
+                                <p class={'zoneInfoBox'}>{thisInfo}</p>
+                            </li>
+                        )
+                    })}
+                </ul>
+            </div>
+            <div class={'tab'} id={'tab-trucks'}>
+                truck truck truck
+            </div>
         </>
     )
     return renderer.render(jsx).on(zoneListElement)
@@ -72,4 +90,21 @@ const filterZones = (input: string, zoneIDList: string[]) => {
             zoneEntry?.setAttribute('hidden', 'true')
         }
     }
+}
+
+const onTabClicked = (tabName: string) => {
+    const allHeadings = document.querySelectorAll('#headings h2')
+    allHeadings.forEach((heading) => {
+        heading.classList.remove('selected')
+    })
+    const selectedHeading = document.querySelector(`#tabHeading-${tabName}`)
+    selectedHeading?.classList.add('selected')
+    
+    
+    const allTabs = document.querySelectorAll('.tab')
+    allTabs.forEach((tab) => {
+        tab.setAttribute('hidden', 'true')
+    })
+    const selectedTab = document.querySelector(`#tab-${tabName}`)
+    selectedTab?.removeAttribute('hidden')
 }
