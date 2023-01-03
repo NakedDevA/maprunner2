@@ -353,13 +353,14 @@ async function switchToLevel(levelFileName: string, isSnow: boolean) {
     const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath(levelFileName))
     const levelTexture = await fetchLevelTexture(terrainImagePath(levelFileName))
     const tintTexture = await fetchLevelTexture(tintImagePath(levelFileName))
+    const zonesJson = await fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName))
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
 
-    const goToObject = (zoneName: string) => moveCameraToObject(zoneName, scene)
-    //set zone menu:
-    if (mapZonesJsonPath) renderMenu(mapZonesJsonPath(levelFileName), goToObject)
+    const goToObject = (objectName: string) => moveCameraToObject(objectName, scene)
+    
+    renderMenu(zonesJson, levelJson.trucks, goToObject)
 }
 
 export async function fetchJson<T>(path: string): Promise<T> {

@@ -43,7 +43,8 @@ export function setUpMeshesFromMap(
 }
 
 function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
-    for (const truck of trucks) {
+    for (let index = 0; index < trucks.length; index++) {
+        const truck = trucks[index]
         //console.log(zone.name)
         const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = truck.rotation
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
@@ -63,7 +64,7 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Trucks)
-        mesh.name = truck.task
+        mesh.name = `${truck.name}_${index}`
         mesh.userData = { displayName: truck.name }
         scene.add(mesh)
     }

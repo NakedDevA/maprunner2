@@ -2,16 +2,20 @@ import { MapZonesJson, ZoneSettings } from '../typings/initialCacheTypes'
 import { fetchJson } from './client'
 import { CommonDOMRenderer } from 'render-jsx/dom'
 import './menu.scss'
+import { TruckCoords } from '../typings/types'
 
 const renderer = new CommonDOMRenderer()
 
-export const renderMenu = async (path: string, goToZone: (zoneName: string) => void) => {
+export const renderMenu = async (
+    zonesJson: MapZonesJson,
+    trucks: TruckCoords[],
+    goToObject: (objectName: string) => void
+) => {
     const menuElement = document.getElementById('menu')
     if (!menuElement) return
     menuElement.firstChild?.remove()
-    
-    const zoneJson = await fetchJson<MapZonesJson>(path)
-    const zoneIDList = Object.keys(zoneJson.zoneDesc).sort()
+
+    const zoneIDList = Object.keys(zonesJson.zoneDesc).sort()
 
     const jsx = (
         <div class="container">
@@ -37,25 +41,42 @@ export const renderMenu = async (path: string, goToZone: (zoneName: string) => v
                 ></input>
                 <ul>
                     {zoneIDList.map((zoneId) => {
-                        const thisInfo = zoneDescription(zoneJson.zoneDesc[zoneId].props)
+                        const thisInfo = zoneDescription(zonesJson.zoneDesc[zoneId].props)
                         return (
                             <li class={'zoneEntry'} id={`zoneEntry-${zoneId}`}>
                                 <button
                                     onclick={() => {
-                                        toggleInfoBox(zoneId)
-                                        goToZone(zoneId)
+                                        toggleInfoBox(`zoneEntry-${zoneId}`)
+                                        goToObject(zoneId)
                                     }}
                                 >
                                     {zoneId}
                                 </button>
-                                <p class={'zoneInfoBox'}>{thisInfo}</p>
+                                <p class={'infoBox'}>{thisInfo}</p>
                             </li>
                         )
                     })}
                 </ul>
             </div>
             <div class={['tab', 'hidden']} id={'tab-trucks'}>
-                truck truck truck
+                <ul>
+                    {trucks.map((truck, index) => {
+                        const uniqueTruckId = `${truck.name}_${index}` // truck names aren't unique and they don't have ids, so we use the fixed index in the file
+                        return (
+                            <li id={`truckEntry-${uniqueTruckId}`}>
+                                <button
+                                    onclick={() => {
+                                        toggleInfoBox(`truckEntry-${uniqueTruckId}`)
+                                        goToObject(uniqueTruckId)
+                                    }}
+                                >
+                                    {truck.name}
+                                </button>
+                                <p class={'infoBox'}>Task name: {truck.task? truck.task: 'none'}</p>
+                            </li>
+                        )
+                    })}
+                </ul>
             </div>
         </div>
     )
@@ -70,21 +91,21 @@ const zoneDescription = (zoneProps: ZoneSettings): string => {
     return multiline
 }
 
-const toggleInfoBox = (zoneId: string) => {
-    const clickedZoneInfo = document.querySelector(`#zoneEntry-${zoneId}`)
+const toggleInfoBox = (clickedId: string) => {
+    const clickedZoneInfo = document.querySelector(`#${clickedId}`)
     if (!clickedZoneInfo) return
-    
+
     //close this one if it's already open
-    if (clickedZoneInfo.classList.contains('zone-info-open')) {
-        return clickedZoneInfo.classList.remove('zone-info-open')
+    if (clickedZoneInfo.classList.contains('info-open')) {
+        return clickedZoneInfo.classList.remove('info-open')
     }
 
     //else close all and open the chosen one
-    const openZoneInfos = document.querySelectorAll('.zone-info-open')
+    const openZoneInfos = document.querySelectorAll('.info-open')
     openZoneInfos.forEach((element) => {
-        element.classList.remove('zone-info-open')
+        element.classList.remove('info-open')
     })
-    clickedZoneInfo.classList.add('zone-info-open')
+    clickedZoneInfo.classList.add('info-open')
 }
 
 const filterZones = (input: string, zoneIDList: string[]) => {
