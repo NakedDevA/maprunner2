@@ -1,21 +1,22 @@
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { fetchJson } from './client'
 import { CommonDOMRenderer } from 'render-jsx/dom'
+import './menu.css'
 
 const renderer = new CommonDOMRenderer()
 
-export const setZoneMenu = async (path: string) => {
+export const setZoneMenu = async (path: string, goToZone:(zoneName:string)=>void) => {
     const zoneJson = await fetchJson<MapZonesJson>(path)
     const zoneIDList = Object.keys(zoneJson.zoneDesc)
     const zoneListElement = document.getElementById('zoneList')
     if (!zoneListElement) return
     
     const jsx = (
-        <div>
+        <ul>
             {zoneIDList.map((zoneId) => {
-                return <div>{zoneId}</div>
+                return <li><button onclick={() =>goToZone(zoneId)}>{zoneId}</button></li>
             })}
-        </div>
+        </ul>
     )
     return renderer.render(jsx).on(zoneListElement)
 }

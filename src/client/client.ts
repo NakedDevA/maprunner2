@@ -374,8 +374,10 @@ animate()
 // load initial map:
 maps.us_01_01()
 
+const goToObject = (zoneName:string) => moveCameraToObject(zoneName, scene)
 //set zone menu:
-setZoneMenu('./mapZones/mapzoneslevel_us_01_01.sso.json')
+setZoneMenu('./mapZones/mapzoneslevel_us_01_01.sso.json', goToObject)
+
 
 //-----------------------
 function init() {
