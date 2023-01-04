@@ -55,12 +55,19 @@ div.container {
             }
             li {
                 transition: padding 0.2s, background-color 0.5s;
-                p.infoBox {
+                .infoBox {
                     max-height: 0px;
                     font-size: small;
                     margin: 0;
                     overflow: hidden;
                     transition: max-height 0.1s;
+
+                    h3 {
+                        margin: 0;
+                    }
+                    p {
+                        margin: 0;
+                    }
                 }
                 &.info-open {
                     background: #00000075;
@@ -68,7 +75,7 @@ div.container {
                     button {
                         text-decoration: underline;
                     }
-                    p {
+                    .infoBox {
                         max-height: 100px;
                         padding: 10px;
                         transition: max-height 0.5s;

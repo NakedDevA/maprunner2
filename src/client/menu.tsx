@@ -39,10 +39,10 @@ export const renderMenu = async (
                 </h2>
             </div>
             <div class={'tab'} id={'tab-zones'}>
-                <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'}/>
+                <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'} />
                 <ul>
                     {zoneIDList.map((zoneId) => {
-                        const thisInfo = zoneDescription(zonesJson.zoneDesc[zoneId].props)
+                        const description = zoneDescription(zonesJson.zoneDesc[zoneId].props)
                         return (
                             <Entry
                                 entryId={`zoneEntry-${zoneId}`}
@@ -50,14 +50,16 @@ export const renderMenu = async (
                                 goToHandler={() => goToObject(zoneId)}
                                 buttonText={zoneId}
                             >
-                                {thisInfo}
+                                <ZoneDescriptionComponent
+                                    zoneProps={zonesJson.zoneDesc[zoneId].props}
+                                ></ZoneDescriptionComponent>
                             </Entry>
                         )
                     })}
                 </ul>
             </div>
             <div class={['tab', 'hidden']} id={'tab-trucks'}>
-                <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'}/>
+                <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'} />
                 <ul>
                     {trucksWithIds.map((truck) => {
                         return (
@@ -98,7 +100,7 @@ const Entry = (
             >
                 {props.buttonText}
             </button>
-            <p class={'infoBox'}>{children}</p>
+            <div class={'infoBox'}>{children}</div>
         </li>
     )
 }
@@ -126,6 +128,35 @@ const zoneDescription = (zoneProps: ZoneSettings): string => {
     const string = keys.filter((key) => key.startsWith('Zone')).toString()
     const multiline = string.replace(',', ',\n')
     return multiline
+}
+const ZoneDescriptionComponent = (
+    props: { zoneProps: ZoneSettings },
+    renderer: CommonDOMRenderer
+) => {
+    if (!props.zoneProps) return <p>No Zone Properties</p>
+    const propNames = Object.keys(props.zoneProps)
+
+    return (
+        <>
+            {props.zoneProps.ZonePropertyCargoLoading && (
+                <div class={'zoneProp'}>
+                    <h3>Cargo Loading</h3>
+                    {props.zoneProps.ZonePropertyCargoLoading.cargosSettings?.map(
+                        (cargoSetting) => {
+                            return (
+                                <p>
+                                    <span>{cargoSetting.name}</span>
+                                    <span style={'float:right'}>
+                                        ({cargoSetting.count ? cargoSetting.count : 'unlimited'})
+                                    </span>
+                                </p>
+                            )
+                        }
+                    )}
+                </div>
+            )}
+        </>
+    )
 }
 
 const toggleInfoBox = (clickedId: string) => {
