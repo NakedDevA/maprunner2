@@ -4,6 +4,7 @@ div.container {
     flex-direction: column;
     div#headings {
         display: flex;
+        padding: 0px 10px;
 
         h2 {
             padding-right: 20px;
@@ -23,6 +24,7 @@ div.container {
         display: flex;
         flex-direction: column;
         overflow: auto;
+        padding: 0px 10px;
 
         &.hidden {
             display: none;
@@ -52,6 +54,7 @@ div.container {
                 }
             }
             li {
+                transition: padding 0.2s, background-color 0.5s;
                 p.infoBox {
                     max-height: 0px;
                     font-size: small;
