@@ -350,17 +350,27 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene) {
 
 async function switchToLevel(levelFileName: string, isSnow: boolean) {
     //qqtas awaitall for loading spinner
-    const levelJson: LevelJson = await fetchJson<LevelJson>(levelJsonPath(levelFileName))
-    const levelTexture = await fetchLevelTexture(terrainImagePath(levelFileName))
-    const tintTexture = await fetchLevelTexture(tintImagePath(levelFileName))
-    const zonesJson = await fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName))
+    const loadingSpinner = document.getElementById('loading-spinner')
+    if (loadingSpinner !== null) {
+        loadingSpinner.style.display = 'block'
+    }
+
+    const [levelJson, levelTexture, tintTexture, zonesJson] = await Promise.all([
+        fetchJson<LevelJson>(levelJsonPath(levelFileName)),
+        fetchLevelTexture(terrainImagePath(levelFileName)),
+        fetchLevelTexture(tintImagePath(levelFileName)),
+        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName))
+    ])
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
 
     const goToObject = (objectName: string) => moveCameraToObject(objectName, scene)
-    
     renderMenu(zonesJson, levelJson.trucks, goToObject)
+    
+    if (loadingSpinner !== null) {
+        loadingSpinner.style.display = 'none'
+    }
 }
 
 export async function fetchJson<T>(path: string): Promise<T> {
@@ -379,26 +389,6 @@ export async function fetchJson<T>(path: string): Promise<T> {
 async function fetchLevelTexture(terrainImagePath: string) {
     const loadManager = new THREE.LoadingManager()
     const loader = new THREE.TextureLoader(loadManager)
-
-    const loadingSpinner = document.getElementById('loading-spinner')
-    loadManager.onError = () => {
-        //console.log('error')
-    }
-    loadManager.onLoad = () => {
-        //console.log('load')
-        if (loadingSpinner !== null) {
-            loadingSpinner.style.display = 'none'
-        }
-    }
-    loadManager.onStart = () => {
-        //console.log('start')
-        if (loadingSpinner !== null) {
-            loadingSpinner.style.display = 'block'
-        }
-    }
-    loadManager.onProgress = () => {
-        //console.log('progress')
-    }
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
         levelTexture.flipY = false
