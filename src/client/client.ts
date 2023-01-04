@@ -163,6 +163,7 @@ renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
+const defaultCameraOffset = new Vector3(0, 800, -900)
 
 init()
 animate()
@@ -173,7 +174,6 @@ maps.us_01_01()
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
-    camera.position.set(0, 800, -900) // qqtas may be based on map size
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
@@ -204,7 +204,6 @@ function init() {
     const mapsFolder = gui.addFolder('Maps')
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
-    layersFolder.open()
 
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
     for (const functionName of allMapFunctionNames) {
@@ -212,11 +211,6 @@ function init() {
     }
     mapsFolder.open()
 
-    const truckbutton = document.getElementById('truckbutton')
-    if (truckbutton)
-        truckbutton.onclick = () => {
-            moveCameraToObject('FUEL_FACTORY', scene)
-        }
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
@@ -332,7 +326,7 @@ function clearScene(scene: THREE.Scene) {
         scene.remove(obj)
     }
 }
-export function moveCameraToObject(objName: string, scene: THREE.Scene) {
+export function moveCameraToObject(objName: string, scene: THREE.Scene, offset:THREE.Vector3) {
     const object = scene.getObjectByName(objName)
     if (!object) return
     //centre controls around our obj
@@ -343,13 +337,12 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene) {
     // focus camera to obj
     camera.lookAt(object.position)
     // position camera offset from object. NB the flipped coords are starting to mount up here.
-    camera.position.set(object.position.x + 150, object.position.y + 250, object.position.z - 250)
+    camera.position.set(object.position.x + (offset.x*-1), object.position.y + offset.y, object.position.z + offset.z)
 }
 
 //---------------- fetchies:
 
 async function switchToLevel(levelFileName: string, isSnow: boolean) {
-    //qqtas awaitall for loading spinner
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'block'
@@ -365,9 +358,11 @@ async function switchToLevel(levelFileName: string, isSnow: boolean) {
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
 
-    const goToObject = (objectName: string) => moveCameraToObject(objectName, scene)
+    const goToObject = (objectName: string) => moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
     renderMenu(zonesJson, levelJson.trucks, goToObject)
     
+    
+    moveCameraToObject('terrainMesh', scene, defaultCameraOffset)
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'none'
     }
