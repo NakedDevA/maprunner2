@@ -39,13 +39,7 @@ export const renderMenu = async (
                 </h2>
             </div>
             <div class={'tab'} id={'tab-zones'}>
-                <input
-                    type={Text}
-                    placeholder={'filter'}
-                    oninput={(e: { target: HTMLInputElement }) =>
-                        filterEntries(e.target.value, zoneIDList, 'zoneEntry')
-                    }
-                ></input>
+                <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'}/>
                 <ul>
                     {zoneIDList.map((zoneId) => {
                         const thisInfo = zoneDescription(zonesJson.zoneDesc[zoneId].props)
@@ -63,13 +57,7 @@ export const renderMenu = async (
                 </ul>
             </div>
             <div class={['tab', 'hidden']} id={'tab-trucks'}>
-                <input
-                    type={Text}
-                    placeholder={'filter'}
-                    oninput={(e: { target: HTMLInputElement }) =>
-                        filterEntries(e.target.value, truckIDList, 'truckEntry')
-                    }
-                ></input>
+                <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'}/>
                 <ul>
                     {trucksWithIds.map((truck) => {
                         return (
@@ -112,6 +100,24 @@ const Entry = (
             </button>
             <p class={'infoBox'}>{children}</p>
         </li>
+    )
+}
+
+const TabFilter = (
+    props: {
+        idsToFilter: string[]
+        idPrefix: string
+    },
+    renderer: CommonDOMRenderer
+) => {
+    return (
+        <input
+            type={Text}
+            placeholder={'filter'}
+            oninput={(e: { target: HTMLInputElement }) =>
+                filterEntries(e.target.value, props.idsToFilter, props.idPrefix)
+            }
+        ></input>
     )
 }
 const zoneDescription = (zoneProps: ZoneSettings): string => {
