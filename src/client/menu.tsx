@@ -187,8 +187,109 @@ const ZoneDescriptionComponent = (
             )}
             {props.zoneProps.ZonePropertyGateway !== undefined ? (
                 <div class={'zoneProp'}>
-                    <h3>Gateway</h3> 
+                    <h3>Gateway</h3>
                     <p>Linked with: {props.zoneProps.ZonePropertyGateway.levelZoneLink}</p>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyStorehouseCraft !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Crafting</h3>
+                    {props.zoneProps.ZonePropertyStorehouseCraft.craftSettings?.map(
+                        (craftSetting) => {
+                            return (
+                                <>
+                                    <p class={'craftSetting'}>
+                                        <span>{craftSetting.name}</span>
+                                        {craftSetting.energy !== undefined ? (
+                                            <span
+                                                style={'float:right'}
+                                            >{`${craftSetting.energy} energy`}</span>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </p>
+
+                                    {craftSetting.cargoComponents !== undefined
+                                        ? craftSetting.cargoComponents.map((requirement) => {
+                                              return (
+                                                  <p>
+                                                      Requires
+                                                      <span style={'float:right'}>
+                                                          {`${requirement.name} x${requirement.count}`}
+                                                      </span>
+                                                  </p>
+                                              )
+                                          })
+                                        : ''}
+                                </>
+                            )
+                        }
+                    )}
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyAutoRepairAndRestore !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>AutoRepairAndRestore</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyCoopTaskGiver !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Coop Task Giver</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyEnergy !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Energy</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyFarmingArea !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Farming Area</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyRecovery !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Recovery Point</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyResupplyRepairParts !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Resupply Repair Point</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyTrailerAttach !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Trailer Store</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyGarageEntrance !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Garage Entrance</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyGarageExit !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Garage Exit</h3>
                 </div>
             ) : (
                 ''

@@ -157,10 +157,11 @@ export type ZoneSettings = {
   ZonePropertyStorehouseCraft?: {
     craftSettings: {
       name: string //"CargoMetalPlanks"
-      cargoComponents: {
+      cargoComponents?: {
         name: string //  "CargoMetalRoll"
         count: number
       }[]
+      energy? :number
     }[]
     platformId: string
   }
