@@ -10,8 +10,11 @@ export const renderMenu = async (
     trucks: TruckCoords[],
     goToObject: (objectName: string) => void
 ) => {
+    
+    // Ugly hack to bin the entire menu before we re-render. Do two because our root element is a fragment which isn't in the DOM
     const menuElement = document.getElementById('menu')
     if (!menuElement) return
+    menuElement.firstChild?.remove()
     menuElement.firstChild?.remove()
 
     const zoneIDList = Object.keys(zonesJson.zoneDesc).sort()
@@ -25,57 +28,63 @@ export const renderMenu = async (
 
     const truckIDList = trucksWithIds.map((truck) => truck.id)
     const jsx = (
-        <div class="container">
-            <div id={'headings'}>
-                <h2
-                    id={'tabHeading-zones'}
-                    class={'selected'}
-                    onclick={() => onTabClicked('zones')}
-                >
-                    Zones
-                </h2>
-                <h2 id={'tabHeading-trucks'} onclick={() => onTabClicked('trucks')}>
-                    Trucks
-                </h2>
+        <>
+            <div class="restoreButtonContainer hidden">
+                <h2 onclick={showMenu}>{'>>>>'}</h2>
             </div>
-            <div class={'tab'} id={'tab-zones'}>
-                <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'} />
-                <ul>
-                    {zoneIDList.map((zoneId) => {
-                        const description = zoneDescription(zonesJson.zoneDesc[zoneId].props)
-                        return (
-                            <Entry
-                                entryId={`zoneEntry-${zoneId}`}
-                                entryClass={'zoneEntry'}
-                                goToHandler={() => goToObject(zoneId)}
-                                buttonText={zoneId}
-                            >
-                                <ZoneDescriptionComponent
-                                    zoneProps={zonesJson.zoneDesc[zoneId].props}
-                                ></ZoneDescriptionComponent>
-                            </Entry>
-                        )
-                    })}
-                </ul>
+            <div class="container">
+                <div id={'headings'}>
+                    <h2
+                        id={'tabHeading-zones'}
+                        class={'selected'}
+                        onclick={() => onTabClicked('zones')}
+                    >
+                        Zones
+                    </h2>
+                    <h2 id={'tabHeading-trucks'} onclick={() => onTabClicked('trucks')}>
+                        Trucks
+                    </h2>
+                    <h2 onclick={hideMenu}>{'<<<<'}</h2>
+                </div>
+                <div class={'tab'} id={'tab-zones'}>
+                    <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'} />
+                    <ul>
+                        {zoneIDList.map((zoneId) => {
+                            const description = zoneDescription(zonesJson.zoneDesc[zoneId].props)
+                            return (
+                                <Entry
+                                    entryId={`zoneEntry-${zoneId}`}
+                                    entryClass={'zoneEntry'}
+                                    goToHandler={() => goToObject(zoneId)}
+                                    buttonText={zoneId}
+                                >
+                                    <ZoneDescriptionComponent
+                                        zoneProps={zonesJson.zoneDesc[zoneId].props}
+                                    ></ZoneDescriptionComponent>
+                                </Entry>
+                            )
+                        })}
+                    </ul>
+                </div>
+                <div class={['tab', 'hidden']} id={'tab-trucks'}>
+                    <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'} />
+                    <ul>
+                        {trucksWithIds.map((truck) => {
+                            return (
+                                <Entry
+                                    entryId={`truckEntry-${truck.id}`}
+                                    entryClass={'truckEntry'}
+                                    goToHandler={() => goToObject(truck.id)}
+                                    buttonText={truck.name}
+                                >
+                                    Task name: {truck.task ? truck.task : 'none'}
+                                </Entry>
+                            )
+                        })}
+                    </ul>
+                </div>
             </div>
-            <div class={['tab', 'hidden']} id={'tab-trucks'}>
-                <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'} />
-                <ul>
-                    {trucksWithIds.map((truck) => {
-                        return (
-                            <Entry
-                                entryId={`truckEntry-${truck.id}`}
-                                entryClass={'truckEntry'}
-                                goToHandler={() => goToObject(truck.id)}
-                                buttonText={truck.name}
-                            >
-                                Task name: {truck.task ? truck.task : 'none'}
-                            </Entry>
-                        )
-                    })}
-                </ul>
-            </div>
-        </div>
+        </>
     )
     return renderer.render(jsx).on(menuElement)
 }
@@ -340,4 +349,14 @@ const onTabClicked = (tabName: string) => {
     })
     const selectedTab = document.querySelector(`#tab-${tabName}`)
     selectedTab?.classList.remove('hidden')
+}
+
+const showMenu = () => {
+    document.querySelector('.container')?.classList.remove('slideAway')
+    document.querySelector('.restoreButtonContainer')?.classList.add('hidden')
+}
+
+const hideMenu = () => {
+    document.querySelector('.container')?.classList.add('slideAway')
+    document.querySelector('.restoreButtonContainer')?.classList.remove('hidden')
 }
