@@ -138,7 +138,7 @@ const ZoneDescriptionComponent = (
 
     return (
         <>
-            {props.zoneProps.ZonePropertyCargoLoading && (
+            {props.zoneProps.ZonePropertyCargoLoading !== undefined ? (
                 <div class={'zoneProp'}>
                     <h3>Cargo Loading</h3>
                     {props.zoneProps.ZonePropertyCargoLoading.cargosSettings?.map(
@@ -154,6 +154,44 @@ const ZoneDescriptionComponent = (
                         }
                     )}
                 </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyFuelStation !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Fuel Station</h3>
+                    {props.zoneProps.ZonePropertyFuelStation.pricePerLiter !== undefined ? (
+                        <p>${props.zoneProps.ZonePropertyFuelStation.pricePerLiter} per litre</p>
+                    ) : (
+                        ''
+                    )}
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyUpgradesGiver !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Upgrade</h3>
+                    <p>{props.zoneProps.ZonePropertyUpgradesGiver.upgrades[0]}</p>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyWatchpoint !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>WatchPoint</h3>
+                    <p>Range: {props.zoneProps.ZonePropertyWatchpoint.range}</p>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyGateway !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Gateway</h3> 
+                    <p>Linked with: {props.zoneProps.ZonePropertyGateway.levelZoneLink}</p>
+                </div>
+            ) : (
+                ''
             )}
         </>
     )

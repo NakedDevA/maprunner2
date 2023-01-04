@@ -137,7 +137,7 @@ export type ZoneSettings = {
   }
   ZonePropertyManualLoading?: {}
   ZonePropertyFuelStation?: {
-    pricePerLiter: number
+    pricePerLiter?: number
   }
   ZonePropertyGateway?: {
     levelZoneLink: string //"level_us_01_02 || MAP_TRANSITION_01_01"
