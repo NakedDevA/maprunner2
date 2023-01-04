@@ -50,17 +50,14 @@ export const renderMenu = async (
                     {zoneIDList.map((zoneId) => {
                         const thisInfo = zoneDescription(zonesJson.zoneDesc[zoneId].props)
                         return (
-                            <li class={'zoneEntry'} id={`zoneEntry-${zoneId}`}>
-                                <button
-                                    onclick={() => {
-                                        toggleInfoBox(`zoneEntry-${zoneId}`)
-                                        goToObject(zoneId)
-                                    }}
-                                >
-                                    {zoneId}
-                                </button>
-                                <p class={'infoBox'}>{thisInfo}</p>
-                            </li>
+                            <Entry
+                                entryId={`zoneEntry-${zoneId}`}
+                                entryClass={'zoneEntry'}
+                                goToHandler={() => goToObject(zoneId)}
+                                buttonText={zoneId}
+                            >
+                                {thisInfo}
+                            </Entry>
                         )
                     })}
                 </ul>
@@ -74,21 +71,16 @@ export const renderMenu = async (
                     }
                 ></input>
                 <ul>
-                    {trucksWithIds.map((truck, index) => {
+                    {trucksWithIds.map((truck) => {
                         return (
-                            <li class={'truckEntry'} id={`truckEntry-${truck.id}`}>
-                                <button
-                                    onclick={() => {
-                                        toggleInfoBox(`truckEntry-${truck.id}`)
-                                        goToObject(truck.id)
-                                    }}
-                                >
-                                    {truck.name}
-                                </button>
-                                <p class={'infoBox'}>
-                                    Task name: {truck.task ? truck.task : 'none'}
-                                </p>
-                            </li>
+                            <Entry
+                                entryId={`truckEntry-${truck.id}`}
+                                entryClass={'truckEntry'}
+                                goToHandler={() => goToObject(truck.id)}
+                                buttonText={truck.name}
+                            >
+                                Task name: {truck.task ? truck.task : 'none'}
+                            </Entry>
                         )
                     })}
                 </ul>
@@ -98,6 +90,30 @@ export const renderMenu = async (
     return renderer.render(jsx).on(menuElement)
 }
 
+const Entry = (
+    props: {
+        entryId: string
+        entryClass: string
+        buttonText: string
+        goToHandler: () => void
+    },
+    renderer: CommonDOMRenderer,
+    children: any
+) => {
+    return (
+        <li class={props.entryClass} id={props.entryId}>
+            <button
+                onclick={() => {
+                    toggleInfoBox(props.entryId)
+                    props.goToHandler()
+                }}
+            >
+                {props.buttonText}
+            </button>
+            <p class={'infoBox'}>{children}</p>
+        </li>
+    )
+}
 const zoneDescription = (zoneProps: ZoneSettings): string => {
     if (!zoneProps) return 'No properties'
     const keys = Object.keys(zoneProps)
