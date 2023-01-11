@@ -1,0 +1,112 @@
+.restoreButtonContainer {
+    position: absolute;
+    transition: opacity 1s, translate 1s;
+    &.hidden {
+        opacity: 0;
+        translate: -100px;
+    }
+
+    h2 {
+        cursor: pointer;
+        padding: 0px 10px;
+        &:hover {
+            text-shadow: 0px 0px 2px #fff;
+        }
+    }
+}
+
+div.container {
+    &.slideAway {
+        translate: -350px;
+    }
+    height: 100%;
+    background: #00000070;
+    display: flex;
+    flex-direction: column;
+    transition: translate 1s;
+    div#headings {
+        display: flex;
+        padding: 0px 10px;
+
+        h2 {
+            padding-right: 20px;
+            color: gray;
+            cursor: pointer;
+
+            &:hover {
+                text-shadow: 0px 0px 2px #fff;
+            }
+            &.selected {
+                color: white;
+                text-shadow: none;
+            }
+        }
+    }
+    div.tab {
+        display: flex;
+        flex-direction: column;
+        overflow: auto;
+        padding: 0px 10px;
+
+        &.hidden {
+            display: none;
+        }
+        input {
+            &:focus-visible {
+                outline: none;
+            }
+        }
+        ul {
+            height: 100%;
+            list-style: none;
+            padding: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            color: white;
+            button {
+                color: inherit;
+                background: initial;
+                border: none;
+                font: message-box;
+                font-size: 13px;
+
+                &:hover {
+                    text-decoration: underline;
+                    cursor: pointer;
+                }
+            }
+            li {
+                transition: padding 0.2s, background-color 0.5s;
+                .infoBox {
+                    max-height: 0px;
+                    font-size: small;
+                    margin: 0;
+                    overflow: hidden;
+                    transition: max-height 0.1s;
+
+                    h3 {
+                        margin: 0;
+                    }
+                    p {
+                        margin: 0;
+                    }
+                    p.craftSetting {
+                        margin-top: 5px;
+                    }
+                }
+                &.info-open {
+                    background: #00000075;
+                    padding-top: 5px;
+                    button {
+                        text-decoration: underline;
+                    }
+                    .infoBox {
+                        max-height: 100px;
+                        padding: 10px;
+                        transition: max-height 0.5s;
+                    }
+                }
+            }
+        }
+    }
+}

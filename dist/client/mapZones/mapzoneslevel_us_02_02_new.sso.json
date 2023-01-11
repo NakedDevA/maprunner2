@@ -1,0 +1,205 @@
+{
+  "indexInRegion": 1,
+  "isVanilla": true,
+  "zoneDesc": {
+    "US_02_02_SERVICE": {
+      "props": {
+        "ZonePropertyCargoLoading": {
+          "cargosSettings": [{ "name": "CargoServiceSpareParts" }, { "name": "CargoCrateLarge" }],
+          "platformId": "US_02_02_SERVICE_MANUAL"
+        },
+        "ZonePropertyAutoRepairAndRestore": {}
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_SERVICE_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_FACTORY": {
+      "props": { "ZonePropertyCargoLoading": { "cargosSettings": [{ "name": "CargoMetalPlanks" }], "platformId": "US_02_02_FACTORY_MANUAL" } },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_FACTORY_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_MILL": {
+      "props": { "ZonePropertyCargoLoading": { "cargosSettings": [{ "name": "CargoWoodenPlanks" }], "platformId": "US_02_02_MILL_MANUAL" } },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_MILL_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_WAREHOUSE_01": {
+      "props": {
+        "ZonePropertyCargoLoading": {
+          "cargosSettings": [{ "name": "CargoPipesMedium" }, { "name": "CargoPipesSmall" }, { "name": "CargoConcreteSlab" }, { "name": "CargoBags" }],
+          "platformId": "US_02_02_WAREHOUSE_01_MANUAL"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_WAREHOUSE_01_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_WAREHOUSE_02": {
+      "props": {
+        "ZonePropertyCargoLoading": {
+          "cargosSettings": [
+            { "name": "CargoPipesMedium" },
+            { "name": "CargoPipesSmall" },
+            { "name": "CargoConcreteSlab" },
+            { "name": "CargoBags" },
+            { "name": "CargoBricks" }
+          ],
+          "platformId": "US_02_02_WAREHOUSE_02_MANUAL"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_WAREHOUSE_02_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_GAS_01_PICKUP": {
+      "props": {
+        "ZonePropertyCargoLoading": { "cargosSettings": [{ "name": "CargoBarrels" }], "platformId": "US_02_02_GAS_01_PICKUP_MANUAL" },
+        "ZonePropertyUnloadingCargo": {}
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_GAS_01_PICKUP_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_GAS_02_PICKUP": {
+      "props": { "ZonePropertyCargoLoading": { "cargosSettings": [{ "name": "CargoBarrels" }], "platformId": "US_02_02_GAS_02_PICKUP_MANUAL" } },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_GAS_02_PICKUP_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_GAS_01": { "props": { "ZonePropertyFuelStation": { "pricePerLiter": 6 } }, "__type": "ZoneSettings" },
+    "US_02_02_GAS_02": { "props": { "ZonePropertyFuelStation": { "pricePerLiter": 5 } }, "__type": "ZoneSettings" },
+    "US_02_02_OIL_SERVICE": {
+      "props": {
+        "ZonePropertyCargoLoading": {
+          "cargosSettings": [{ "name": "CargoServiceSparePartsSpecial" }, { "name": "CargoContainerLargeDrilling" }],
+          "platformId": "US_02_02_OIL_SERVICE_MANUAL"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_OIL_SERVICE_MANUAL": { "props": { "ZonePropertyManualLoading": {} }, "__type": "ZoneSettings" },
+    "US_02_02_TRUCK_STOP": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_PIPELINE": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_BRIDGE_BUILD_01": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_BRIDGE_BUILD_02": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_POLAR_BASE": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_WP_01": {
+      "props": {
+        "ZonePropertyWatchpoint": {
+          "range": 350,
+          "cameraPosStart": { "x": -4.37682, "y": 82.63235, "z": -192.1603, "__type": "Vector3d" },
+          "cameraDirStart": { "x": -0.9339, "y": 0.24681, "z": 0.25868, "__type": "Vector3d" },
+          "cameraPosEnd": { "x": -17.09708, "y": 102.3377, "z": -176.6228, "__type": "Vector3d" },
+          "cameraDirEnd": { "x": -0.82009, "y": -0.41157, "z": -0.39758, "__type": "Vector3d" },
+          "animationTime": 5000,
+          "finishDelayTime": 500
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_WP_02": {
+      "props": {
+        "ZonePropertyWatchpoint": {
+          "range": 150,
+          "cameraPosStart": { "x": 397.5738, "y": 85.10983, "z": -162.1728, "__type": "Vector3d" },
+          "cameraDirStart": { "x": -0.63343, "y": 0.26941, "z": 0.72539, "__type": "Vector3d" },
+          "cameraPosEnd": { "x": 402.7719, "y": 104.3907, "z": -153.533, "__type": "Vector3d" },
+          "cameraDirEnd": { "x": -0.75988, "y": -0.43381, "z": 0.48413, "__type": "Vector3d" },
+          "animationTime": 5000,
+          "finishDelayTime": 500
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_WP_03": {
+      "props": {
+        "ZonePropertyWatchpoint": {
+          "cameraPosStart": { "x": 39.66676, "y": 80.6244, "z": 409.3108, "__type": "Vector3d" },
+          "cameraDirStart": { "x": -0.91064, "y": 0.23228, "z": -0.34174, "__type": "Vector3d" },
+          "cameraPosEnd": { "x": 27.4821, "y": 101.4958, "z": 427.9447, "__type": "Vector3d" },
+          "cameraDirEnd": { "x": -0.18354, "y": -0.50181, "z": -0.84528, "__type": "Vector3d" },
+          "animationTime": 5000,
+          "finishDelayTime": 500
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_TRANSIT_01": {
+      "props": {
+        "ZonePropertyGateway": {
+          "cameraPos": { "x": -379.2808, "y": 94.5712, "z": -322.603, "__type": "Vector3d" },
+          "cameraDir": { "x": 0.11639, "y": -0.32971, "z": 0.93688, "__type": "Vector3d" },
+          "animationTime": 8000,
+          "startDelayTime": 3000,
+          "levelZoneLink": "level_us_02_01 || US_02_01_TRANSIT_02",
+          "extraZoneToPlaceTrucks": "level_us_02_02_new || MAP_TRANSITION_US_02_02A_OUT",
+          "extraZoneToPlaceWinch": "level_us_02_02_new || MAP_TRANSITION_US_02_02A_OUT_WINCH"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_TRANSIT_02": {
+      "props": {
+        "ZonePropertyGateway": {
+          "cameraPos": { "x": -334.1561, "y": 119.5952, "z": 384.2277, "__type": "Vector3d" },
+          "cameraDir": { "x": 0.27637, "y": -0.39914, "z": -0.87425, "__type": "Vector3d" },
+          "animationTime": 8000,
+          "startDelayTime": 3000,
+          "levelZoneLink": "level_us_02_04_new || MAP_TRANSITION_02_04_A",
+          "extraZoneToPlaceTrucks": "level_us_02_02_new || MAP_TRANSITION_US_02_02B_OUT",
+          "extraZoneToPlaceWinch": "level_us_02_02_new || MAP_TRANSITION_US_02_02B_OUT_WINCH"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_TRANSIT_03": {
+      "props": {
+        "ZonePropertyGateway": {
+          "cameraPos": { "x": 154.9572, "y": 133.1271, "z": -389.6707, "__type": "Vector3d" },
+          "cameraDir": { "x": -0.6302, "y": -0.3862, "z": 0.67358, "__type": "Vector3d" },
+          "animationTime": 8000,
+          "startDelayTime": 3000,
+          "levelZoneLink": "level_us_02_03_new || US_02_03_TRANSIT_02",
+          "extraZoneToPlaceTrucks": "level_us_02_02_new || MAP_TRANSITION_US_02_02C_OUT",
+          "extraZoneToPlaceWinch": "level_us_02_02_new || MAP_TRANSITION_US_02_02C_OUT_WINCH"
+        }
+      },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_VILLAGE": { "props": { "ZonePropertyUnloadingCargo": {} }, "__type": "ZoneSettings" },
+    "US_02_02_TRAILER_GARAGE_01": { "props": { "ZonePropertyTrailerAttach": {} }, "__type": "ZoneSettings" },
+    "US_02_02_TRAILER_GARAGE_02": { "props": { "ZonePropertyTrailerAttach": {} }, "__type": "ZoneSettings" },
+    "US_02_02_TO_THE_TOWER_CNT": { "__type": "ZoneSettings" },
+    "US_02_02_TO_THE_TOWER": { "__type": "ZoneSettings" },
+    "US_02_02_SERVICE_CONVOY_TSK": { "__type": "ZoneSettings" },
+    "US_02_02_BRICKS_ON_RIVER_TSK": { "__type": "ZoneSettings" },
+    "US_02_02_BRICKS_01": { "__type": "ZoneSettings" },
+    "US_02_02_BRICKS_02": { "__type": "ZoneSettings" },
+    "US_02_02_BRICKS_03": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_01_CNT": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_02": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_03": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_04": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_05": { "__type": "ZoneSettings" },
+    "US_02_02_CRATES_06": { "__type": "ZoneSettings" },
+    "US_02_02_WORKING_STIFF_TSK": { "__type": "ZoneSettings" },
+    "US_02_02_ENVIRONMENTAL_ISSUE_TSK": { "__type": "ZoneSettings" },
+    "US_02_02_RESEARCH_ZONE": { "__type": "ZoneSettings" },
+    "US_02_02_PIPELINE_01": { "__type": "ZoneSettings" },
+    "US_02_02_UPG_01": {
+      "props": { "ZonePropertyUpgradesGiver": { "upgrades": ["chevrolet_kodiak_c70_transferbox_allwheels"] } },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_UPG_02": { "props": { "ZonePropertyUpgradesGiver": { "upgrades": ["us_truck_old_engine_2"] } }, "__type": "ZoneSettings" },
+    "US_02_02_UPG_04": {
+      "props": { "ZonePropertyUpgradesGiver": { "upgrades": ["international_loadstar_1700_suspension_high"] } },
+      "__type": "ZoneSettings"
+    },
+    "US_02_02_UPG_05": { "props": { "ZonePropertyUpgradesGiver": { "upgrades": ["us_truck_modern_engine_2"] } }, "__type": "ZoneSettings" },
+    "US_02_02_UPG_06": { "props": { "ZonePropertyUpgradesGiver": { "upgrades": ["g_truck_highrange"] } }, "__type": "ZoneSettings" },
+    "US_02_02_TO_THE_TOWER_2": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02A_OUT": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02A_OUT_WINCH": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02B_OUT": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02B_OUT_WINCH": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02C_OUT": { "__type": "ZoneSettings" },
+    "MAP_TRANSITION_US_02_02C_OUT_WINCH": { "__type": "ZoneSettings" }
+  },
+  "__type": "MapWithZonesDesc"
+}

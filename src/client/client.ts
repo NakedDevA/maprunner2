@@ -1,351 +1,148 @@
 import { GUI } from 'dat.gui'
 import * as THREE from 'three'
-import { Layers } from 'three'
+import { Box3, Layers, Vector3 } from 'three'
 import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
+import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
+import { renderMenu } from './menu'
+import { levelJsonPath, terrainImagePath, tintImagePath, mapZonesJsonPath } from './pathUtils'
 
 const maps = {
-
     //trials:
     trial_01_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_01_01.pak.json',
-            './terrainimages/level_trial_01_01_map.png',
-            './tint/level_trial_01_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_01_01', false)
     },
     trial_01_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_01_02.pak.json',
-            './terrainimages/level_trial_01_02_map.png',
-            './tint/level_trial_01_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_01_02', false)
     },
     trial_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_02_01.pak.json',
-            './terrainimages/level_trial_02_01_map.png',
-            './tint/level_trial_02_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_02_01', true)
     },
     trial_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_02_02.pak.json',
-            './terrainimages/level_trial_02_02_map.png',
-            './tint/level_trial_02_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_02_02', true)
     },
     trial_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_01.pak.json',
-            './terrainimages/level_trial_03_01_map.png',
-            './tint/level_trial_03_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_03_01', true)
     },
     trial_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_02.pak.json',
-            './terrainimages/level_trial_03_02_map.png',
-            './tint/level_trial_03_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_03_02', false)
     },
     trial_03_03: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_03_03.pak.json',
-            './terrainimages/level_trial_03_03_map.png',
-            './tint/level_trial_03_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_03_03', false)
     },
     trial_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_04_01.pak.json',
-            './terrainimages/level_trial_04_01_map.png',
-            './tint/level_trial_04_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_04_01', false)
     },
     trial_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_04_02.pak.json',
-            './terrainimages/level_trial_04_02_map.png',
-            './tint/level_trial_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_trial_04_02', true)
     },
     trial_05_01: async function () {
-        await switchToLevel(
-            './leveljson/level_trial_05_01.pak.json',
-            './terrainimages/level_trial_05_01_map.png',
-            './tint/level_trial_05_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_trial_05_01', false)
     },
     //michigan
     us_01_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_01.pak.json',
-            './terrainimages/level_us_01_01_map.png',
-            './tint/level_us_01_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_01', false)
     },
     us_01_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_02.pak.json',
-            './terrainimages/level_us_01_02_map.png',
-            './tint/level_us_01_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_02', false)
     },
     us_01_03: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_03.pak.json',
-            './terrainimages/level_us_01_03_map.png',
-            './tint/level_us_01_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_03', false)
     },
     us_01_04: async function () {
-        await switchToLevel(
-            './leveljson/level_us_01_04_new.pak.json',
-            './terrainimages/level_us_01_04_new_map.png',
-            './tint/level_us_01_04_new_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_01_04_new', false)
     },
     //alaska
     us_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_01.pak.json',
-            './terrainimages/level_us_02_01_map.png',
-            './tint/level_us_02_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_01', true)
     },
     us_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_02_new.pak.json',
-            './terrainimages/level_us_02_02_new_map.png',
-            './tint/level_us_02_02_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_02_new', true)
     },
     us_02_03: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_03_new.pak.json',
-            './terrainimages/level_us_02_03_new_map.png',
-            './tint/level_us_02_03_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_03_new', true)
     },
     us_02_04: async function () {
-        await switchToLevel(
-            './leveljson/level_us_02_04_new.pak.json',
-            './terrainimages/level_us_02_04_new_map.png',
-            './tint/level_us_02_04_new_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_02_04_new', true)
     },
     // taymyr
     ru_02_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_01_crop.pak.json',
-            './terrainimages/level_ru_02_01_crop_map.png',
-            './tint/level_ru_02_01_crop_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_01_crop', false)
     },
     ru_02_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_02.pak.json',
-            './terrainimages/level_ru_02_02_map.png',
-            './tint/level_ru_02_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_02', false)
     },
     ru_02_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_03.pak.json',
-            './terrainimages/level_ru_02_03_map.png',
-            './tint/level_ru_02_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_03', false)
     },
     ru_02_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_02_04.pak.json',
-            './terrainimages/level_ru_02_04_map.png',
-            './tint/level_ru_02_04_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_02_04', false)
     },
     // kola
     ru_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_03_01.pak.json',
-            './terrainimages/level_ru_03_01_map.png',
-            './tint/level_ru_03_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_03_01', true)
     },
     ru_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_03_02.pak.json',
-            './terrainimages/level_ru_03_02_map.png',
-            './tint/level_ru_03_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_03_02', true)
     },
     // amur
     ru_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_01.pak.json',
-            './terrainimages/level_ru_04_01_map.png',
-            './tint/level_ru_04_01_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_01', true)
     },
     ru_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_02.pak.json',
-            './terrainimages/level_ru_04_02_map.png',
-            './tint/level_ru_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_02', true)
     },
     ru_04_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_03.pak.json',
-            './terrainimages/level_ru_04_03_map.png',
-            './tint/level_ru_04_03_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_03', true)
     },
     ru_04_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_04_04.pak.json',
-            './terrainimages/level_ru_04_04_map.png',
-            './tint/level_ru_04_04_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_ru_04_04', true)
     },
     // don
     ru_05_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_05_01.pak.json',
-            './terrainimages/level_ru_05_01_map.png',
-            './tint/level_ru_05_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_05_01', false)
     },
     ru_05_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_05_02.pak.json',
-            './terrainimages/level_ru_05_02_map.png',
-            './tint/level_ru_05_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_05_02', false)
     },
     // belozersk
     ru_08_01: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_01.pak.json',
-            './terrainimages/level_ru_08_01_map.png',
-            './tint/level_ru_08_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_01', false)
     },
     ru_08_02: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_02.pak.json',
-            './terrainimages/level_ru_08_02_map.png',
-            './tint/level_ru_08_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_02', false)
     },
     ru_08_03: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_03.pak.json',
-            './terrainimages/level_ru_08_03_map.png',
-            './tint/level_ru_08_03_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_03', false)
     },
     ru_08_04: async function () {
-        await switchToLevel(
-            './leveljson/level_ru_08_04.pak.json',
-            './terrainimages/level_ru_08_04_map.png',
-            './tint/level_ru_08_04_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_ru_08_04', false)
     },
     //wisconsin
     us_03_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_03_01.pak.json',
-            './terrainimages/level_us_03_01_map.png',
-            './tint/level_us_03_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_03_01', false)
     },
     us_03_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_03_02.pak.json',
-            './terrainimages/level_us_03_02_map.png',
-            './tint/level_us_03_02_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_03_02', false)
     },
     //yukon
     us_04_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_04_01.pak.json',
-            './terrainimages/level_us_04_01_map.png',
-            './tint/level_us_04_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_04_01', false)
     },
     us_04_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_04_02.pak.json',
-            './terrainimages/level_us_04_02_map.png',
-            './tint/level_us_04_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_04_02', true)
     },
     //Maine
     us_06_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_06_01.pak.json',
-            './terrainimages/level_us_06_01_map.png',
-            './tint/level_us_06_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_06_01', false)
     },
     us_06_02: async function () {
-        await switchToLevel(
-            './leveljson/level_us_06_02.pak.json',
-            './terrainimages/level_us_06_02_map.png',
-            './tint/level_us_06_02_tint_map__cmp.png',
-            true
-        )
+        await switchToLevel('level_us_06_02', true)
     },
     //Tennessee
     us_07_01: async function () {
-        await switchToLevel(
-            './leveljson/level_us_07_01.pak.json',
-            './terrainimages/level_us_07_01_map.png',
-            './tint/level_us_07_01_tint_map__cmp.png',
-            false
-        )
+        await switchToLevel('level_us_07_01', false)
     },
 }
 const scene = new THREE.Scene()
@@ -366,6 +163,7 @@ renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
+const defaultCameraOffset = new Vector3(0, 800, -900)
 
 init()
 animate()
@@ -376,7 +174,6 @@ maps.us_01_01()
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
-    camera.position.set(0, 800, -900) // qqtas may be based on map size
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
@@ -403,17 +200,68 @@ function init() {
     }
 
     const gui = new GUI()
-    const layersFolder = gui.addFolder('Layers')
-    const mapsFolder = gui.addFolder('Maps')
+    const layersFolder = gui.addFolder('Debug Layers')
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
-    layersFolder.open()
+
+    const michiganFolder = gui.addFolder('Michigan')
+    const alaskaFolder = gui.addFolder('Alaska')
+    const taymyrFolder = gui.addFolder('Taymyr')
+    const kolaFolder = gui.addFolder('Kola')
+    const yukonFolder = gui.addFolder('Yukon')
+    const wisonsinFolder = gui.addFolder('Wisconsin')
+    const amurFolder = gui.addFolder('Amur')
+    const donFolder = gui.addFolder('Don')
+    const maineFolder = gui.addFolder('Maine')
+    const tennesseeFolder = gui.addFolder('Tennessee')
+    const belozerskFolder = gui.addFolder('Belozersk')
+    const trialsFolder = gui.addFolder('Trials')
 
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
     for (const functionName of allMapFunctionNames) {
-        mapsFolder.add(maps, functionName, true)
+        switch (functionName.substring(0, 5)) {
+            case 'us_01':
+                michiganFolder.add(maps, functionName)
+                break
+            case 'us_02':
+                alaskaFolder.add(maps, functionName)
+                break
+            case 'ru_02':
+                taymyrFolder.add(maps, functionName)
+                break
+            case 'ru_03':
+                kolaFolder.add(maps, functionName)
+                break
+            case 'us_04':
+                yukonFolder.add(maps, functionName)
+                break
+            case 'us_03':
+                wisonsinFolder.add(maps, functionName)
+                break
+            case 'ru_04':
+                amurFolder.add(maps, functionName)
+                break
+            case 'ru_05':
+                donFolder.add(maps, functionName)
+                break
+            case 'us_06':
+                maineFolder.add(maps, functionName)
+                break
+            case 'us_07':
+                tennesseeFolder.add(maps, functionName)
+                break
+            case 'ru_08':
+                belozerskFolder.add(maps, functionName)
+                break
+            case 'trial':
+                trialsFolder.add(maps, functionName)
+                break
+
+            default:
+                break
+        }
     }
-    mapsFolder.open()
+    michiganFolder.open()
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
@@ -438,13 +286,12 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
     scene.add(dirLight1)
     //scene.add( new THREE.CameraHelper( dirLight1.shadow.camera ) )
 
-
     if (isWinter) {
-        const alaskaAmbient = new THREE.AmbientLight(0xAAEDFF)
+        const alaskaAmbient = new THREE.AmbientLight(0xaaedff)
         alaskaAmbient.intensity = 0.2 // tinge of blue. Not sure how to make snow look good really
         scene.add(alaskaAmbient)
     } else {
-        const michiganAmbientLight = new THREE.AmbientLight(0xFFADAD) //slightly yellow - colour corrects mud to brown rather than sickly green
+        const michiganAmbientLight = new THREE.AmbientLight(0xffadad) //slightly yellow - colour corrects mud to brown rather than sickly green
         michiganAmbientLight.intensity = 0.5
         scene.add(michiganAmbientLight)
     }
@@ -500,7 +347,7 @@ function checkMouseIntersections() {
             // update info box
             if (infoElement !== null) {
                 const allIntersects = intersects.reduce((acc, intersection) => {
-                    return acc.concat(`${intersection.object.name}\n`)
+                    return acc.concat(`${intersection.object.userData.displayName}\n`)
                 }, '')
                 infoElement.innerText = allIntersects
                 infoElement.style.display = 'inline-block'
@@ -530,26 +377,55 @@ function clearScene(scene: THREE.Scene) {
         scene.remove(obj)
     }
 }
+export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: THREE.Vector3) {
+    const object = scene.getObjectByName(objName)
+    if (!object) return
+    //centre controls around our obj
+    const __box = new Box3().setFromObject(object)
+    const center = __box.getCenter(new Vector3())
+    controls.target = center
+
+    // focus camera to obj
+    camera.lookAt(object.position)
+    // position camera offset from object. NB the flipped coords are starting to mount up here.
+    camera.position.set(
+        object.position.x + offset.x * -1,
+        object.position.y + offset.y,
+        object.position.z + offset.z
+    )
+}
 
 //---------------- fetchies:
-async function switchToLevel(
-    levelJsonPath: string,
-    terrainImagePath: string,
-    tintImagePath: string,
-    isSnow: boolean
-) {
-    console.log(camera.position)
-    const levelJson: LevelJson = await fetchLevelJson(levelJsonPath)
-    const levelTexture = await fetchLevelTexture(terrainImagePath)
-    const tintTexture = await fetchLevelTexture(tintImagePath)
+
+async function switchToLevel(levelFileName: string, isSnow: boolean) {
+    const loadingSpinner = document.getElementById('loading-spinner')
+    if (loadingSpinner !== null) {
+        loadingSpinner.style.display = 'block'
+    }
+
+    const [levelJson, levelTexture, tintTexture, zonesJson] = await Promise.all([
+        fetchJson<LevelJson>(levelJsonPath(levelFileName)),
+        fetchLevelTexture(terrainImagePath(levelFileName)),
+        fetchLevelTexture(tintImagePath(levelFileName)),
+        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName)),
+    ])
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
+
+    const goToObject = (objectName: string) =>
+        moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
+    renderMenu(zonesJson, levelJson.trucks, goToObject)
+
+    moveCameraToObject('terrainMesh', scene, defaultCameraOffset)
+    if (loadingSpinner !== null) {
+        loadingSpinner.style.display = 'none'
+    }
 }
 
-async function fetchLevelJson(path: string): Promise<LevelJson> {
+export async function fetchJson<T>(path: string): Promise<T> {
     const response = await window.fetch(path)
-    const json: LevelJson = await response.json()
+    const json: T = await response.json()
     if (response.ok) {
         return json
     } else {
@@ -563,34 +439,14 @@ async function fetchLevelJson(path: string): Promise<LevelJson> {
 async function fetchLevelTexture(terrainImagePath: string) {
     const loadManager = new THREE.LoadingManager()
     const loader = new THREE.TextureLoader(loadManager)
-
-    const loadingSpinner = document.getElementById('loading-spinner')
-    loadManager.onError = () => {
-        //console.log('error')
-    }
-    loadManager.onLoad = () => {
-        //console.log('load')
-        if (loadingSpinner !== null) {
-            loadingSpinner.style.display = 'none'
-        }
-    }
-    loadManager.onStart = () => {
-        //console.log('start')
-        if (loadingSpinner !== null) {
-            loadingSpinner.style.display = 'block'
-        }
-    }
-    loadManager.onProgress = () => {
-        //console.log('progress')
-    }
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
         levelTexture.flipY = false
         console.log(levelTexture?.name)
         return levelTexture
     } catch (error) {
-        console.log ('Failed to load texture! Have you set the filenames correctly?')
-        console.log (error)
+        console.log('Failed to load texture! Have you set the filenames correctly?')
+        console.log(error)
         return new THREE.Texture()
     }
 }

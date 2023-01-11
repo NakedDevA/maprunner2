@@ -2,7 +2,10 @@
     "compilerOptions": {
         "target": "ES6",
         "moduleResolution": "node",
-        "strict": true
+        "strict": true,
+        "jsx": "react",
+        "jsxFactory": "renderer.create",
+        "jsxFragmentFactory": "renderer.fragment"
     },
     "include": ["**/*.ts", "../typings/types.ts"]
 }

@@ -43,7 +43,8 @@ export function setUpMeshesFromMap(
 }
 
 function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
-    for (const truck of trucks) {
+    for (let index = 0; index < trucks.length; index++) {
+        const truck = trucks[index]
         //console.log(zone.name)
         const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = truck.rotation
         var newBox1 = new THREE.BoxGeometry(16, 8, 8)
@@ -58,13 +59,13 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
 
-        newBox1.translate(-truck.x, truck.y, truck.z)
-
         const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
+        mesh.position.set(-truck.x, truck.y, truck.z) // NB MIRRORED
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Trucks)
-        mesh.name = truck.name
+        mesh.name = `${truck.name}_${index}`
+        mesh.userData = { displayName: truck.name }
         scene.add(mesh)
     }
 }
@@ -92,13 +93,13 @@ function addZones(
         newBox1.applyQuaternion(quaternion)
 
         const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
-        newBox1.translate(-zone.x, approxHeight, zone.z)
-
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
+        mesh.position.set(-zone.x, approxHeight, zone.z) // NB MIRRORED
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Zones)
         mesh.name = zone.name
+        mesh.userData = { displayName: zone.name }
         scene.add(mesh)
     }
 }
@@ -196,14 +197,14 @@ function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
             if (
                 landmark.name.includes('spruce_') ||
                 landmark.name.includes('tsuga') ||
-                landmark.name.includes('pine')||
+                landmark.name.includes('pine') ||
                 landmark.name.includes('larch')
             ) {
                 mergedGreenTreeGeoms.push(newBox1)
             } else if (
                 landmark.name.includes('birch_') ||
                 landmark.name.includes('aspen') ||
-                landmark.name.includes('sugar_maple') 
+                landmark.name.includes('sugar_maple')
             ) {
                 mergedAutumnTreeGeoms.push(newBox1)
             } else if (landmark.name.includes('swamp_')) {
