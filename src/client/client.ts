@@ -200,17 +200,68 @@ function init() {
     }
 
     const gui = new GUI()
-    const layersFolder = gui.addFolder('Layers')
-    const mapsFolder = gui.addFolder('Maps')
+    const layersFolder = gui.addFolder('Debug Layers')
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
 
+    const michiganFolder = gui.addFolder('Michigan')
+    const alaskaFolder = gui.addFolder('Alaska')
+    const taymyrFolder = gui.addFolder('Taymyr')
+    const kolaFolder = gui.addFolder('Kola')
+    const yukonFolder = gui.addFolder('Yukon')
+    const wisonsinFolder = gui.addFolder('Wisconsin')
+    const amurFolder = gui.addFolder('Amur')
+    const donFolder = gui.addFolder('Don')
+    const maineFolder = gui.addFolder('Maine')
+    const tennesseeFolder = gui.addFolder('Tennessee')
+    const belozerskFolder = gui.addFolder('Belozersk')
+    const trialsFolder = gui.addFolder('Trials')
+
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
     for (const functionName of allMapFunctionNames) {
-        mapsFolder.add(maps, functionName, true)
-    }
-    mapsFolder.open()
+        switch (functionName.substring(0, 5)) {
+            case 'us_01':
+                michiganFolder.add(maps, functionName)
+                break
+            case 'us_02':
+                alaskaFolder.add(maps, functionName)
+                break
+            case 'ru_02':
+                taymyrFolder.add(maps, functionName)
+                break
+            case 'ru_03':
+                kolaFolder.add(maps, functionName)
+                break
+            case 'us_04':
+                yukonFolder.add(maps, functionName)
+                break
+            case 'us_03':
+                wisonsinFolder.add(maps, functionName)
+                break
+            case 'ru_04':
+                amurFolder.add(maps, functionName)
+                break
+            case 'ru_05':
+                donFolder.add(maps, functionName)
+                break
+            case 'us_06':
+                maineFolder.add(maps, functionName)
+                break
+            case 'us_07':
+                tennesseeFolder.add(maps, functionName)
+                break
+            case 'ru_08':
+                belozerskFolder.add(maps, functionName)
+                break
+            case 'trial':
+                trialsFolder.add(maps, functionName)
+                break
 
+            default:
+                break
+        }
+    }
+    michiganFolder.open()
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
@@ -326,7 +377,7 @@ function clearScene(scene: THREE.Scene) {
         scene.remove(obj)
     }
 }
-export function moveCameraToObject(objName: string, scene: THREE.Scene, offset:THREE.Vector3) {
+export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: THREE.Vector3) {
     const object = scene.getObjectByName(objName)
     if (!object) return
     //centre controls around our obj
@@ -337,7 +388,11 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset:T
     // focus camera to obj
     camera.lookAt(object.position)
     // position camera offset from object. NB the flipped coords are starting to mount up here.
-    camera.position.set(object.position.x + (offset.x*-1), object.position.y + offset.y, object.position.z + offset.z)
+    camera.position.set(
+        object.position.x + offset.x * -1,
+        object.position.y + offset.y,
+        object.position.z + offset.z
+    )
 }
 
 //---------------- fetchies:
@@ -352,16 +407,16 @@ async function switchToLevel(levelFileName: string, isSnow: boolean) {
         fetchJson<LevelJson>(levelJsonPath(levelFileName)),
         fetchLevelTexture(terrainImagePath(levelFileName)),
         fetchLevelTexture(tintImagePath(levelFileName)),
-        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName))
+        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName)),
     ])
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
     setUpLights(scene, isSnow)
 
-    const goToObject = (objectName: string) => moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
+    const goToObject = (objectName: string) =>
+        moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
     renderMenu(zonesJson, levelJson.trucks, goToObject)
-    
-    
+
     moveCameraToObject('terrainMesh', scene, defaultCameraOffset)
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'none'
