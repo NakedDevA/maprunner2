@@ -144,6 +144,13 @@ const maps = {
     us_07_01: async function () {
         await switchToLevel('level_us_07_01', false)
     },
+    //PTS - Ontario
+    us_09_01: async function () {
+        await switchToLevel('level_us_09_01', false)
+    },
+    us_09_02: async function () {
+        await switchToLevel('level_us_09_02', false)
+    },
 }
 const scene = new THREE.Scene()
 
@@ -215,6 +222,7 @@ function init() {
     const maineFolder = gui.addFolder('Maine')
     const tennesseeFolder = gui.addFolder('Tennessee')
     const belozerskFolder = gui.addFolder('Belozersk')
+    const ptsFolder = gui.addFolder('PTS_ONTARIO')
     const trialsFolder = gui.addFolder('Trials')
 
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
@@ -252,6 +260,9 @@ function init() {
                 break
             case 'ru_08':
                 belozerskFolder.add(maps, functionName)
+                break
+            case 'us_09':
+                ptsFolder.add(maps, functionName)
                 break
             case 'trial':
                 trialsFolder.add(maps, functionName)
