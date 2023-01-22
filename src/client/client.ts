@@ -145,11 +145,17 @@ const maps = {
         await switchToLevel('level_us_07_01', false)
     },
     //PTS - Ontario
-    us_09_01: async function () {
-        await switchToLevel('level_us_09_01', false)
+    us_09_01_v210: async function () {
+        await switchToLevel('level_us_09_01', false, 'v21')
     },
-    us_09_02: async function () {
-        await switchToLevel('level_us_09_02', false)
+    us_09_02_v210: async function () {
+        await switchToLevel('level_us_09_02', false, 'v21')
+    },
+    us_09_01_v211: async function () {
+        await switchToLevel('level_us_09_01', false, 'v211')
+    },
+    us_09_02_v211: async function () {
+        await switchToLevel('level_us_09_02', false, 'v211')
     },
 }
 const scene = new THREE.Scene()
@@ -408,17 +414,17 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: 
 
 //---------------- fetchies:
 
-async function switchToLevel(levelFileName: string, isSnow: boolean) {
+async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?:string) {
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'block'
     }
 
     const [levelJson, levelTexture, tintTexture, zonesJson] = await Promise.all([
-        fetchJson<LevelJson>(levelJsonPath(levelFileName)),
+        fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
         fetchLevelTexture(terrainImagePath(levelFileName)),
         fetchLevelTexture(tintImagePath(levelFileName)),
-        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName)),
+        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
     ])
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
