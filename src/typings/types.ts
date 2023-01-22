@@ -45,6 +45,10 @@ export type TruckCoords = {
         c3: number
     }
     task: string
+    fuel: number
+    damage: number
+    visualDamage: number
+    isLocked: boolean
 }
 
 export type MapSize = {

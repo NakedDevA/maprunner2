@@ -10,7 +10,6 @@ export const renderMenu = async (
     trucks: TruckCoords[],
     goToObject: (objectName: string) => void
 ) => {
-    
     // Ugly hack to bin the entire menu before we re-render. Do two because our root element is a fragment which isn't in the DOM
     const menuElement = document.getElementById('menu')
     if (!menuElement) return
@@ -77,7 +76,11 @@ export const renderMenu = async (
                                     goToHandler={() => goToObject(truck.id)}
                                     buttonText={truck.name}
                                 >
-                                    Task name: {truck.task ? truck.task : 'none'}
+                                    <p>Task name: {truck.task ? truck.task : 'none'}</p>
+                                    <p>Fuel: {truck.fuel}%</p>
+                                    <p>Damage: {truck.damage}%</p>
+                                    <p>VisualDamage: {truck.visualDamage}%</p>
+                                    <p>IsLocked: {truck.isLocked ? 'true' : 'false'}</p>
                                 </Entry>
                             )
                         })}
