@@ -5,7 +5,7 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
-import { renderMenu } from './menu'
+import { renderMenu, mapIconClicked } from './menu'
 import { levelJsonPath, terrainImagePath, tintImagePath, mapZonesJsonPath } from './pathUtils'
 
 const maps = {
@@ -202,6 +202,7 @@ function init() {
 
     window.addEventListener('resize', onWindowResize, false)
     document.addEventListener('mousemove', onPointerMove)
+    window.addEventListener('pointerdown', onPointerDown)
 
     const layers = {
         toggleZones: function () {
@@ -332,6 +333,16 @@ function onPointerMove(event: { clientX: number; clientY: number }) {
         infoElement.style.left = `${cssPointerLocation.clientX + 20}px`
     }
 }
+function onPointerDown(event: { clientX: number; clientY: number }) {
+    if (INTERSECTED) {
+        console.log('we on something')
+        console.log(INTERSECTED)
+        console.log(INTERSECTED.name)
+        mapIconClicked(INTERSECTED.name, INTERSECTED.userData.type)
+    } else {
+        console.log('u miss')
+    }
+}
 
 function animate() {
     requestAnimationFrame(animate)
@@ -414,7 +425,7 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: 
 
 //---------------- fetchies:
 
-async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?:string) {
+async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?: string) {
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'block'

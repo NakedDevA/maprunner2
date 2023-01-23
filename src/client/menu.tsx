@@ -106,7 +106,7 @@ const Entry = (
         <li class={props.entryClass} id={props.entryId}>
             <button
                 onclick={() => {
-                    toggleInfoBox(props.entryId)
+                    openInfoBox(props.entryId)
                     props.goToHandler()
                 }}
             >
@@ -126,6 +126,7 @@ const TabFilter = (
 ) => {
     return (
         <input
+            id={'tabFilter'}
             type={Text}
             placeholder={'filter'}
             oninput={(e: { target: HTMLInputElement }) =>
@@ -310,14 +311,14 @@ const ZoneDescriptionComponent = (
     )
 }
 
-const toggleInfoBox = (clickedId: string) => {
+const openInfoBox = (clickedId: string) => {
     const clickedZoneInfo = document.querySelector(`#${clickedId}`)
     if (!clickedZoneInfo) return
 
     //close this one if it's already open
-    if (clickedZoneInfo.classList.contains('info-open')) {
+   /* if (clickedZoneInfo.classList.contains('info-open')) {
         return clickedZoneInfo.classList.remove('info-open')
-    }
+    }*/
 
     //else close all and open the chosen one
     const openZoneInfos = document.querySelectorAll('.info-open')
@@ -362,4 +363,14 @@ const showMenu = () => {
 const hideMenu = () => {
     document.querySelector('.container')?.classList.add('slideAway')
     document.querySelector('.restoreButtonContainer')?.classList.remove('hidden')
+}
+
+export const mapIconClicked = (id: string, type: 'trucks'|'zones') => {
+    //force select tab
+    onTabClicked(type)
+
+    const elementId = type === 'trucks' ? `truckEntry-${id}` : `zoneEntry-${id}`
+    document.querySelector('#tabFilter')!.nodeValue = ''
+    document.querySelector(`#${elementId}`)?.scrollIntoView()
+    openInfoBox(elementId)
 }
