@@ -230,7 +230,9 @@ const ZoneDescriptionComponent = (
                                                   <p>
                                                       Requires
                                                       <span style={'float:right'}>
-                                                          {`${requirement.name} x${requirement.count}`}
+                                                          {`${requirement.name} x${
+                                                              requirement.count ?? '1'
+                                                          }`}
                                                       </span>
                                                   </p>
                                               )
@@ -307,6 +309,28 @@ const ZoneDescriptionComponent = (
             ) : (
                 ''
             )}
+            {props.zoneProps.ZonePropertyManualLoading !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Manual Loading</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyWaterStation !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Water Station</h3>
+                    <p>Name: {props.zoneProps.ZonePropertyWaterStation.stationUIName}</p>
+                    <p>PricePerLitre: {props.zoneProps.ZonePropertyWaterStation.pricePerLiter}</p>
+                    <p>StationType: {props.zoneProps.ZonePropertyWaterStation.stationType}</p>
+                    <p>Water: {props.zoneProps.ZonePropertyWaterStation.water ?? '0'}</p>
+                    <p>WaterCapacity: {props.zoneProps.ZonePropertyWaterStation.waterCapacity}</p>
+                    {props.zoneProps.ZonePropertyWaterStation.sharedZones?.map((zone) => {
+                        return <p>SharedZone:{zone.globalZoneId}</p>
+                    }) ?? ''}
+                </div>
+            ) : (
+                ''
+            )}
         </>
     )
 }
@@ -372,12 +396,12 @@ export const mapIconClicked = (id: string, type: 'trucks' | 'zones') => {
     onTabClicked(type)
 
     //reset filter
-    const filter = (document.querySelector('#tabFilter') as HTMLInputElement | undefined)
+    const filter = document.querySelector('#tabFilter') as HTMLInputElement | undefined
     if (filter) {
         filter.value = ''
-        filter.dispatchEvent(new Event('input', { 'bubbles': true }));
+        filter.dispatchEvent(new Event('input', { bubbles: true }))
     }
-    
+
     //show content
     document.querySelector(`#${elementId}`)?.scrollIntoView()
     openInfoBox(elementId)
