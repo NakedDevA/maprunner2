@@ -365,7 +365,7 @@ function checkMouseIntersections() {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
             INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
-            INTERSECTED.material.emissive.setHex(0xff0000)
+            INTERSECTED.material.emissive.setHex(0x1FFD00)
 
             // update info box
             if (infoElement !== null) {
