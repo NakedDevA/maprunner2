@@ -334,14 +334,9 @@ function onPointerMove(event: { clientX: number; clientY: number }) {
     }
 }
 function onPointerDown(event: { clientX: number; clientY: number }) {
-    if (INTERSECTED) {
-        console.log('we on something')
-        console.log(INTERSECTED)
-        console.log(INTERSECTED.name)
+    if (INTERSECTED && INTERSECTED.userData?.type) {
         mapIconClicked(INTERSECTED.name, INTERSECTED.userData.type)
-    } else {
-        console.log('u miss')
-    }
+    } 
 }
 
 function animate() {

@@ -316,7 +316,7 @@ const openInfoBox = (clickedId: string) => {
     if (!clickedZoneInfo) return
 
     //close this one if it's already open
-   /* if (clickedZoneInfo.classList.contains('info-open')) {
+    /* if (clickedZoneInfo.classList.contains('info-open')) {
         return clickedZoneInfo.classList.remove('info-open')
     }*/
 
@@ -365,12 +365,20 @@ const hideMenu = () => {
     document.querySelector('.restoreButtonContainer')?.classList.remove('hidden')
 }
 
-export const mapIconClicked = (id: string, type: 'trucks'|'zones') => {
+export const mapIconClicked = (id: string, type: 'trucks' | 'zones') => {
+    const elementId = type === 'trucks' ? `truckEntry-${id}` : `zoneEntry-${id}`
+
     //force select tab
     onTabClicked(type)
 
-    const elementId = type === 'trucks' ? `truckEntry-${id}` : `zoneEntry-${id}`
-    document.querySelector('#tabFilter')!.nodeValue = ''
+    //reset filter
+    const filter = (document.querySelector('#tabFilter') as HTMLInputElement | undefined)
+    if (filter) {
+        filter.value = ''
+        filter.dispatchEvent(new Event('input', { 'bubbles': true }));
+    }
+    
+    //show content
     document.querySelector(`#${elementId}`)?.scrollIntoView()
     openInfoBox(elementId)
 }
