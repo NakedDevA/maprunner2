@@ -65,7 +65,7 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Trucks)
         mesh.name = `${truck.name}_${index}`
-        mesh.userData = { displayName: truck.name }
+        mesh.userData = { displayName: truck.name, type: 'trucks' }
         scene.add(mesh)
     }
 }
@@ -99,7 +99,7 @@ function addZones(
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Zones)
         mesh.name = zone.name
-        mesh.userData = { displayName: zone.name }
+        mesh.userData = { displayName: zone.name, type: 'zones' }
         scene.add(mesh)
     }
 }

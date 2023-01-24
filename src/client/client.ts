@@ -5,7 +5,7 @@ import { MapControls } from 'three/examples/jsm/controls/OrbitControls'
 import { LevelJson } from '../typings/types'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
-import { renderMenu } from './menu'
+import { renderMenu, mapIconClicked } from './menu'
 import { levelJsonPath, terrainImagePath, tintImagePath, mapZonesJsonPath } from './pathUtils'
 
 const maps = {
@@ -144,6 +144,19 @@ const maps = {
     us_07_01: async function () {
         await switchToLevel('level_us_07_01', false)
     },
+    //PTS - Ontario
+    us_09_01_v210: async function () {
+        await switchToLevel('level_us_09_01', false, 'v21')
+    },
+    us_09_02_v210: async function () {
+        await switchToLevel('level_us_09_02', false, 'v21')
+    },
+    us_09_01_v211: async function () {
+        await switchToLevel('level_us_09_01', false, 'v211')
+    },
+    us_09_02_v211: async function () {
+        await switchToLevel('level_us_09_02', false, 'v211')
+    },
 }
 const scene = new THREE.Scene()
 
@@ -189,6 +202,7 @@ function init() {
 
     window.addEventListener('resize', onWindowResize, false)
     document.addEventListener('mousemove', onPointerMove)
+    window.addEventListener('pointerdown', onPointerDown)
 
     const layers = {
         toggleZones: function () {
@@ -215,6 +229,7 @@ function init() {
     const maineFolder = gui.addFolder('Maine')
     const tennesseeFolder = gui.addFolder('Tennessee')
     const belozerskFolder = gui.addFolder('Belozersk')
+    const ptsFolder = gui.addFolder('PTS_ONTARIO')
     const trialsFolder = gui.addFolder('Trials')
 
     const allMapFunctionNames = Object.getOwnPropertyNames(maps)
@@ -252,6 +267,9 @@ function init() {
                 break
             case 'ru_08':
                 belozerskFolder.add(maps, functionName)
+                break
+            case 'us_09':
+                ptsFolder.add(maps, functionName)
                 break
             case 'trial':
                 trialsFolder.add(maps, functionName)
@@ -315,6 +333,11 @@ function onPointerMove(event: { clientX: number; clientY: number }) {
         infoElement.style.left = `${cssPointerLocation.clientX + 20}px`
     }
 }
+function onPointerDown(event: { clientX: number; clientY: number }) {
+    if (INTERSECTED && INTERSECTED.userData?.type) {
+        mapIconClicked(INTERSECTED.name, INTERSECTED.userData.type)
+    } 
+}
 
 function animate() {
     requestAnimationFrame(animate)
@@ -342,7 +365,7 @@ function checkMouseIntersections() {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
             INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
-            INTERSECTED.material.emissive.setHex(0xff0000)
+            INTERSECTED.material.emissive.setHex(0x1FFD00)
 
             // update info box
             if (infoElement !== null) {
@@ -397,17 +420,17 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: 
 
 //---------------- fetchies:
 
-async function switchToLevel(levelFileName: string, isSnow: boolean) {
+async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?: string) {
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
         loadingSpinner.style.display = 'block'
     }
 
     const [levelJson, levelTexture, tintTexture, zonesJson] = await Promise.all([
-        fetchJson<LevelJson>(levelJsonPath(levelFileName)),
+        fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
         fetchLevelTexture(terrainImagePath(levelFileName)),
         fetchLevelTexture(tintImagePath(levelFileName)),
-        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName)),
+        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
     ])
     clearScene(scene)
     setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)

@@ -10,7 +10,6 @@ export const renderMenu = async (
     trucks: TruckCoords[],
     goToObject: (objectName: string) => void
 ) => {
-    
     // Ugly hack to bin the entire menu before we re-render. Do two because our root element is a fragment which isn't in the DOM
     const menuElement = document.getElementById('menu')
     if (!menuElement) return
@@ -77,7 +76,11 @@ export const renderMenu = async (
                                     goToHandler={() => goToObject(truck.id)}
                                     buttonText={truck.name}
                                 >
-                                    Task name: {truck.task ? truck.task : 'none'}
+                                    <p>Task name: {truck.task ? truck.task : 'none'}</p>
+                                    <p>Fuel: {truck.fuel}%</p>
+                                    <p>Damage: {truck.damage}%</p>
+                                    <p>VisualDamage: {truck.visualDamage}%</p>
+                                    <p>IsLocked: {truck.isLocked ? 'true' : 'false'}</p>
                                 </Entry>
                             )
                         })}
@@ -103,7 +106,7 @@ const Entry = (
         <li class={props.entryClass} id={props.entryId}>
             <button
                 onclick={() => {
-                    toggleInfoBox(props.entryId)
+                    openInfoBox(props.entryId)
                     props.goToHandler()
                 }}
             >
@@ -123,6 +126,7 @@ const TabFilter = (
 ) => {
     return (
         <input
+            id={'tabFilter'}
             type={Text}
             placeholder={'filter'}
             oninput={(e: { target: HTMLInputElement }) =>
@@ -226,7 +230,9 @@ const ZoneDescriptionComponent = (
                                                   <p>
                                                       Requires
                                                       <span style={'float:right'}>
-                                                          {`${requirement.name} x${requirement.count}`}
+                                                          {`${requirement.name} x${
+                                                              requirement.count ?? '1'
+                                                          }`}
                                                       </span>
                                                   </p>
                                               )
@@ -303,18 +309,40 @@ const ZoneDescriptionComponent = (
             ) : (
                 ''
             )}
+            {props.zoneProps.ZonePropertyManualLoading !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Manual Loading</h3>
+                </div>
+            ) : (
+                ''
+            )}
+            {props.zoneProps.ZonePropertyWaterStation !== undefined ? (
+                <div class={'zoneProp'}>
+                    <h3>Water Station</h3>
+                    <p>Name: {props.zoneProps.ZonePropertyWaterStation.stationUIName}</p>
+                    <p>PricePerLitre: {props.zoneProps.ZonePropertyWaterStation.pricePerLiter}</p>
+                    <p>StationType: {props.zoneProps.ZonePropertyWaterStation.stationType}</p>
+                    <p>Water: {props.zoneProps.ZonePropertyWaterStation.water ?? '0'}</p>
+                    <p>WaterCapacity: {props.zoneProps.ZonePropertyWaterStation.waterCapacity}</p>
+                    {props.zoneProps.ZonePropertyWaterStation.sharedZones?.map((zone) => {
+                        return <p>SharedZone:{zone.globalZoneId}</p>
+                    }) ?? ''}
+                </div>
+            ) : (
+                ''
+            )}
         </>
     )
 }
 
-const toggleInfoBox = (clickedId: string) => {
+const openInfoBox = (clickedId: string) => {
     const clickedZoneInfo = document.querySelector(`#${clickedId}`)
     if (!clickedZoneInfo) return
 
     //close this one if it's already open
-    if (clickedZoneInfo.classList.contains('info-open')) {
+    /* if (clickedZoneInfo.classList.contains('info-open')) {
         return clickedZoneInfo.classList.remove('info-open')
-    }
+    }*/
 
     //else close all and open the chosen one
     const openZoneInfos = document.querySelectorAll('.info-open')
@@ -359,4 +387,22 @@ const showMenu = () => {
 const hideMenu = () => {
     document.querySelector('.container')?.classList.add('slideAway')
     document.querySelector('.restoreButtonContainer')?.classList.remove('hidden')
+}
+
+export const mapIconClicked = (id: string, type: 'trucks' | 'zones') => {
+    const elementId = type === 'trucks' ? `truckEntry-${id}` : `zoneEntry-${id}`
+
+    //force select tab
+    onTabClicked(type)
+
+    //reset filter
+    const filter = document.querySelector('#tabFilter') as HTMLInputElement | undefined
+    if (filter) {
+        filter.value = ''
+        filter.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
+    //show content
+    document.querySelector(`#${elementId}`)?.scrollIntoView()
+    openInfoBox(elementId)
 }

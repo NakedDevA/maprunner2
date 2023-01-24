@@ -48,7 +48,7 @@ npm run deploy
 
 9. Deploy to netflify
 
-Specify /dist/client when promted for dir
+Specify dist/client when promted for dir
 ```bash
 netlify deploy
 netfliy deploy --prod

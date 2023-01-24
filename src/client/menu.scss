@@ -101,7 +101,7 @@ div.container {
                         text-decoration: underline;
                     }
                     .infoBox {
-                        max-height: 100px;
+                        max-height: fit-content;
                         padding: 10px;
                         transition: max-height 0.5s;
                     }
