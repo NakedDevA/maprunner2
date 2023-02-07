@@ -32,14 +32,14 @@ export function setUpMeshesFromMap(
     //SR map points run bottom to top, right to left. So we have to reverse points in both axes
     // All the coordinate weirdness is done to the terrain mesh so we can be in sane happy land for objects ON the map
     const listToReverse = [...heightMapList]
-    const reversedList = listToReverse.reverse()
+    const reversedList = listToReverse
     const chunked = chunk(reversedList, mapSize.pointsX)
-    const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
+    const fixedHeightMap = chunked.flat()
 
     addLandmarks(landmarks, scene, landmarkModels)
-    addTerrain(mapSize, levelTexture, tintTexture, scene, fixedHeightMap)
+    addTerrain(mapSize, levelTexture, tintTexture, scene, heightMapList)
     addModels(models, scene, landmarkModels)
-    addZones(zones, scene, fixedHeightMap, mapSize)
+    addZones(zones, scene, heightMapList, mapSize)
     addTrucks(trucks, scene, landmarkModels)
 }
 
@@ -64,7 +64,7 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene, landmarkModels: La
         const matrix = new THREE.Matrix4()
         // prettier-ignore
         matrix.set(
-            -a1, -b1, -c1, 0, 
+            a1, b1, c1, 0, 
             a2, b2, c2, 0, 
             a3, b3, c3, 0, 
             0, 0, 0, 1)
@@ -72,10 +72,9 @@ function addTrucks(trucks: TruckCoords[], scene: THREE.Scene, landmarkModels: La
         // some models correspond to the landmarks we're already drawing, potential for duplicates!
         const geom = landmarkGeometry.clone()
         geom.applyMatrix4(matrix)
-        geom.computeVertexNormals()
 
         const mesh = new THREE.Mesh(geom, landmarkUVMaterial(textureName!))
-        mesh.position.set(-truck.x, truck.y, truck.z) // NB MIRRORED
+        mesh.position.set(truck.x, truck.y, truck.z) 
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Trucks)
@@ -99,16 +98,16 @@ function addZones(
         const matrix = new THREE.Matrix4()
         // prettier-ignore
         matrix.set(
-            zone.angleA, 0, zone.angleB, 0, 
+            zone.angleA, 0, -zone.angleB, 0, 
             0, 1, 0, 0, 
-            -zone.angleB, 0, zone.angleA, 0, 
+            zone.angleB, 0, zone.angleA, 0, 
             0, 0, 0, 1)
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
 
         const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
-        mesh.position.set(-zone.x, approxHeight, zone.z) // NB MIRRORED
+        mesh.position.set(zone.x, approxHeight, zone.z)
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Zones)
@@ -130,8 +129,7 @@ function approxTerrainHeightAtPoint(
 
     // If the heightMap is a 2d array, find the approximate column and row out object coordinates would be in
     const approxColumn = Math.floor((mapSize.pointsX * absoluteObjectX) / mapSize.mapX)
-    const approxRow =
-        mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
+    const approxRow = Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
 
     // Get the value at this location in the 2d array
     const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
@@ -174,9 +172,9 @@ async function addModels(models: ModelCoords[], scene: THREE.Scene, landmarkMode
                 const matrix = new THREE.Matrix4()
                 // prettier-ignore
                 matrix.set(
-                    a1, a2, a3, -instance.x + xOffset, 
-                    b1, b2, b3, instance.y + yOffset, 
-                    c1, c2, c3, instance.z + zOffset, 
+                    a1, b1, c1, instance.x + xOffset, 
+                    a2, b2, c2, instance.y + yOffset, 
+                    a3, b3, c3, instance.z + zOffset, 
                     0, 0, 0, 1)
 
                 // some models correspond to the landmarks we're already drawing, potential for duplicates!
@@ -196,7 +194,7 @@ async function addModels(models: ModelCoords[], scene: THREE.Scene, landmarkMode
                 const matrix = new THREE.Matrix4()
                 // prettier-ignore
                 matrix.set(
-                    -a1, -b1, -c1, -instance.x, 
+                    a1, b1, c1, instance.x, 
                     a2, b2, c2, instance.y, 
                     a3, b3, c3, instance.z, 
                     0, 0, 0, 1)
@@ -204,7 +202,6 @@ async function addModels(models: ModelCoords[], scene: THREE.Scene, landmarkMode
                 // some models correspond to the landmarks we're already drawing, potential for duplicates!
                 const geom = landmarkGeometry.clone()
                 geom.applyMatrix4(matrix)
-                geom.computeVertexNormals()
                 const keystring = textureName ?? NO_TEXTURE_KEY
                 if (geometriesByMaterial[keystring]) geometriesByMaterial[keystring].push(geom)
                 else geometriesByMaterial[keystring] = [geom]
@@ -236,7 +233,6 @@ function addTerrain(
     geometry.name = 'terraingeom'
 
     geometry.rotateX(-Math.PI / 2) // flat plane
-    geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
 
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
@@ -292,16 +288,7 @@ function addLandmarks(
             matrix.makeRotationFromQuaternion(rotateQuat)
             matrix.setPosition(entry.x, entry.y, entry.z)
 
-            // prettier-ignore
-            matrix.set(
-                    -matrix.elements[0], matrix.elements[4],-matrix.elements[8],-matrix.elements[12],
-                    matrix.elements[1], matrix.elements[5],matrix.elements[9],matrix.elements[13],
-                    matrix.elements[2], matrix.elements[6],matrix.elements[10],matrix.elements[14],
-                    matrix.elements[3], matrix.elements[7],matrix.elements[11],matrix.elements[15],
-                    )
-
             geom.applyMatrix4(matrix)
-            geom.computeVertexNormals()
 
             const keystring = textureName ?? NO_TEXTURE_KEY
             if (geometriesByMaterial[keystring]) geometriesByMaterial[keystring].push(geom)

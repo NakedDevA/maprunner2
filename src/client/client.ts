@@ -190,13 +190,18 @@ renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
-const defaultCameraOffset = new Vector3(0, 800, -900)
+const defaultCameraOffset = new Vector3(0, 800, 900)
 
 init()
 animate()
 
 // load initial map:
 maps.us_01_01()
+
+// IMPORTANT: threejs z-axis points the opposite way from SR coordinates.
+// Fixing it here at the scene level means we can input positions to the scene directly from the game, and everything looks as it should.
+// Everything OUTSIDE the scene (camera, lights, helpers etc) needs to be aware of this and flip coords to match.
+scene.scale.z = -1
 
 //-----------------------
 function init() {
@@ -215,6 +220,7 @@ function init() {
     controls.minDistance = 10
     controls.maxDistance = 2000
     controls.maxPolarAngle = Math.PI / 2
+    controls.zoomSpeed = 2
 
     window.addEventListener('resize', onWindowResize, false)
     document.addEventListener('mousemove', onPointerMove)
@@ -311,8 +317,8 @@ function init() {
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
-    const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
-    dirLight1.position.set(2000, 1250, 0)
+    const dirLight1 = new THREE.DirectionalLight(0xffffff)
+    dirLight1.position.set(-2000, 1250, 0) // the sun is on the left, as in SR and real life
     dirLight1.intensity = isWinter ? 1 : 1.2 // avoid blowing eyes out on snow
     dirLight1.castShadow = true
     const r = 3
@@ -334,7 +340,7 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
 
     if (isWinter) {
         const alaskaAmbient = new THREE.AmbientLight(0xaaedff)
-        alaskaAmbient.intensity = 0.3 // tinge of blue. Not sure how to make snow look good really
+        alaskaAmbient.intensity = 0.3 // tinge of blue to make pretty snow
         scene.add(alaskaAmbient)
     } else {
         const michiganAmbientLight = new THREE.AmbientLight(0xffadad) //slightly yellow - colour corrects mud to brown rather than sickly green
@@ -398,7 +404,7 @@ function checkMouseIntersections() {
             // update info box
             if (infoElement !== null) {
                 // Intersections can be an individual *face* of a model, so we map them to unique objects first
-                const intersectedObjects = [...new Set([...intersects.map(i=>i.object)])]
+                const intersectedObjects = [...new Set([...intersects.map((i) => i.object)])]
 
                 const allIntersects = intersectedObjects.reduce((acc, object) => {
                     return acc.concat(`${object.userData.displayName}\n`)
@@ -427,10 +433,10 @@ function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<
 function clearScene(scene: THREE.Scene) {
     for (var i = scene.children.length - 1; i >= 0; i--) {
         var obj = scene.children[i]
-        //console.log(`removing ${obj.name}`)
         scene.remove(obj)
     }
 }
+
 export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: THREE.Vector3) {
     const object = scene.getObjectByName(objName)
     if (!object) return
@@ -441,16 +447,15 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: 
 
     // focus camera to obj
     camera.lookAt(object.position)
-    // position camera offset from object. NB the flipped coords are starting to mount up here.
+    // position camera offset from object. NB the SCENE is z-flipped but camera is not
     camera.position.set(
-        object.position.x + offset.x * -1,
+        object.position.x + offset.x,
         object.position.y + offset.y,
-        object.position.z + offset.z
+        -object.position.z + offset.z // There's the z-flip
     )
 }
 
 //---------------- fetchies:
-
 async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?: string) {
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
@@ -470,7 +475,7 @@ async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuff
     setUpLights(scene, isSnow)
 
     const goToObject = (objectName: string) =>
-        moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
+        moveCameraToObject(objectName, scene, new THREE.Vector3(-75, 125, 125))
     renderMenu(zonesJson, levelJson.trucks, goToObject)
 
     moveCameraToObject('terrainMesh', scene, defaultCameraOffset)
@@ -497,7 +502,6 @@ async function fetchLevelTexture(terrainImagePath: string) {
     const loader = new THREE.TextureLoader(loadManager)
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
-        levelTexture.flipY = false
         //console.log(levelTexture?.name)
         return levelTexture
     } catch (error) {

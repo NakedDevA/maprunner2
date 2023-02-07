@@ -8,17 +8,15 @@ export const lookUpLandmarkData = (name: string, data: LandmarkIndex): LandmarkF
 }
 
 export const makeLandmarkGeometry = (landmark: LandmarkFile): THREE.BufferGeometry => {
-    // IMPORTANT: we have to flip the geometries to convert SR engine coords to Threejs.
-    // This is done by flipping trucks in x, which also inverts the face normals from outside to inside
     const meshNode = pickLastMeshNode(landmark)
     const mesh = meshNode.mesh!
 
-    const faces = mesh.faces.reduce<number[]>((acc, face) => acc.concat(face.c, face.b, face.a), []) //Order faces c->a to invert normals
+    const faces = mesh.faces.reduce<number[]>((acc, face) => acc.concat(face.a, face.b, face.c), []) 
 
     // Vertices and UVs are stored in the same array in the lmk file
     const { vertices, uvs } = mesh.vertices.reduce<{ vertices: number[]; uvs: number[] }>(
         (acc, vertex) => {
-            acc.vertices.push(vertex.x, vertex.y, vertex.z) //Flip x axis
+            acc.vertices.push(vertex.x, vertex.y, vertex.z) 
 
             // UVs can be negative and bigger magnitude than 1, because SR hates me.
             // Take decimal portion then wrap it around 1 if negative
@@ -44,6 +42,7 @@ export const makeLandmarkGeometry = (landmark: LandmarkFile): THREE.BufferGeomet
         matrix.fromArray(meshNode.matrix)
         manualGeometry.applyMatrix4(matrix)
     }
+    manualGeometry.computeVertexNormals()
     return manualGeometry
 }
 
