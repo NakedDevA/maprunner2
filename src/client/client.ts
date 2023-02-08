@@ -191,7 +191,7 @@ export const enum LAYERS {
     BackupModels,
 }
 var INTERSECTED: any //currently hovered item
-const renderer = new THREE.WebGLRenderer({ antialias: true })
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer:true })
 renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
