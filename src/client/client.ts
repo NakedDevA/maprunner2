@@ -155,17 +155,23 @@ const maps = {
     us_09_01_v210: async function () {
         await switchToLevel('level_us_09_01', false, 'v21')
     },
-    us_09_02_v210: async function () {
-        await switchToLevel('level_us_09_02', false, 'v21')
-    },
     us_09_01_v211: async function () {
         await switchToLevel('level_us_09_01', false, 'v211')
+    },
+    us_09_01_v212: async function () {
+        await switchToLevel('level_us_09_01', false, 'v212')
+    },
+    us_09_01_v213: async function () {
+        await switchToLevel('level_us_09_01', false, 'v213')
+    },
+    us_09_02_v210: async function () {
+        await switchToLevel('level_us_09_02', false, 'v21')
     },
     us_09_02_v211: async function () {
         await switchToLevel('level_us_09_02', false, 'v211')
     },
-    us_09_01_v213: async function () {
-        await switchToLevel('level_us_09_01', false, 'v213')
+    us_09_02_v212: async function () {
+        await switchToLevel('level_us_09_02', false, 'v212')
     },
     us_09_02_v213: async function () {
         await switchToLevel('level_us_09_02', false, 'v213')
