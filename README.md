@@ -63,3 +63,12 @@ netfliy deploy --prod
 4. Add ground texture file to /dist/client
 5. Add button to show new map
 6. Deploy
+
+## Adding Textures
+1. Find texture file in shared_textures.pak or main_menu_textures.pak
+2. (error message should appear in console when we try to load a missing tex)
+3. Convert pct to TGA with QCPCT
+4. Convert TGA to ong (photopea, photoshop)
+5. Shrink to max 256x256px, run through pngyu to optimise
+6. Add to dist/client/landmarkTextures
+

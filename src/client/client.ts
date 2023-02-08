@@ -6,7 +6,14 @@ import { LevelJson } from '../typings/types'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { setUpMeshesFromMap } from './sceneBuilder'
 import { renderMenu, mapIconClicked } from './menu'
-import { levelJsonPath, terrainImagePath, tintImagePath, mapZonesJsonPath } from './pathUtils'
+import {
+    levelJsonPath,
+    terrainImagePath,
+    tintImagePath,
+    mapZonesJsonPath,
+    overrideTruckLandmarkNames,
+} from './pathUtils'
+import { LandmarkFile, processLandmark } from './landmarkParser'
 
 const maps = {
     //trials:
@@ -157,6 +164,12 @@ const maps = {
     us_09_02_v211: async function () {
         await switchToLevel('level_us_09_02', false, 'v211')
     },
+    us_09_01_v213: async function () {
+        await switchToLevel('level_us_09_01', false, 'v213')
+    },
+    us_09_02_v213: async function () {
+        await switchToLevel('level_us_09_02', false, 'v213')
+    },
 }
 const scene = new THREE.Scene()
 
@@ -169,6 +182,7 @@ export const enum LAYERS {
     Models,
     Zones,
     Trucks,
+    BackupModels,
 }
 var INTERSECTED: any //currently hovered item
 const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -176,7 +190,7 @@ renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
 const controls = new MapControls(camera, renderer.domElement)
-const defaultCameraOffset = new Vector3(0, 800, -900)
+const defaultCameraOffset = new Vector3(0, 800, 900)
 
 init()
 animate()
@@ -184,12 +198,19 @@ animate()
 // load initial map:
 maps.us_01_01()
 
+// IMPORTANT: threejs z-axis points the opposite way from SR coordinates.
+// Fixing it here at the scene level means we can input positions to the scene directly from the game, and everything looks as it should.
+// Everything OUTSIDE the scene (camera, lights, helpers etc) needs to be aware of this and flip coords to match.
+scene.scale.z = -1
+
 //-----------------------
 function init() {
     scene.background = new THREE.Color(0x444444)
 
     camera.layers.enable(LAYERS.Trucks)
     camera.layers.enable(LAYERS.Zones)
+    camera.layers.enable(LAYERS.Models)
+    camera.layers.enable(LAYERS.Landmarks)
 
     renderer.setSize(window.innerWidth, window.innerHeight)
     document.body.appendChild(renderer.domElement)
@@ -199,6 +220,7 @@ function init() {
     controls.minDistance = 10
     controls.maxDistance = 2000
     controls.maxPolarAngle = Math.PI / 2
+    controls.zoomSpeed = 2
 
     window.addEventListener('resize', onWindowResize, false)
     document.addEventListener('mousemove', onPointerMove)
@@ -211,12 +233,24 @@ function init() {
         toggleTrucks: function () {
             camera.layers.toggle(LAYERS.Trucks)
         },
+        toggleModels: function () {
+            camera.layers.toggle(LAYERS.Models)
+        },
+        toggleBackupModels: function () {
+            camera.layers.toggle(LAYERS.BackupModels)
+        },
+        toggleLandmarks: function () {
+            camera.layers.toggle(LAYERS.Landmarks)
+        },
     }
 
     const gui = new GUI()
     const layersFolder = gui.addFolder('Debug Layers')
     layersFolder.add(layers, 'toggleZones', true).name('Toggle Zones')
     layersFolder.add(layers, 'toggleTrucks', true).name('Toggle Trucks')
+    layersFolder.add(layers, 'toggleModels', true).name('Toggle Models')
+    layersFolder.add(layers, 'toggleBackupModels', true).name('Toggle Backup Box Models')
+    layersFolder.add(layers, 'toggleLandmarks', true).name('Toggle Landmarks')
 
     const michiganFolder = gui.addFolder('Michigan')
     const alaskaFolder = gui.addFolder('Alaska')
@@ -283,9 +317,9 @@ function init() {
 }
 
 function setUpLights(scene: THREE.Scene, isWinter: boolean) {
-    const dirLight1 = new THREE.DirectionalLight(0xffffff) // white from above
-    dirLight1.position.set(2000, 1250, 0)
-    dirLight1.intensity = isWinter ? 0.9 : 1.2 // avoid blowing eyes out on snow
+    const dirLight1 = new THREE.DirectionalLight(0xffffff)
+    dirLight1.position.set(-2000, 1250, 0) // the sun is on the left, as in SR and real life
+    dirLight1.intensity = isWinter ? 1 : 1.2 // avoid blowing eyes out on snow
     dirLight1.castShadow = true
     const r = 3
     const d = 1000
@@ -306,7 +340,7 @@ function setUpLights(scene: THREE.Scene, isWinter: boolean) {
 
     if (isWinter) {
         const alaskaAmbient = new THREE.AmbientLight(0xaaedff)
-        alaskaAmbient.intensity = 0.2 // tinge of blue. Not sure how to make snow look good really
+        alaskaAmbient.intensity = 0.3 // tinge of blue to make pretty snow
         scene.add(alaskaAmbient)
     } else {
         const michiganAmbientLight = new THREE.AmbientLight(0xffadad) //slightly yellow - colour corrects mud to brown rather than sickly green
@@ -336,7 +370,7 @@ function onPointerMove(event: { clientX: number; clientY: number }) {
 function onPointerDown(event: { clientX: number; clientY: number }) {
     if (INTERSECTED && INTERSECTED.userData?.type) {
         mapIconClicked(INTERSECTED.name, INTERSECTED.userData.type)
-    } 
+    }
 }
 
 function animate() {
@@ -365,12 +399,15 @@ function checkMouseIntersections() {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex)
             INTERSECTED = intersectedItem
             INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex()
-            INTERSECTED.material.emissive.setHex(0x1FFD00)
+            INTERSECTED.material.emissive.setHex(0x1ffd00)
 
             // update info box
             if (infoElement !== null) {
-                const allIntersects = intersects.reduce((acc, intersection) => {
-                    return acc.concat(`${intersection.object.userData.displayName}\n`)
+                // Intersections can be an individual *face* of a model, so we map them to unique objects first
+                const intersectedObjects = [...new Set([...intersects.map((i) => i.object)])]
+
+                const allIntersects = intersectedObjects.reduce((acc, object) => {
+                    return acc.concat(`${object.userData.displayName}\n`)
                 }, '')
                 infoElement.innerText = allIntersects
                 infoElement.style.display = 'inline-block'
@@ -396,10 +433,10 @@ function pickPriorityIntersection(intersects: THREE.Intersection<THREE.Object3D<
 function clearScene(scene: THREE.Scene) {
     for (var i = scene.children.length - 1; i >= 0; i--) {
         var obj = scene.children[i]
-        //console.log(`removing ${obj.name}`)
         scene.remove(obj)
     }
 }
+
 export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: THREE.Vector3) {
     const object = scene.getObjectByName(objName)
     if (!object) return
@@ -410,16 +447,15 @@ export function moveCameraToObject(objName: string, scene: THREE.Scene, offset: 
 
     // focus camera to obj
     camera.lookAt(object.position)
-    // position camera offset from object. NB the flipped coords are starting to mount up here.
+    // position camera offset from object. NB the SCENE is z-flipped but camera is not
     camera.position.set(
-        object.position.x + offset.x * -1,
+        object.position.x + offset.x,
         object.position.y + offset.y,
-        object.position.z + offset.z
+        -object.position.z + offset.z // There's the z-flip
     )
 }
 
 //---------------- fetchies:
-
 async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuffix?: string) {
     const loadingSpinner = document.getElementById('loading-spinner')
     if (loadingSpinner !== null) {
@@ -432,12 +468,14 @@ async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuff
         fetchLevelTexture(tintImagePath(levelFileName)),
         fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
     ])
+    const landmarkModels = await fetchRequiredLandmarks(levelJson)
+
     clearScene(scene)
-    setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture)
+    setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture, landmarkModels)
     setUpLights(scene, isSnow)
 
     const goToObject = (objectName: string) =>
-        moveCameraToObject(objectName, scene, new THREE.Vector3(-150, 250, -250))
+        moveCameraToObject(objectName, scene, new THREE.Vector3(-75, 125, 125))
     renderMenu(zonesJson, levelJson.trucks, goToObject)
 
     moveCameraToObject('terrainMesh', scene, defaultCameraOffset)
@@ -464,12 +502,71 @@ async function fetchLevelTexture(terrainImagePath: string) {
     const loader = new THREE.TextureLoader(loadManager)
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
-        levelTexture.flipY = false
-        console.log(levelTexture?.name)
+        //console.log(levelTexture?.name)
         return levelTexture
     } catch (error) {
         console.log('Failed to load texture! Have you set the filenames correctly?')
         console.log(error)
         return new THREE.Texture()
+    }
+}
+
+async function fetchRequiredLandmarks(levelJson: LevelJson) {
+    const pathsFromModels: string[] = levelJson.models.reduce<string[]>((acc, model) => {
+        if (model.lmk.length) acc.push(model.lmk.replace('/', '_'))
+        return acc
+    }, [])
+    const pathsFromLandmarks = levelJson.landmarks.reduce<string[]>((acc, landmark) => {
+        if (landmark.name) acc.push(landmark.name.replace('/', '_'))
+        return acc
+    }, [])
+    const pathsFromTrucks = levelJson.trucks.reduce<string[]>((acc, truck) => {
+        if (truck.name) {
+            const truckLmkName =
+                overrideTruckLandmarkNames[truck.name] ?? `landmarks_${truck.name}_lmk`
+            acc.push(truckLmkName)
+        }
+        return acc
+    }, [])
+
+    const uniquePaths = [
+        ...new Set([...pathsFromLandmarks, ...pathsFromModels, ...pathsFromTrucks]),
+    ]
+
+    const landmarkFiles = await Promise.all(
+        uniquePaths.map(async (path) => {
+            const data = await fetchLandmarkData(path)
+            return { name: path, data }
+        })
+    )
+
+    return landmarkFiles
+}
+
+function arrayBufferToBufferCycle(ab: ArrayBuffer) {
+    var buffer = Buffer.alloc(ab.byteLength)
+    var view = new Uint8Array(ab)
+    for (var i = 0; i < buffer.length; ++i) {
+        buffer[i] = view[i]
+    }
+    return buffer
+}
+
+async function fetchLandmarkData(landmarkPath: string): Promise<LandmarkFile | undefined> {
+    try {
+        const response = await window.fetch(`landmarks/${landmarkPath}`)
+        const arrayBuffer = await response.arrayBuffer()
+        if (response.status !== 200) return undefined
+
+        const buffer = arrayBufferToBufferCycle(arrayBuffer)
+        const landmark = processLandmark(buffer)
+
+        return landmark
+    } catch (error) {
+        console.log(
+            `Failed to load landmark data for ${landmarkPath}! Have you set the filenames correctly?`
+        )
+        console.log(error)
+        return
     }
 }

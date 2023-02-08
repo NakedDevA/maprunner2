@@ -1,21 +1,32 @@
 export type LandmarkCoords = {
     name: string
+
     entries: {
         x: number
         y: number
         z: number
+        s: number
+        q: number[]
     }[]
 }
 
-export type ModelCoords = {
-    type: string
-    landmark: string
-    models: {
-        x: number
-        y: number
-        z: number
-    }[]
+export type Coords = {
+    x: number
+    y: number
+    z: number
 }
+
+export type ModelCoords = {
+    t: string //type
+    lmk: string //landmark
+    c: { //corners
+        a: Coords
+        b: Coords
+    }
+    i: ModelInstance[] //instances
+}
+
+export type ModelInstance = Coords & { r: RotationMatrix }
 
 export type ZoneCoords = {
     name: string
@@ -28,22 +39,24 @@ export type ZoneCoords = {
     sizeZ: number
 }
 
+type RotationMatrix = {
+    a1: number
+    a2: number
+    a3: number
+    b1: number
+    b2: number
+    b3: number
+    c1: number
+    c2: number
+    c3: number
+}
+
 export type TruckCoords = {
     name: string
     x: number
     y: number
     z: number
-    rotation: {
-        a1: number
-        a2: number
-        a3: number
-        b1: number
-        b2: number
-        b3: number
-        c1: number
-        c2: number
-        c3: number
-    }
+    rotation: RotationMatrix
     task: string
     fuel: number
     damage: number

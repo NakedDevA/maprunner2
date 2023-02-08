@@ -7,60 +7,74 @@ import {
     TruckCoords,
     ZoneCoords,
 } from '../typings/types'
-import {
-    unknownLandmarkMaterial,
-    greenTreeMaterial,
-    autumnTreeMaterial,
-    modelMaterial,
-    zoneMaterial,
-    truckMaterial,
-    brownsMaterial,
-    greysMaterial,
-} from './materials'
+import { zoneMaterial, modelMaterial } from './materials'
 import { LAYERS } from './client'
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { LandmarkIndex } from './landmarkParser'
+import {
+    lookUpLandmarkData,
+    landmarkUVMaterial,
+    makeLandmarkGeometry,
+} from './makeLandmarkGeometry'
+import { overrideTruckLandmarkNames } from './pathUtils'
+
+const NO_TEXTURE_KEY = 'untextured'
 
 export function setUpMeshesFromMap(
     scene: THREE.Scene,
     levelJson: LevelJson,
     levelTexture: THREE.Texture,
-    tintTexture: THREE.Texture
+    tintTexture: THREE.Texture,
+    landmarkModels: LandmarkIndex
 ) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
     //SR map points run bottom to top, right to left. So we have to reverse points in both axes
     // All the coordinate weirdness is done to the terrain mesh so we can be in sane happy land for objects ON the map
     const listToReverse = [...heightMapList]
-    const reversedList = listToReverse.reverse()
+    const reversedList = listToReverse
     const chunked = chunk(reversedList, mapSize.pointsX)
-    const fixedHeightMap = chunked.map((row) => row.reverse()).flat()
+    const fixedHeightMap = chunked.flat()
 
-    addLandmarks(landmarks, scene)
-    addTerrain(mapSize, levelTexture, tintTexture, scene, fixedHeightMap)
-    addModels(models, scene)
-    addZones(zones, scene, fixedHeightMap, mapSize)
-    addTrucks(trucks, scene)
+    addLandmarks(landmarks, scene, landmarkModels)
+    addTerrain(mapSize, levelTexture, tintTexture, scene, heightMapList)
+    addModels(models, scene, landmarkModels)
+    addZones(zones, scene, heightMapList, mapSize)
+    addTrucks(trucks, scene, landmarkModels)
 }
 
-function addTrucks(trucks: TruckCoords[], scene: THREE.Scene) {
+function addTrucks(trucks: TruckCoords[], scene: THREE.Scene, landmarkModels: LandmarkIndex) {
     for (let index = 0; index < trucks.length; index++) {
         const truck = trucks[index]
-        //console.log(zone.name)
+
+        const truckLandmarkID =
+            overrideTruckLandmarkNames[truck.name] ?? `landmarks_${truck.name}_lmk`
+        const landmarkData = lookUpLandmarkData(truckLandmarkID, landmarkModels)
+        if (!landmarkData) {
+            console.log(`Missing landmark file for ${truck.name}`)
+            continue
+        }
+
+        // Draw landmark model on map
+        const landmarkGeometry = makeLandmarkGeometry(landmarkData)
+        const xml = new DOMParser().parseFromString(landmarkData.xml, 'application/xml')
+        const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
+
         const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = truck.rotation
-        var newBox1 = new THREE.BoxGeometry(16, 8, 8)
-        const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
         // prettier-ignore
         matrix.set(
-            a1, a2, a3, 0, 
-            b1, b2, b3, 0, 
-            c1, c2, c3, 0, 
+            a1, b1, c1, 0, 
+            a2, b2, c2, 0, 
+            a3, b3, c3, 0, 
             0, 0, 0, 1)
-        quaternion.setFromRotationMatrix(matrix)
-        newBox1.applyQuaternion(quaternion)
 
-        const mesh = new THREE.Mesh(newBox1, truckMaterial.clone())
-        mesh.position.set(-truck.x, truck.y, truck.z) // NB MIRRORED
+        // some models correspond to the landmarks we're already drawing, potential for duplicates!
+        const geom = landmarkGeometry.clone()
+        geom.applyMatrix4(matrix)
+
+        const mesh = new THREE.Mesh(geom, landmarkUVMaterial(textureName!))
+        mesh.position.set(truck.x, truck.y, truck.z) 
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Trucks)
@@ -79,22 +93,21 @@ function addZones(
     for (const zone of zones) {
         //console.log(zone.name)
         var newBox1 = new THREE.BoxGeometry(zone.sizeX, 20, zone.sizeZ)
-
         // The map file lists two random angles, which seem to correspond to the rotation matrix like this:
         const quaternion = new THREE.Quaternion()
         const matrix = new THREE.Matrix4()
         // prettier-ignore
         matrix.set(
-            zone.angleA, 0, zone.angleB, 0, 
+            zone.angleA, 0, -zone.angleB, 0, 
             0, 1, 0, 0, 
-            -zone.angleB, 0, zone.angleA, 0, 
+            zone.angleB, 0, zone.angleA, 0, 
             0, 0, 0, 1)
         quaternion.setFromRotationMatrix(matrix)
         newBox1.applyQuaternion(quaternion)
 
         const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
         const mesh = new THREE.Mesh(newBox1, zoneMaterial.clone())
-        mesh.position.set(-zone.x, approxHeight, zone.z) // NB MIRRORED
+        mesh.position.set(zone.x, approxHeight, zone.z)
         mesh.updateMatrix()
         mesh.matrixAutoUpdate = false
         mesh.layers.set(LAYERS.Zones)
@@ -116,8 +129,7 @@ function approxTerrainHeightAtPoint(
 
     // If the heightMap is a 2d array, find the approximate column and row out object coordinates would be in
     const approxColumn = Math.floor((mapSize.pointsX * absoluteObjectX) / mapSize.mapX)
-    const approxRow =
-        mapSize.pointsZ - Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
+    const approxRow = Math.floor((mapSize.pointsZ * absoluteObjectZ) / mapSize.mapZ)
 
     // Get the value at this location in the 2d array
     const approxIndexInArray = approxColumn + approxRow * mapSize.pointsX
@@ -125,22 +137,84 @@ function approxTerrainHeightAtPoint(
     return approxHeight
 }
 
-function addModels(models: ModelCoords[], scene: THREE.Scene) {
-    var mergedModelGeoms = []
+async function addModels(models: ModelCoords[], scene: THREE.Scene, landmarkModels: LandmarkIndex) {
+    var geometriesByMaterial: Record<string, THREE.BufferGeometry[]> = {}
+    var backupBoxGeometries: THREE.BufferGeometry[] = []
+
     for (const model of models) {
-        //console.log(model.type)
-        for (const entry of model.models) {
-            // some models correspond to the landmarks we're already drawing, don't duplicate
-            // qqtas will revisit this when we want to rotate models- landmarks have no rotation so we'll want to overdraw the model
-            if (!model.landmark.length) {
-                var newBox1 = new THREE.BoxGeometry(2, 2, 2)
-                newBox1.translate(-entry.x, entry.y, entry.z)
-                mergedModelGeoms.push(newBox1)
+        // Farplane is the skybox, which is stupid to render because it is larger than everything else
+        if (
+            model.t.includes('farplane') ||
+            model.t.includes('birds_flying') ||
+            model.t.includes('birds_sea') ||
+            model.t.includes('air_balloon') ||
+            model.t.includes('fireflies_animated_01')
+        )
+            continue
+
+        const landmarkData = lookUpLandmarkData(model.lmk.replace('/', '_'), landmarkModels)
+
+        if (!landmarkData) {
+            //Draw box
+            //data includes bounding box corners, which we use to give approx mesh size
+            const width = model.c.b.x - model.c.a.x
+            const height = model.c.b.y - model.c.a.y
+            const depth = model.c.b.z - model.c.a.z
+            // if (width>10) console.log(`type:${model.t} is ${width} x ${height} x ${depth}`)
+
+            //Bounding boxes aren't symmetric, so we shift the mesh to account for this
+            const xOffset = (model.c.b.x + model.c.a.x) / 2
+            const yOffset = (model.c.b.y + model.c.a.y) / 2
+            const zOffset = (model.c.b.z + model.c.a.z) / 2
+
+            for (const instance of model.i) {
+                const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = instance.r
+                const matrix = new THREE.Matrix4()
+                // prettier-ignore
+                matrix.set(
+                    a1, b1, c1, instance.x + xOffset, 
+                    a2, b2, c2, instance.y + yOffset, 
+                    a3, b3, c3, instance.z + zOffset, 
+                    0, 0, 0, 1)
+
+                // some models correspond to the landmarks we're already drawing, potential for duplicates!
+                const geom = new THREE.BoxGeometry(width, height, depth)
+                geom.applyMatrix4(matrix)
+
+                backupBoxGeometries.push(geom)
+            }
+        } else {
+            // Draw landmark model on map
+            const landmarkGeometry = makeLandmarkGeometry(landmarkData)
+            const xml = new DOMParser().parseFromString(landmarkData.xml, 'application/xml')
+            const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
+
+            for (const instance of model.i) {
+                const { a1, a2, a3, b1, b2, b3, c1, c2, c3 } = instance.r
+                const matrix = new THREE.Matrix4()
+                // prettier-ignore
+                matrix.set(
+                    a1, b1, c1, instance.x, 
+                    a2, b2, c2, instance.y, 
+                    a3, b3, c3, instance.z, 
+                    0, 0, 0, 1)
+
+                // some models correspond to the landmarks we're already drawing, potential for duplicates!
+                const geom = landmarkGeometry.clone()
+                geom.applyMatrix4(matrix)
+                const keystring = textureName ?? NO_TEXTURE_KEY
+                if (geometriesByMaterial[keystring]) geometriesByMaterial[keystring].push(geom)
+                else geometriesByMaterial[keystring] = [geom]
             }
         }
     }
-
-    const modelsMesh = addStaticMergedMesh(mergedModelGeoms, modelMaterial, scene)
+    for (const textureName in geometriesByMaterial) {
+        const geoms = geometriesByMaterial[textureName]
+        const material =
+            textureName === NO_TEXTURE_KEY ? modelMaterial : landmarkUVMaterial(textureName)
+        addStaticMergedMesh(geoms, material, scene, true, LAYERS.Models)
+    }
+    addStaticMergedMesh(backupBoxGeometries, modelMaterial, scene, false, LAYERS.BackupModels)
 }
 
 function addTerrain(
@@ -159,7 +233,6 @@ function addTerrain(
     geometry.name = 'terraingeom'
 
     geometry.rotateX(-Math.PI / 2) // flat plane
-    geometry.rotateY(Math.PI) // SR measures from the opposite corner compared to threejs!
 
     const vertices = geometry.attributes.position
     for (let i = 0; i < vertices.count; i++) {
@@ -183,59 +256,59 @@ function addTerrain(
     scene.add(terrainMesh)
 }
 
-function addLandmarks(landmarks: LandmarkCoords[], scene: THREE.Scene) {
-    var mergedLandmarkGeoms = []
-    var mergedGreenTreeGeoms = []
-    var mergedAutumnTreeGeoms = []
-    var mergedBrownGeoms = []
-    var mergedGreyGeoms = []
+function addLandmarks(
+    landmarks: LandmarkCoords[],
+    scene: THREE.Scene,
+    landmarkModels: LandmarkIndex
+) {
+    var geometriesByMaterial: Record<string, THREE.BufferGeometry[]> = {}
+
+    //force these to use the standard lmk material
     for (const landmark of landmarks) {
         //console.log(`${landmark.name} x ${landmark.entries.length}`)
+
+        const landmarkData = lookUpLandmarkData(landmark.name.replace('/', '_'), landmarkModels)
+        if (!landmarkData) {
+            console.log(`Missing landmark data for ${landmark.name}`)
+            continue
+        }
+        const landmarkGeometry = makeLandmarkGeometry(landmarkData)
+        const xml = new DOMParser().parseFromString(landmarkData.xml, 'application/xml')
+        const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
+
         for (const entry of landmark.entries) {
-            var newBox1 = new THREE.BoxGeometry(3, 2, 3)
-            newBox1.translate(-entry.x, entry.y, entry.z)
-            if (
-                landmark.name.includes('spruce_') ||
-                landmark.name.includes('tsuga') ||
-                landmark.name.includes('pine') ||
-                landmark.name.includes('larch')
-            ) {
-                mergedGreenTreeGeoms.push(newBox1)
-            } else if (
-                landmark.name.includes('birch_') ||
-                landmark.name.includes('aspen') ||
-                landmark.name.includes('sugar_maple')
-            ) {
-                mergedAutumnTreeGeoms.push(newBox1)
-            } else if (landmark.name.includes('swamp_')) {
-                mergedBrownGeoms.push(newBox1)
-            } else if (landmark.name.includes('concrete') || landmark.name.includes('rock')) {
-                mergedGreyGeoms.push(newBox1)
-            } else mergedLandmarkGeoms.push(newBox1)
+            const geom = landmarkGeometry.clone()
+            geom.scale(entry.s, entry.s, entry.s)
+
+            const rotateQuat = new THREE.Quaternion()
+            rotateQuat.fromArray(entry.q)
+            rotateQuat.normalize()
+
+            const matrix = new THREE.Matrix4()
+            matrix.makeRotationFromQuaternion(rotateQuat)
+            matrix.setPosition(entry.x, entry.y, entry.z)
+
+            geom.applyMatrix4(matrix)
+
+            const keystring = textureName ?? NO_TEXTURE_KEY
+            if (geometriesByMaterial[keystring]) geometriesByMaterial[keystring].push(geom)
+            else geometriesByMaterial[keystring] = [geom]
         }
     }
-    const landmarksMesh = addStaticMergedMesh(mergedLandmarkGeoms, unknownLandmarkMaterial, scene)
-    const landmarkSpruceTreesMesh = addStaticMergedMesh(
-        mergedGreenTreeGeoms,
-        greenTreeMaterial,
-        scene,
-        true
-    )
-    const landmarkBirchTreesMesh = addStaticMergedMesh(
-        mergedAutumnTreeGeoms,
-        autumnTreeMaterial,
-        scene,
-        true
-    )
-    const landmarkBrownsMesh = addStaticMergedMesh(mergedBrownGeoms, brownsMaterial, scene, true)
-    const landmarkGreysMesh = addStaticMergedMesh(mergedGreyGeoms, greysMaterial, scene, true)
+    for (const textureName in geometriesByMaterial) {
+        const geoms = geometriesByMaterial[textureName]
+        const material =
+            textureName === NO_TEXTURE_KEY ? modelMaterial : landmarkUVMaterial(textureName)
+        addStaticMergedMesh(geoms, material, scene, true, LAYERS.Landmarks)
+    }
 }
 
 function addStaticMergedMesh(
     mergedGeoms: THREE.BufferGeometry[],
     material: THREE.MeshPhongMaterial,
     scene: THREE.Scene,
-    castShadow = false
+    castShadow = false,
+    layer?: number
 ) {
     if (!mergedGeoms.length) return
     var mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(mergedGeoms)
@@ -244,6 +317,8 @@ function addStaticMergedMesh(
     mesh.matrixAutoUpdate = false
     mesh.castShadow = castShadow
     mesh.receiveShadow = false
+
+    if (layer) mesh.layers.set(layer)
     scene.add(mesh)
 }
 
