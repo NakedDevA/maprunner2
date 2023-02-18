@@ -5,7 +5,10 @@ export const terrainImagePath = (levelFileName: string): string => {
     return `./terrainimages/${levelFileName}_map.png`
 }
 export const tintImagePath = (levelFileName: string): string => {
-    return `./tint/${levelFileName}_tint_map__cmp.png`
+    return `./tint/${levelFileName}_tint_map__cmp_alpha.png`
+}
+export const mudImagePath = (levelFileName: string): string => {
+    return `./combinedMud/${levelFileName}_combined.png`
 }
 export const mapZonesJsonPath = (levelFileName: string, versionSuffix: string = ''): string => {
     return `./mapZones/mapzones${levelFileName}.sso${versionSuffix}.json`

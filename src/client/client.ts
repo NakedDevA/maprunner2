@@ -12,6 +12,7 @@ import {
     tintImagePath,
     mapZonesJsonPath,
     overrideTruckLandmarkNames,
+    mudImagePath,
 } from './pathUtils'
 import { LandmarkFile, processLandmark } from './landmarkParser'
 
@@ -135,7 +136,7 @@ const maps = {
     },
     //yukon
     us_04_01: async function () {
-        await switchToLevel('level_us_04_01', false)
+        await switchToLevel('level_us_04_01', true)
     },
     us_04_02: async function () {
         await switchToLevel('level_us_04_02', true)
@@ -191,7 +192,7 @@ export const enum LAYERS {
     BackupModels,
 }
 var INTERSECTED: any //currently hovered item
-const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer:true })
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true })
 renderer.shadowMap.enabled = true
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000)
@@ -248,6 +249,15 @@ function init() {
         toggleLandmarks: function () {
             camera.layers.toggle(LAYERS.Landmarks)
         },
+        toggleTerrainSeverity: function () {
+            const terrain: THREE.Mesh = scene.getObjectByName('terrainMesh') as THREE.Mesh
+            if (terrain && terrain.material instanceof THREE.MeshPhongMaterial) {
+                const currentIntensity = terrain.material.emissiveIntensity
+                terrain.material.color =
+                    currentIntensity === 1 ? new THREE.Color(0xffffff) : new THREE.Color(0x1f1f1f)
+                terrain.material.emissiveIntensity = currentIntensity === 1 ? 0 : 1
+            }
+        },
     }
 
     const gui = new GUI()
@@ -257,6 +267,7 @@ function init() {
     layersFolder.add(layers, 'toggleModels', true).name('Toggle Models')
     layersFolder.add(layers, 'toggleBackupModels', true).name('Toggle Backup Box Models')
     layersFolder.add(layers, 'toggleLandmarks', true).name('Toggle Landmarks')
+    layersFolder.add(layers, 'toggleTerrainSeverity', true).name('Toggle Mud Display')
 
     const michiganFolder = gui.addFolder('Michigan')
     const alaskaFolder = gui.addFolder('Alaska')
@@ -468,16 +479,17 @@ async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuff
         loadingSpinner.style.display = 'block'
     }
 
-    const [levelJson, levelTexture, tintTexture, zonesJson] = await Promise.all([
+    const [levelJson, levelTexture, tintTexture, mudTexture, zonesJson] = await Promise.all([
         fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
         fetchLevelTexture(terrainImagePath(levelFileName)),
         fetchLevelTexture(tintImagePath(levelFileName)),
+        fetchLevelTexture(mudImagePath(levelFileName)),
         fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
     ])
     const landmarkModels = await fetchRequiredLandmarks(levelJson)
 
     clearScene(scene)
-    setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture, landmarkModels)
+    setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture, mudTexture, landmarkModels)
     setUpLights(scene, isSnow)
 
     const goToObject = (objectName: string) =>
