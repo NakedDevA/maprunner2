@@ -25,19 +25,13 @@ export function setUpMeshesFromMap(
     levelJson: LevelJson,
     levelTexture: THREE.Texture,
     tintTexture: THREE.Texture,
+    mudTexture: THREE.Texture,
     landmarkModels: LandmarkIndex
 ) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
-    //SR map points run bottom to top, right to left. So we have to reverse points in both axes
-    // All the coordinate weirdness is done to the terrain mesh so we can be in sane happy land for objects ON the map
-    const listToReverse = [...heightMapList]
-    const reversedList = listToReverse
-    const chunked = chunk(reversedList, mapSize.pointsX)
-    const fixedHeightMap = chunked.flat()
-
     addLandmarks(landmarks, scene, landmarkModels)
-    addTerrain(mapSize, levelTexture, tintTexture, scene, heightMapList)
+    addTerrain(mapSize, levelTexture, tintTexture, mudTexture, scene, heightMapList)
     addModels(models, scene, landmarkModels)
     addZones(zones, scene, heightMapList, mapSize)
     addTrucks(trucks, scene, landmarkModels)
@@ -221,6 +215,7 @@ function addTerrain(
     mapSize: MapSize,
     levelTexture: THREE.Texture,
     tintTexture: THREE.Texture,
+    mudTexture: THREE.Texture,
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
@@ -245,7 +240,10 @@ function addTerrain(
         map: levelTexture,
         specularMap: tintTexture,
         shininess: 50,
-        //color:0xFFDADA //qqtas color correct michigan like this on-demand. Maybe handpicked colour per map?
+        emissiveMap:mudTexture,
+        emissive:0xb30000,
+        emissiveIntensity: 0,
+        //color is used to toggle with the emissive intensity for showing the mud texture more clearly
         //wireframe:true
     })
     const terrainMesh = new THREE.Mesh(geometry, material)
