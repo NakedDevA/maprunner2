@@ -135,7 +135,7 @@ const maps = {
     },
     //yukon
     us_04_01: async function () {
-        await switchToLevel('level_us_04_01', false)
+        await switchToLevel('level_us_04_01', true)
     },
     us_04_02: async function () {
         await switchToLevel('level_us_04_02', true)
