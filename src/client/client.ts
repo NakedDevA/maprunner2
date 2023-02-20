@@ -13,6 +13,7 @@ import {
     mapZonesJsonPath,
     overrideTruckLandmarkNames,
     mudImagePath,
+    snowImagePath,
 } from './pathUtils'
 import { LandmarkFile, processLandmark } from './landmarkParser'
 
@@ -258,6 +259,14 @@ function init() {
                 terrain.material.emissiveIntensity = currentIntensity === 1 ? 0 : 1
             }
         },
+        toggleSnowDepth: function () {
+            const terrain: THREE.Mesh = scene.getObjectByName('terrainMesh') as THREE.Mesh
+            if (terrain && terrain.material instanceof THREE.MeshPhongMaterial) {
+                const currentDisplacement = terrain.material.displacementScale
+                terrain.material.displacementScale =
+                    currentDisplacement === 5 ? 0 : 5
+            }
+        },
     }
 
     const gui = new GUI()
@@ -268,6 +277,7 @@ function init() {
     layersFolder.add(layers, 'toggleBackupModels', true).name('Toggle Backup Box Models')
     layersFolder.add(layers, 'toggleLandmarks', true).name('Toggle Landmarks')
     layersFolder.add(layers, 'toggleTerrainSeverity', true).name('Toggle Mud Display')
+    layersFolder.add(layers, 'toggleSnowDepth', true).name('Toggle Snow Depth')
 
     const michiganFolder = gui.addFolder('Michigan')
     const alaskaFolder = gui.addFolder('Alaska')
@@ -479,17 +489,27 @@ async function switchToLevel(levelFileName: string, isSnow: boolean, versionSuff
         loadingSpinner.style.display = 'block'
     }
 
-    const [levelJson, levelTexture, tintTexture, mudTexture, zonesJson] = await Promise.all([
-        fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
-        fetchLevelTexture(terrainImagePath(levelFileName)),
-        fetchLevelTexture(tintImagePath(levelFileName)),
-        fetchLevelTexture(mudImagePath(levelFileName)),
-        fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
-    ])
+    const [levelJson, levelTexture, tintTexture, mudTexture, snowTexture, zonesJson] =
+        await Promise.all([
+            fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
+            fetchLevelTexture(terrainImagePath(levelFileName)),
+            fetchLevelTexture(tintImagePath(levelFileName)),
+            fetchLevelTexture(mudImagePath(levelFileName)),
+            fetchLevelTexture(snowImagePath(levelFileName)),
+            fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
+        ])
     const landmarkModels = await fetchRequiredLandmarks(levelJson)
 
     clearScene(scene)
-    setUpMeshesFromMap(scene, levelJson, levelTexture, tintTexture, mudTexture, landmarkModels)
+    setUpMeshesFromMap(
+        scene,
+        levelJson,
+        levelTexture,
+        tintTexture,
+        mudTexture,
+        snowTexture,
+        landmarkModels
+    )
     setUpLights(scene, isSnow)
 
     const goToObject = (objectName: string) =>

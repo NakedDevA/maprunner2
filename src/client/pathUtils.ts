@@ -10,6 +10,9 @@ export const tintImagePath = (levelFileName: string): string => {
 export const mudImagePath = (levelFileName: string): string => {
     return `./combinedMud/${levelFileName}_combined.png`
 }
+export const snowImagePath = (levelFileName: string): string => {
+    return `./snowDepth/${levelFileName}_snow_map.png`
+}
 export const mapZonesJsonPath = (levelFileName: string, versionSuffix: string = ''): string => {
     return `./mapZones/mapzones${levelFileName}.sso${versionSuffix}.json`
 }

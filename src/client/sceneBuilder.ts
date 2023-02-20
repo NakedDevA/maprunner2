@@ -26,12 +26,13 @@ export function setUpMeshesFromMap(
     levelTexture: THREE.Texture,
     tintTexture: THREE.Texture,
     mudTexture: THREE.Texture,
+    snowTexture: THREE.Texture,
     landmarkModels: LandmarkIndex
 ) {
     const { landmarks, models, zones, trucks, mapSize, heightMapList } = levelJson
 
     addLandmarks(landmarks, scene, landmarkModels)
-    addTerrain(mapSize, levelTexture, tintTexture, mudTexture, scene, heightMapList)
+    addTerrain(mapSize, levelTexture, tintTexture, mudTexture, snowTexture, scene, heightMapList)
     addModels(models, scene, landmarkModels)
     addZones(zones, scene, heightMapList, mapSize)
     addTrucks(trucks, scene, landmarkModels)
@@ -216,6 +217,7 @@ function addTerrain(
     levelTexture: THREE.Texture,
     tintTexture: THREE.Texture,
     mudTexture: THREE.Texture,
+    snowTexture: THREE.Texture,
     scene: THREE.Scene,
     heightMapList: number[]
 ) {
@@ -240,6 +242,8 @@ function addTerrain(
         map: levelTexture,
         specularMap: tintTexture,
         shininess: 50,
+        displacementMap:snowTexture,
+        displacementScale:5,
         emissiveMap:mudTexture,
         emissive:0xb30000,
         emissiveIntensity: 0,
