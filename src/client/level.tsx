@@ -1,18 +1,6 @@
-import { useLoader } from '@react-three/fiber'
 import * as React from 'react'
-import * as THREE from 'three'
-import { FileLoader, Loader, ObjectLoader, TextureLoader } from 'three'
-import { LevelJson } from '../typings/types'
-import {
-    terrainImagePath,
-    tintImagePath,
-    mudImagePath,
-    snowImagePath,
-    mapZonesJsonPath,
-    levelJsonPath,
-} from './pathUtils'
 import Terrain from './terrain'
-import { useFetchJson } from './useFetchJson'
+import { useLevelResources } from './useFetchForLevel'
 
 interface LevelProps {
     levelFileName: string
@@ -20,28 +8,21 @@ interface LevelProps {
 }
 
 export default function Level({ levelFileName, versionSuffix }: LevelProps) {
-    const [levelTexture, tintTexture, mudTexture] = useLoader(TextureLoader, [
-        terrainImagePath(levelFileName),
-        tintImagePath(levelFileName),
-        mudImagePath(levelFileName),
-    ])
+    const levelResources = useLevelResources(levelFileName, versionSuffix)
 
-    let snowTexture
-    try {
-        ;[snowTexture] = useLoader(TextureLoader, [snowImagePath(levelFileName)])
-    } catch (error) {
-        console.log(`Found no snow map for ${levelFileName}`)
+    console.log(levelResources?.landmarkModels?.length)
+
+    if (!levelResources) {
+        return <></>
     }
-
-    const levelJson = useFetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix))
 
     return (
         <Terrain
-            levelTexture={levelTexture}
-            tintTexture={tintTexture}
-            mudTexture={mudTexture}
-            snowTexture={snowTexture}
-            levelJson={levelJson}
+            levelTexture={levelResources.levelTexture}
+            tintTexture={levelResources.tintTexture}
+            mudTexture={levelResources.mudTexture}
+            snowTexture={levelResources.snowTexture}
+            levelJson={levelResources.levelJson}
         />
     )
 }
