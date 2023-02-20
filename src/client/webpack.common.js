@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 module.exports = {
-    entry: './src/client/client.ts',
+    entry: './src/client/main.tsx',
     module: {
         rules: [
             {

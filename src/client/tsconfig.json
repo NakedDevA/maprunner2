@@ -4,8 +4,6 @@
         "moduleResolution": "node",
         "strict": true,
         "jsx": "react",
-        "jsxFactory": "renderer.create",
-        "jsxFragmentFactory": "renderer.fragment"
     },
-    "include": ["**/*.ts", "../typings/types.ts"]
+    "include": ["**/*.ts", "**/*.tsx", "../typings/types.ts"]
 }

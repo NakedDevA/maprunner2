@@ -1,9 +1,7 @@
 import { MapZonesJson, ZoneSettings } from '../typings/initialCacheTypes'
-import { CommonDOMRenderer } from 'render-jsx/dom'
 import './menu.scss'
 import { TruckCoords } from '../typings/types'
-
-const renderer = new CommonDOMRenderer()
+import * as React from 'react'
 
 export const renderMenu = async (
     zonesJson: MapZonesJson,
@@ -28,24 +26,24 @@ export const renderMenu = async (
     const truckIDList = trucksWithIds.map((truck) => truck.id)
     const jsx = (
         <>
-            <div class="restoreButtonContainer hidden">
-                <h2 onclick={showMenu}>{'>>>>'}</h2>
+            <div className="restoreButtonContainer hidden">
+                <h2 onClick={showMenu}>{'>>>>'}</h2>
             </div>
-            <div class="container">
+            <div className="container">
                 <div id={'headings'}>
                     <h2
                         id={'tabHeading-zones'}
-                        class={'selected'}
-                        onclick={() => onTabClicked('zones')}
+                        className={'selected'}
+                        onClick={() => onTabClicked('zones')}
                     >
                         Zones
                     </h2>
-                    <h2 id={'tabHeading-trucks'} onclick={() => onTabClicked('trucks')}>
+                    <h2 id={'tabHeading-trucks'} onClick={() => onTabClicked('trucks')}>
                         Trucks
                     </h2>
-                    <h2 onclick={hideMenu}>{'<<<<'}</h2>
+                    <h2 onClick={hideMenu}>{'<<<<'}</h2>
                 </div>
-                <div class={'tab'} id={'tab-zones'}>
+                <div className={'tab'} id={'tab-zones'}>
                     <TabFilter idsToFilter={zoneIDList} idPrefix={'zoneEntry'} />
                     <ul>
                         {zoneIDList.map((zoneId) => {
@@ -65,7 +63,7 @@ export const renderMenu = async (
                         })}
                     </ul>
                 </div>
-                <div class={['tab', 'hidden']} id={'tab-trucks'}>
+                <div className={'tab hidden'} id={'tab-trucks'}>
                     <TabFilter idsToFilter={truckIDList} idPrefix={'truckEntry'} />
                     <ul>
                         {trucksWithIds.map((truck) => {
@@ -89,48 +87,39 @@ export const renderMenu = async (
             </div>
         </>
     )
-    return renderer.render(jsx).on(menuElement)
+    return jsx
 }
 
-const Entry = (
-    props: {
-        entryId: string
-        entryClass: string
-        buttonText: string
-        goToHandler: () => void
-    },
-    renderer: CommonDOMRenderer,
-    children: any
-) => {
+const Entry = (props: {
+    entryId: string
+    entryClass: string
+    buttonText: string
+    goToHandler: () => void
+    children: React.ReactNode
+}) => {
     return (
-        <li class={props.entryClass} id={props.entryId}>
+        <li className={props.entryClass} id={props.entryId}>
             <button
-                onclick={() => {
+                onClick={() => {
                     openInfoBox(props.entryId)
                     props.goToHandler()
                 }}
             >
                 {props.buttonText}
             </button>
-            <div class={'infoBox'}>{children}</div>
+            <div className={'infoBox'}>{props.children}</div>
         </li>
     )
 }
 
-const TabFilter = (
-    props: {
-        idsToFilter: string[]
-        idPrefix: string
-    },
-    renderer: CommonDOMRenderer
-) => {
+const TabFilter = (props: { idsToFilter: string[]; idPrefix: string }) => {
     return (
         <input
             id={'tabFilter'}
-            type={Text}
+            type={'Text'}
             placeholder={'filter'}
-            oninput={(e: { target: HTMLInputElement }) =>
-                filterEntries(e.target.value, props.idsToFilter, props.idPrefix)
+            onInput={(event: React.ChangeEvent<HTMLInputElement>) =>
+                filterEntries(event.target.value, props.idsToFilter, props.idPrefix)
             }
         ></input>
     )
@@ -142,24 +131,21 @@ const zoneDescription = (zoneProps: ZoneSettings): string => {
     const multiline = string.replace(',', ',\n')
     return multiline
 }
-const ZoneDescriptionComponent = (
-    props: { zoneProps: ZoneSettings },
-    renderer: CommonDOMRenderer
-) => {
+const ZoneDescriptionComponent = (props: { zoneProps: ZoneSettings }) => {
     if (!props.zoneProps) return <p>No Zone Properties</p>
     const propNames = Object.keys(props.zoneProps)
 
     return (
         <>
             {props.zoneProps.ZonePropertyCargoLoading !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Cargo Loading</h3>
                     {props.zoneProps.ZonePropertyCargoLoading.cargosSettings?.map(
                         (cargoSetting) => {
                             return (
                                 <p>
                                     <span>{cargoSetting.name}</span>
-                                    <span style={'float:right'}>
+                                    <span style={{ float: 'right' }}>
                                         ({cargoSetting.count ? cargoSetting.count : 'unlimited'})
                                     </span>
                                 </p>
@@ -171,7 +157,7 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyFuelStation !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Fuel Station</h3>
                     {props.zoneProps.ZonePropertyFuelStation.pricePerLiter !== undefined ? (
                         <p>${props.zoneProps.ZonePropertyFuelStation.pricePerLiter} per litre</p>
@@ -183,7 +169,7 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyUpgradesGiver !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Upgrade</h3>
                     <p>{props.zoneProps.ZonePropertyUpgradesGiver.upgrades[0]}</p>
                 </div>
@@ -191,7 +177,7 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyWatchpoint !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>WatchPoint</h3>
                     <p>Range: {props.zoneProps.ZonePropertyWatchpoint.range}</p>
                 </div>
@@ -199,7 +185,7 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyGateway !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Gateway</h3>
                     <p>Linked with: {props.zoneProps.ZonePropertyGateway.levelZoneLink}</p>
                 </div>
@@ -207,17 +193,17 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyStorehouseCraft !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Crafting</h3>
                     {props.zoneProps.ZonePropertyStorehouseCraft.craftSettings?.map(
                         (craftSetting) => {
                             return (
                                 <>
-                                    <p class={'craftSetting'}>
+                                    <p className={'craftSetting'}>
                                         <span>{craftSetting.name}</span>
                                         {craftSetting.energy !== undefined ? (
                                             <span
-                                                style={'float:right'}
+                                                style={{ float: 'right' }}
                                             >{`${craftSetting.energy} energy`}</span>
                                         ) : (
                                             ''
@@ -229,7 +215,7 @@ const ZoneDescriptionComponent = (
                                               return (
                                                   <p>
                                                       Requires
-                                                      <span style={'float:right'}>
+                                                      <span style={{ float: 'right' }}>
                                                           {`${requirement.name} x${
                                                               requirement.count ?? '1'
                                                           }`}
@@ -247,77 +233,77 @@ const ZoneDescriptionComponent = (
                 ''
             )}
             {props.zoneProps.ZonePropertyAutoRepairAndRestore !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>AutoRepairAndRestore</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyCoopTaskGiver !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Coop Task Giver</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyEnergy !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Energy</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyFarmingArea !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Farming Area</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyRecovery !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Recovery Point</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyResupplyRepairParts !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Resupply Repair Point</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyTrailerAttach !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Trailer Store</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyGarageEntrance !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Garage Entrance</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyGarageExit !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Garage Exit</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyManualLoading !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Manual Loading</h3>
                 </div>
             ) : (
                 ''
             )}
             {props.zoneProps.ZonePropertyWaterStation !== undefined ? (
-                <div class={'zoneProp'}>
+                <div className={'zoneProp'}>
                     <h3>Water Station</h3>
                     <p>Name: {props.zoneProps.ZonePropertyWaterStation.stationUIName}</p>
                     <p>PricePerLitre: {props.zoneProps.ZonePropertyWaterStation.pricePerLiter}</p>
