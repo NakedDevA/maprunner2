@@ -32,6 +32,7 @@ function Box(props: any) {
 export default function App() {
     return (
         <Canvas>
+            <color attach="background" args={['#444444']} />
             <Lighting isWinter={true} />
             <Box position={[-1.2, 0, 0]} />
             <Box position={[1.2, 0, 0]} />
