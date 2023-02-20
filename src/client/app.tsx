@@ -5,10 +5,13 @@ import * as React from 'react'
 
 function Box(props: any) {
   // This reference gives us direct access to the THREE.Mesh object
-  const ref = useRef()
+  const ref = useRef<THREE.Object3D>()
   // Hold state for hovered and clicked events
   const [hovered, hover] = useState(false)
   const [clicked, click] = useState(false)
+  // Subscribe this component to the render-loop, //rotate the mesh every frame
+  //qqtas this is equiv to animate in the render loop - needed for many things
+  useFrame((state, delta) => ({}))
   // Return the view, these are regular Threejs elements expressed in JSX
   return (
     <mesh
