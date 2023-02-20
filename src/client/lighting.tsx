@@ -4,7 +4,7 @@ export default function Lighting(props: { isWinter: boolean }) {
     return (
         <>
             <directionalLight
-                color={'0xffffff'}
+                color={0xffffff}
                 position={[-2000, 1250, 0]}
                 intensity={props.isWinter ? 1 : 1.2}
                 castShadow
@@ -20,8 +20,10 @@ export default function Lighting(props: { isWinter: boolean }) {
                 //shadow-camera-fov={45}
                 shadow-bias={-0.0005}
             ></directionalLight>
-            isWinter && <ambientLight color={0xaaedff} intensity={0.3}></ambientLight>
-            !isWinter && <ambientLight color={0xffadad} intensity={0.5}></ambientLight>
+            <ambientLight
+                color={props.isWinter ? 0xaaedff : 0xffadad}
+                intensity={props.isWinter ? 0.3 : 0.5}
+            ></ambientLight>
             <pointLight position={[-10, -10, -10]} />
         </>
     )

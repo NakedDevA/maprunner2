@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import * as React from 'react'
 import Lighting from './lighting'
 import MyControls from './controls'
+import Level from './level'
 
 function Box(props: any) {
     // This reference gives us direct access to the THREE.Mesh object
@@ -36,6 +37,7 @@ export default function App() {
             <Lighting isWinter={true} />
             <Box position={[-1.2, 0, 0]} />
             <Box position={[1.2, 0, 0]} />
+            <Level levelFileName={'level_us_01_01'}/>
             <MyControls />
         </Canvas>
     )
