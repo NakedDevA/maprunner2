@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as React from 'react'
 import Lighting from './lighting'
 import MyControls from './controls'
 import Level from './level'
 import { Vector3 } from 'three'
 import { PerspectiveCamera } from '@react-three/drei'
-
 function Box(props: any) {
     // This reference gives us direct access to the THREE.Mesh object
     const ref = useRef<THREE.Object3D>()
@@ -15,7 +14,7 @@ function Box(props: any) {
     const [clicked, click] = useState(false)
     // Subscribe this component to the render-loop, //rotate the mesh every frame
     //qqtas this is equiv to animate in the render loop - needed for many things
-    useFrame((state, delta) => ({}))
+    //useFrame((state, delta) => ({}))
     // Return the view, these are regular Threejs elements expressed in JSX
     return (
         <mesh
@@ -37,6 +36,7 @@ const defaultCameraOffset = new Vector3(0, 800, 900)
 export default function App() {
     return (
         <Canvas>
+            <color attach="background" args={['#444444']} />
             <PerspectiveCamera
                 makeDefault
                 fov={75}
@@ -45,12 +45,12 @@ export default function App() {
                 far={3000}
                 getObjectsByProperty={undefined}
             />
-
-            <color attach="background" args={['#444444']} />
-            <Lighting isWinter={true} />
-            <Box position={[-1.2, 0, 0]} />
-            <Box position={[1.2, 0, 0]} />
-            <Level levelFileName={'level_us_01_01'} />
+            <group scale-z={-1}>
+                <Lighting isWinter={true} />
+                <Box position={[-1.2, 0, 0]} />
+                <Box position={[1.2, 0, 0]} />
+                <Level levelFileName={'level_us_01_01'} />
+            </group>
             <MyControls />
         </Canvas>
     )
