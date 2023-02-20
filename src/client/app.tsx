@@ -4,6 +4,8 @@ import * as React from 'react'
 import Lighting from './lighting'
 import MyControls from './controls'
 import Level from './level'
+import { Vector3 } from 'three'
+import { PerspectiveCamera } from '@react-three/drei'
 
 function Box(props: any) {
     // This reference gives us direct access to the THREE.Mesh object
@@ -30,14 +32,25 @@ function Box(props: any) {
     )
 }
 
+const defaultCameraOffset = new Vector3(0, 800, 900)
+
 export default function App() {
     return (
         <Canvas>
+            <PerspectiveCamera
+                makeDefault
+                fov={75}
+                aspect={window.innerWidth / window.innerHeight}
+                near={0.1}
+                far={3000}
+                getObjectsByProperty={undefined}
+            />
+
             <color attach="background" args={['#444444']} />
             <Lighting isWinter={true} />
             <Box position={[-1.2, 0, 0]} />
             <Box position={[1.2, 0, 0]} />
-            <Level levelFileName={'level_us_01_01'}/>
+            <Level levelFileName={'level_us_01_01'} />
             <MyControls />
         </Canvas>
     )
