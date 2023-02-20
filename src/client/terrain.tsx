@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
+import { LevelJson } from '../typings/types'
 
 type TerrainProps = {
     levelTexture: THREE.Texture
     tintTexture: THREE.Texture
     mudTexture: THREE.Texture
     snowTexture?: THREE.Texture
+    levelJson?: LevelJson
 }
 
 export default function Terrain({
@@ -14,6 +16,7 @@ export default function Terrain({
     tintTexture,
     mudTexture,
     snowTexture,
+    levelJson,
 }: TerrainProps) {
     const mapSize = { mapHeight: 186, mapX: 2016, mapZ: 2016, pointsX: 589, pointsZ: 589 } //qqtas blackriver debug
 
@@ -27,12 +30,15 @@ export default function Terrain({
 
     geometry.rotateX(-Math.PI / 2) // flat plane
 
-    /*const vertices = geometry.attributes.position
-for (let i = 0; i < vertices.count; i++) {
-    const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
-    vertices.setY(i, heightMapList[i] * MAGIC_SCALING_FACTOR)
-}*/
-
+    if (levelJson) {
+        const vertices = geometry.attributes.position
+        for (let i = 0; i < vertices.count; i++) {
+            const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
+            vertices.setY(i, levelJson.heightMapList[i] * MAGIC_SCALING_FACTOR)
+        }
+    } else {
+      console.log('josn not loaded yet')
+    }
     return (
         <mesh receiveShadow castShadow name="terrainMesh" geometry={geometry}>
             <meshPhongMaterial
