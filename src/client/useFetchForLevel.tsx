@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import * as THREE from 'three'
+import { sRGBEncoding } from 'three'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { LevelJson } from '../typings/types'
 import { LandmarkFile, LandmarkIndex, processLandmark } from './landmarkParser'
@@ -75,6 +76,7 @@ async function fetchLevelTexture(terrainImagePath: string) {
     const loader = new THREE.TextureLoader(loadManager)
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
+        levelTexture.encoding = sRGBEncoding
         //console.log(levelTexture?.name)
         return levelTexture
     } catch (error) {

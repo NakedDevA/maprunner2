@@ -74,6 +74,8 @@ export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLand
                     material={material}
                     name={textureName}
                     layers={LAYERS.Landmarks}
+                    castShadow
+                    receiveShadow
                 ></mesh>
             )
         }

@@ -8,9 +8,9 @@ interface IProps {
 }
 
 const zoneMaterial = new THREE.MeshBasicMaterial({
-    color: 0xff0000,
+    color: 0xd007de,
+    opacity: 0.7,
     transparent: true,
-    opacity: 0.5,
 })
 
 const Zone = (props: { zone: ZoneCoords; mapSize: MapSize; heightMapList: number[] }) => {

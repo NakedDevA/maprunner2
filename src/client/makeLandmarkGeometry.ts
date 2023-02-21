@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { sRGBEncoding } from 'three'
 import { LandmarkFile, LandmarkIndex, Mesh, TreeNode } from './landmarkParser'
 const IDENTITY_MATRIX4 = '1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1'
 
@@ -57,6 +58,8 @@ export const landmarkUVMaterial = (landmarkTextureName: string) => {
     const fileName = landmarkTextureName.replace('/', '_').replace('.tga', '.png')
     const texture = loader.load(`landmarkTextures/${fileName}`)
     texture.flipY = false
+    texture.encoding = sRGBEncoding
+    
     const uvMaterial = new THREE.MeshPhongMaterial({
         name: landmarkTextureName,
         map: texture,
