@@ -7,6 +7,7 @@ import Level from './level'
 import { Vector3 } from 'three'
 import { PerspectiveCamera } from '@react-three/drei'
 import LevelMenu from './levelMenu'
+import * as THREE from 'three'
 function Box(props: any) {
     // This reference gives us direct access to the THREE.Mesh object
     const ref = useRef<THREE.Object3D>()
@@ -45,7 +46,7 @@ export default function App() {
     return (
         <>
             {showMenu && <LevelMenu pickLevel={pickLevel} />}
-            <Canvas>
+            <Canvas shadows>
                 <color attach="background" args={['#444444']} />
                 <PerspectiveCamera
                     makeDefault
@@ -55,8 +56,8 @@ export default function App() {
                     far={3000}
                     getObjectsByProperty={undefined}
                 />
+                <Lighting isWinter={false} />
                 <group scale-z={-1}>
-                    <Lighting isWinter={true} />
                     <Box position={[-1.2, 0, 0]} />
                     <Box position={[1.2, 0, 0]} />
                     <Level levelFileName={selectedLevelId} />

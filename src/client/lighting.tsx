@@ -10,21 +10,20 @@ export default function Lighting(props: { isWinter: boolean }) {
                 castShadow
                 shadow-mapSize-width={4096}
                 shadow-mapSize-height={4096}
-                shadow-radius={3}
+               // shadow-radius={3}
                 shadow-camera-top={1000}
                 shadow-camera-right={1000}
                 shadow-camera-bottom={-1000}
                 shadow-camera-left={-1000}
                 shadow-camera-near={1}
                 shadow-camera-far={20000}
-                //shadow-camera-fov={45}
-                shadow-bias={-0.0005}
+                shadow-camera-fov={45}
+              //  shadow-bias={-0.0005}
             ></directionalLight>
             <ambientLight
-                color={props.isWinter ? 0xaaedff : 0xffadad}
-                intensity={props.isWinter ? 0.3 : 0.5}
+                color={0xffffff}
+                intensity={props.isWinter ? 0.3 : 0.3}
             ></ambientLight>
-            <pointLight position={[-10, -10, -10]} />
         </>
     )
 }
