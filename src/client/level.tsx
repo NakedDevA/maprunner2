@@ -17,6 +17,10 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
     }
 
     return (
+        //Zones
+        //Trucks
+        //Landmarks
+        //Models
         <Terrain
             levelTexture={levelResources.levelTexture}
             tintTexture={levelResources.tintTexture}
