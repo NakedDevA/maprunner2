@@ -7,7 +7,7 @@ type TerrainProps = {
     tintTexture: THREE.Texture
     mudTexture: THREE.Texture
     snowTexture?: THREE.Texture
-    levelJson?: LevelJson
+    levelJson: LevelJson
 }
 
 export default function Terrain({
@@ -17,7 +17,7 @@ export default function Terrain({
     snowTexture,
     levelJson,
 }: TerrainProps) {
-    const mapSize = { mapHeight: 186, mapX: 2016, mapZ: 2016, pointsX: 589, pointsZ: 589 } //qqtas blackriver debug
+    const mapSize = levelJson.mapSize
 
     const geometry = new THREE.PlaneGeometry(
         mapSize.mapX,
@@ -29,15 +29,16 @@ export default function Terrain({
 
     geometry.rotateX(-Math.PI / 2) // flat plane
 
-    if (levelJson) {
-        const vertices = geometry.attributes.position
-        for (let i = 0; i < vertices.count; i++) {
-            const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
-            vertices.setY(i, levelJson.heightMapList[i] * MAGIC_SCALING_FACTOR)
-        }
-    } else {
-      console.log('josn not loaded yet')
+    const vertices = geometry.attributes.position
+    for (let i = 0; i < vertices.count; i++) {
+        const MAGIC_SCALING_FACTOR = mapSize.mapHeight / 256
+        vertices.setY(i, levelJson.heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
+
+    
+    React.useEffect(() => {
+      console.log('terrainload')
+  })
     return (
         <mesh receiveShadow castShadow name="terrainMesh" geometry={geometry}>
             <meshPhongMaterial
