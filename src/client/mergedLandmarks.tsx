@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as THREE from 'three'
 
-import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils";
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
 import { LAYERS } from './client'
 import { LandmarkIndex } from './landmarkParser'
@@ -20,7 +20,7 @@ interface MergedLandmarkProps {
 const NO_TEXTURE_KEY = 'qqtas'
 export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLandmarkProps) {
     const landmarks = levelJson.landmarks
-    
+
     const geometriesByMaterial = React.useMemo(() => {
         const geometriesByMaterial: Record<string, THREE.BufferGeometry[]> = {}
 
@@ -66,19 +66,16 @@ export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLand
             const material =
                 textureName === NO_TEXTURE_KEY ? modelMaterial : landmarkUVMaterial(textureName)
             const mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(geoms)
-            const mesh = new THREE.Mesh(mergedBoxes, material)
-            mesh.updateMatrix()
-            mesh.matrixAutoUpdate = false
-            mesh.castShadow = false
-            mesh.receiveShadow = false
 
-            if (textureName === NO_TEXTURE_KEY) {
-                mesh.layers.set(LAYERS.Models)
-            } else {
-                mesh.layers.set(LAYERS.Landmarks)
-            }
-
-            meshJSX.push(<primitive object={mesh} />)
+            meshJSX.push(
+                <mesh
+                    key={textureName}
+                    geometry={mergedBoxes}
+                    material={material}
+                    name={textureName}
+                    layers={LAYERS.Landmarks}
+                ></mesh>
+            )
         }
 
         return meshJSX
