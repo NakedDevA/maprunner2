@@ -9,6 +9,5 @@ export const MyCamera = (props: any) => {
     React.useEffect(() => {
         void set({ camera: ref.current })
     }, [])
-    //  useFrame(() => ref.current.updateMatrixWorld())
     return <PerspectiveCamera ref={ref} {...props} />
 }
