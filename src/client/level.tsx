@@ -1,6 +1,7 @@
 import * as React from 'react'
 import Terrain from './terrain'
 import { useLevelResources } from './useFetchForLevel'
+import Zones from './zones'
 
 interface LevelProps {
     levelFileName: string
@@ -16,17 +17,17 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
         return <></>
     }
 
+    //qqtas turcks lmks models
     return (
-        //Zones
-        //Trucks
-        //Landmarks
-        //Models
-        <Terrain
-            levelTexture={levelResources.levelTexture}
-            tintTexture={levelResources.tintTexture}
-            mudTexture={levelResources.mudTexture}
-            snowTexture={levelResources.snowTexture}
-            levelJson={levelResources.levelJson}
-        />
+        <>
+            <Zones levelJson={levelResources.levelJson} />
+            <Terrain
+                levelTexture={levelResources.levelTexture}
+                tintTexture={levelResources.tintTexture}
+                mudTexture={levelResources.mudTexture}
+                snowTexture={levelResources.snowTexture}
+                levelJson={levelResources.levelJson}
+            />
+        </>
     )
 }

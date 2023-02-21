@@ -1,6 +1,7 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { LevelJson } from '../typings/types'
+import { LAYERS } from './client'
 
 type TerrainProps = {
     levelTexture: THREE.Texture
@@ -35,12 +36,14 @@ export default function Terrain({
         vertices.setY(i, levelJson.heightMapList[i] * MAGIC_SCALING_FACTOR)
     }
 
-    
-    React.useEffect(() => {
-      console.log('terrainload')
-  })
     return (
-        <mesh receiveShadow castShadow name="terrainMesh" geometry={geometry}>
+        <mesh
+            receiveShadow
+            castShadow
+            name="terrainMesh"
+            geometry={geometry}
+            layers={LAYERS.Terrain}
+        >
             <meshPhongMaterial
                 name={'terrainMaterial'}
                 map={levelTexture}

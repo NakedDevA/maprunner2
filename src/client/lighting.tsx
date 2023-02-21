@@ -1,9 +1,14 @@
 import * as React from 'react'
+import * as THREE from 'three'
+import { LAYERS } from './client'
 
 export default function Lighting(props: { isWinter: boolean }) {
+    const allLayers = new THREE.Layers()
+    allLayers.enableAll()
     return (
         <>
-            <directionalLight
+            <directionalLight 
+                layers={allLayers}
                 color={0xffffff}
                 position={[-2000, 1250, 0]}
                 intensity={props.isWinter ? 1 : 1.2}
@@ -21,6 +26,7 @@ export default function Lighting(props: { isWinter: boolean }) {
               //  shadow-bias={-0.0005}
             ></directionalLight>
             <ambientLight
+                layers={allLayers}
                 color={0xffffff}
                 intensity={props.isWinter ? 0.3 : 0.3}
             ></ambientLight>
