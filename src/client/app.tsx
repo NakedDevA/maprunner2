@@ -26,7 +26,7 @@ export default function App() {
     return (
         <>
             {showMenu && <LevelMenu pickLevel={pickLevel} />}
-            <Canvas shadows>
+            <Canvas shadows gl={{logarithmicDepthBuffer:true}}>
                 <color attach="background" args={['#444444']} />
                 <MyCamera
                     makeDefault
