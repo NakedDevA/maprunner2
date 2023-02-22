@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import * as React from 'react'
 import { LevelJson, MapSize, ZoneCoords } from '../typings/types'
 import { LAYERS } from './client'
+import { BoxGeometry } from 'three'
 
 interface IProps {
     levelJson: LevelJson
@@ -16,8 +17,8 @@ const zoneMaterial = new THREE.MeshBasicMaterial({
 const Zone = (props: { zone: ZoneCoords; mapSize: MapSize; heightMapList: number[] }) => {
     const { zone, mapSize, heightMapList } = props
 
-    const box = new THREE.BoxGeometry(zone.sizeX, 20, zone.sizeZ)
     const matrix = new THREE.Matrix4()
+    const geomRef = React.useRef<BoxGeometry>(null!)
 
     // prettier-ignore
     matrix.set(
@@ -28,19 +29,28 @@ const Zone = (props: { zone: ZoneCoords; mapSize: MapSize; heightMapList: number
     )
 
     const quaternion = new THREE.Quaternion().setFromRotationMatrix(matrix)
-    box.applyQuaternion(quaternion)
+
+    React.useLayoutEffect(() => {
+        geomRef.current.applyQuaternion(quaternion)
+    }, [zone])
 
     const approxHeight = approxTerrainHeightAtPoint(zone.x, zone.z, mapSize, heightMapList)
 
     return (
         <mesh
-            geometry={box}
             material={zoneMaterial}
             position={[zone.x, approxHeight, zone.z]}
             name={zone.name}
             userData={{ displayName: zone.name, type: 'zones' }}
             layers={LAYERS.Zones}
-        ></mesh>
+        >
+            <boxGeometry
+                key={zone.name}
+                args={[zone.sizeX, 20, zone.sizeZ]}
+                ref={geomRef}
+                name={'terraingeom'}
+            />
+        </mesh>
     )
 }
 

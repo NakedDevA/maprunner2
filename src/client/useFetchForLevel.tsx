@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import * as THREE from 'three'
-import { sRGBEncoding } from 'three'
+import { sRGBEncoding, TextureLoader } from 'three'
 import { MapZonesJson } from '../typings/initialCacheTypes'
 import { LevelJson } from '../typings/types'
 import { LandmarkFile, LandmarkIndex, processLandmark } from './landmarkParser'
@@ -31,14 +31,17 @@ export const useLevelResources = (
     const [resources, setResources] = useState<LevelResources | undefined>(undefined)
 
     useEffect(() => {
+        const loadManager = new THREE.LoadingManager()
+        const loader = new THREE.TextureLoader(loadManager)
+
         async function switchToLevel(levelFileName: string, versionSuffix?: string) {
             const [levelJson, levelTexture, tintTexture, mudTexture, snowTexture, zonesJson] =
                 await Promise.all([
                     fetchJson<LevelJson>(levelJsonPath(levelFileName, versionSuffix)),
-                    fetchLevelTexture(terrainImagePath(levelFileName)),
-                    fetchLevelTexture(tintImagePath(levelFileName)),
-                    fetchLevelTexture(mudImagePath(levelFileName)),
-                    fetchLevelTexture(snowImagePath(levelFileName)),
+                    fetchLevelTexture(terrainImagePath(levelFileName), loader),
+                    fetchLevelTexture(tintImagePath(levelFileName), loader),
+                    fetchLevelTexture(mudImagePath(levelFileName), loader),
+                    fetchLevelTexture(snowImagePath(levelFileName), loader),
                     fetchJson<MapZonesJson>(mapZonesJsonPath(levelFileName, versionSuffix)),
                 ])
             const landmarkModels = await fetchRequiredLandmarks(levelJson)
@@ -71,9 +74,7 @@ async function fetchJson<T>(path: string): Promise<T> {
     }
 }
 
-async function fetchLevelTexture(terrainImagePath: string) {
-    const loadManager = new THREE.LoadingManager()
-    const loader = new THREE.TextureLoader(loadManager)
+async function fetchLevelTexture(terrainImagePath: string, loader: TextureLoader) {
     try {
         const levelTexture = await loader.loadAsync(terrainImagePath)
         levelTexture.encoding = sRGBEncoding
