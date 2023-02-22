@@ -1,47 +1,51 @@
 import * as React from 'react'
 import * as THREE from 'three'
-
-import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils'
+import { InstancedMesh } from 'three'
+import { mergeBufferGeometries } from 'three-stdlib/utils/BufferGeometryUtils'
 import { LevelJson } from '../typings/types'
 import { LAYERS } from './client'
 import { LandmarkIndex } from './landmarkParser'
-import {
-    lookUpLandmarkData,
-    makeLandmarkGeometry,
-    landmarkUVMaterial,
-} from './makeLandmarkGeometry'
-import { modelMaterial, zoneMaterial } from './materials'
+import { modelMaterial } from './materials'
 
 interface MergedLandmarkProps {
     levelJson: LevelJson
     landmarkIndex: LandmarkIndex
 }
 
-const NO_TEXTURE_KEY = 'qqtas'
 export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLandmarkProps) {
+    const instancedMeshRef = React.useRef<InstancedMesh>(null!)
     const allLandmarks = levelJson.landmarks
-    const geomsToMerge = allLandmarks.flatMap((landmark) => {
-        return landmark.entries.map((entry) => {
-            const geom = new THREE.BoxGeometry(3, 3, 3)
 
+    const allmatrices = allLandmarks.flatMap((landmark) => {
+        return landmark.entries.map((entry) => {
             const rotateQuat = new THREE.Quaternion()
             rotateQuat.fromArray(entry.q)
             rotateQuat.normalize()
-
             const matrix = new THREE.Matrix4()
             matrix.makeRotationFromQuaternion(rotateQuat)
             matrix.setPosition(entry.x, entry.y, entry.z)
 
-            geom.applyMatrix4(matrix)
-            return geom
+            return matrix
         })
     })
-    const merged = React.useMemo(() => {
-        return BufferGeometryUtils.mergeBufferGeometries(geomsToMerge)
-    }, [geomsToMerge])
 
-    geomsToMerge.forEach(geom=>geom.dispose())
+    React.useLayoutEffect(() => {
+        for (let index = 0; index < allmatrices.length; index++) {
+            const matrix = allmatrices[index]
+            instancedMeshRef.current.setMatrixAt(index, matrix)
+        }
+    })
 
-
-    return <mesh material={modelMaterial} geometry={merged} layers={LAYERS.Zones}></mesh>
+    return (
+        <>
+            <instancedMesh
+                ref={instancedMeshRef}
+                args={[undefined, modelMaterial, allmatrices.length]}
+                layers={LAYERS.Zones}
+            >
+                <boxGeometry args={[3, 3, 3]}></boxGeometry>
+                <meshPhongMaterial color={0x3a3c42} flatShading />
+            </instancedMesh>
+        </>
+    )
 }
