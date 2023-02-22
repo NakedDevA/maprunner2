@@ -10,7 +10,7 @@ import {
     makeLandmarkGeometry,
     landmarkUVMaterial,
 } from './makeLandmarkGeometry'
-import { modelMaterial } from './materials'
+import { modelMaterial, zoneMaterial } from './materials'
 
 interface MergedLandmarkProps {
     levelJson: LevelJson
@@ -19,69 +19,29 @@ interface MergedLandmarkProps {
 
 const NO_TEXTURE_KEY = 'qqtas'
 export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLandmarkProps) {
-    const landmarks = levelJson.landmarks
+    const allLandmarks = levelJson.landmarks
+    const geomsToMerge = allLandmarks.flatMap((landmark) => {
+        return landmark.entries.map((entry) => {
+            const geom = new THREE.BoxGeometry(3, 3, 3)
 
-    const geometriesByMaterial = React.useMemo(() => {
-        const geometriesByMaterial: Record<string, THREE.BufferGeometry[]> = {}
+            const rotateQuat = new THREE.Quaternion()
+            rotateQuat.fromArray(entry.q)
+            rotateQuat.normalize()
 
-        //force these to use the standard lmk material
-        for (const landmark of landmarks) {
-            const landmarkData = lookUpLandmarkData(landmark.name.replace('/', '_'), landmarkIndex)
-            if (!landmarkData) {
-                console.log(`Missing landmark data for ${landmark.name}`)
-                continue
-            }
-            const landmarkGeometry = makeLandmarkGeometry(landmarkData)
-            const xml = new DOMParser().parseFromString(landmarkData.xml, 'application/xml')
-            const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
+            const matrix = new THREE.Matrix4()
+            matrix.makeRotationFromQuaternion(rotateQuat)
+            matrix.setPosition(entry.x, entry.y, entry.z)
 
-            for (const entry of landmark.entries) {
-                const geom = landmarkGeometry.clone()
-                geom.scale(entry.s, entry.s, entry.s)
+            geom.applyMatrix4(matrix)
+            return geom
+        })
+    })
+    const merged = React.useMemo(() => {
+        return BufferGeometryUtils.mergeBufferGeometries(geomsToMerge)
+    }, [geomsToMerge])
 
-                const rotateQuat = new THREE.Quaternion()
-                rotateQuat.fromArray(entry.q)
-                rotateQuat.normalize()
+    geomsToMerge.forEach(geom=>geom.dispose())
 
-                const matrix = new THREE.Matrix4()
-                matrix.makeRotationFromQuaternion(rotateQuat)
-                matrix.setPosition(entry.x, entry.y, entry.z)
 
-                geom.applyMatrix4(matrix)
-
-                const keystring = textureName ?? NO_TEXTURE_KEY
-                if (geometriesByMaterial[keystring]) geometriesByMaterial[keystring].push(geom)
-                else geometriesByMaterial[keystring] = [geom]
-            }
-        }
-
-        return geometriesByMaterial
-    }, [levelJson, landmarkIndex])
-
-    const meshJSX = React.useMemo(() => {
-        const meshJSX: JSX.Element[] = []
-
-        for (const textureName in geometriesByMaterial) {
-            const geoms = geometriesByMaterial[textureName]
-            const material =
-                textureName === NO_TEXTURE_KEY ? modelMaterial : landmarkUVMaterial(textureName)
-            const mergedBoxes = BufferGeometryUtils.mergeBufferGeometries(geoms)
-
-            meshJSX.push(
-                <mesh
-                    key={textureName}
-                    geometry={mergedBoxes}
-                    material={material}
-                    name={textureName}
-                    layers={LAYERS.Landmarks}
-                    castShadow
-                    receiveShadow
-                ></mesh>
-            )
-        }
-
-        return meshJSX
-    }, [geometriesByMaterial])
-
-    return <>{meshJSX}</>
+    return <mesh material={modelMaterial} geometry={merged} layers={LAYERS.Zones}></mesh>
 }
