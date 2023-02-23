@@ -1,5 +1,5 @@
 import * as React from 'react'
-import MergedLandmarks from './mergedLandmarks'
+import LandmarkKind from './mergedLandmarks'
 import Terrain from './terrain'
 import { useLevelResources } from './useFetchForLevel'
 import Zones from './zones'
@@ -20,7 +20,13 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
     return (
         <>
             <Zones levelJson={levelResources.levelJson} />
-            <MergedLandmarks levelJson={levelResources.levelJson} landmarkIndex={levelResources.landmarkModels}></MergedLandmarks>
+            {levelResources.levelJson.landmarks.map((landmark, index) => (
+                <LandmarkKind
+                    key={index}
+                    landmarkCoords={landmark}
+                    landmarkIndex={levelResources.landmarkModels}
+                ></LandmarkKind>
+            ))}
             <Terrain
                 levelTexture={levelResources.levelTexture}
                 tintTexture={levelResources.tintTexture}

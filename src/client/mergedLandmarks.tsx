@@ -1,38 +1,38 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { BufferGeometry, InstancedMesh } from 'three'
-import { mergeBufferGeometries } from 'three-stdlib/utils/BufferGeometryUtils'
-import { LevelJson } from '../typings/types'
+import { LandmarkCoords, LevelJson } from '../typings/types'
 import { LAYERS } from './client'
 import { LandmarkFile, LandmarkIndex, TreeNode } from './landmarkParser'
 import { modelMaterial } from './materials'
 
-interface MergedLandmarkProps {
-    levelJson: LevelJson
+interface LandmarkKindProps {
     landmarkIndex: LandmarkIndex
+    landmarkCoords: LandmarkCoords
 }
 
-export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLandmarkProps) {
+// Renders all landmarks of a single type, using an instanced mesh and shared material
+export default function LandmarkKind({ landmarkIndex, landmarkCoords }: LandmarkKindProps) {
     const instancedMeshRef = React.useRef<InstancedMesh>(null!)
     const bufferGeometryRef = React.useRef<BufferGeometry>(null!)
-    const allLandmarks = levelJson.landmarks
 
-    const allmatrices = allLandmarks.flatMap((landmark) => {
-        return landmark.entries.map((entry) => {
-            const rotateQuat = new THREE.Quaternion()
-            rotateQuat.fromArray(entry.q)
-            rotateQuat.normalize()
-            const matrix = new THREE.Matrix4()
-            matrix.makeRotationFromQuaternion(rotateQuat)
-            matrix.setPosition(entry.x, entry.y, entry.z)
+    const landmarkFile = lookUpLandmarkData(landmarkCoords.name.replace('/', '_'), landmarkIndex)
+    if (!landmarkFile) {
+        console.error(`Missing landmark data for ${landmarkCoords.name}`)
+        return <></>
+    }
 
-            return matrix
-        })
+    const allmatrices = landmarkCoords.entries.map((entry) => {
+        const rotateQuat = new THREE.Quaternion()
+        rotateQuat.fromArray(entry.q)
+        rotateQuat.normalize()
+        const matrix = new THREE.Matrix4()
+        matrix.makeRotationFromQuaternion(rotateQuat)
+        matrix.setPosition(entry.x, entry.y, entry.z)
+        return matrix
     })
 
-    const landmark = landmarkIndex[0].data! //qqtas force one for test
-
-    const meshNode = pickLastMeshNode(landmark)
+    const meshNode = pickLastMeshNode(landmarkFile)
     const mesh = meshNode.mesh!
     const faces = mesh.faces.reduce<number[]>((acc, face) => acc.concat(face.a, face.b, face.c), [])
 
@@ -76,7 +76,6 @@ export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLand
                 layers={LAYERS.Zones}
                 castShadow
                 receiveShadow
-                
             >
                 <bufferGeometry ref={bufferGeometryRef}>
                     <bufferAttribute attach="index" args={[facesInts, 1]} />
@@ -88,7 +87,6 @@ export default function MergedLandmarks({ levelJson, landmarkIndex }: MergedLand
                         attach={'attributes-uv'}
                         args={[uvsFloats, 2]}
                     ></bufferAttribute>
-                    <matrix4></matrix4>
                 </bufferGeometry>
                 <meshPhongMaterial color={0x3a3c42} flatShading />
             </instancedMesh>
@@ -101,4 +99,9 @@ const pickLastMeshNode = (landmark: LandmarkFile): TreeNode => {
     const allNodesWithMeshes = landmark.treeNodes.filter((node) => node.mesh !== undefined)
     const lastMeshNode = allNodesWithMeshes[allNodesWithMeshes.length - 1]
     return lastMeshNode
+}
+
+const lookUpLandmarkData = (name: string, data: LandmarkIndex): LandmarkFile | undefined => {
+    const selected = data.find((data) => data.name === name)
+    return selected?.data
 }

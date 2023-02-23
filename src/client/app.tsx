@@ -26,7 +26,7 @@ export default function App() {
     return (
         <>
             {showMenu && <LevelMenu pickLevel={pickLevel} />}
-            <Canvas shadows gl={{logarithmicDepthBuffer:true}}>
+            <Canvas shadows gl={{ logarithmicDepthBuffer: true }}>
                 <color attach="background" args={['#444444']} />
                 <MyCamera
                     makeDefault
@@ -40,7 +40,7 @@ export default function App() {
                 <group scale-z={-1}>
                     <Level levelFileName={selectedLevelId} />
                 </group>
-                <FocusHandler objName={focus.objName} offset={focus.offset}/>
+                <FocusHandler objName={focus.objName} offset={focus.offset} />
             </Canvas>
         </>
     )
