@@ -1,5 +1,5 @@
 import * as React from 'react'
-import LandmarkKind from './mergedLandmarks'
+import LandmarkKind from './landmarkKind'
 import Terrain from './terrain'
 import { useLevelResources } from './useFetchForLevel'
 import Zones from './zones'

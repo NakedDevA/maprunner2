@@ -1,6 +1,6 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { BufferGeometry, InstancedMesh } from 'three'
+import { BufferGeometry, InstancedMesh, sRGBEncoding } from 'three'
 import { LandmarkCoords, LevelJson } from '../typings/types'
 import { LAYERS } from './client'
 import { LandmarkFile, LandmarkIndex, TreeNode } from './landmarkParser'
@@ -105,3 +105,4 @@ const lookUpLandmarkData = (name: string, data: LandmarkIndex): LandmarkFile | u
     const selected = data.find((data) => data.name === name)
     return selected?.data
 }
+
