@@ -12,7 +12,10 @@ interface LandmarkKindProps {
 }
 
 // Renders all landmarks of a single type, using an instanced mesh and shared material
-export default function LandmarkKind({ landmarkIndex, landmarkCoords }: LandmarkKindProps) {
+export default function LandmarkKind({
+    landmarkIndex,
+    landmarkCoords,
+}: LandmarkKindProps) {
     const instancedMeshRef = React.useRef<InstancedMesh>(null!)
     const bufferGeometryRef = React.useRef<BufferGeometry>(null!)
 
@@ -26,7 +29,7 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
     const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
     const texture = textureName ? landmarkUVTexture(textureName) : undefined
 
-    const allmatrices = landmarkCoords.entries.map((entry) => {
+    const entryMatrices = landmarkCoords.entries.map((entry) => {
         const rotateQuat = new THREE.Quaternion()
         rotateQuat.fromArray(entry.q)
         rotateQuat.normalize()
@@ -37,11 +40,13 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
     })
 
     const meshNode = pickLastMeshNode(landmarkFile)
-    const mesh = meshNode.mesh!
-    const faces = mesh.faces.reduce<number[]>((acc, face) => acc.concat(face.a, face.b, face.c), [])
+    const faces = meshNode.mesh!.faces.reduce<number[]>(
+        (acc, face) => acc.concat(face.a, face.b, face.c),
+        []
+    )
 
     // Vertices and UVs are stored in the same array in the lmk file
-    const { vertices, uvs } = mesh.vertices.reduce<{ vertices: number[]; uvs: number[] }>(
+    const { vertices, uvs } = meshNode.mesh!.vertices.reduce<{ vertices: number[]; uvs: number[] }>(
         (acc, vertex) => {
             acc.vertices.push(vertex.x, vertex.y, vertex.z)
 
@@ -62,26 +67,27 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
     React.useLayoutEffect(() => {
         //Almost everything has a default transform, however...
         if (meshNode.matrix.toString() !== IDENTITY_MATRIX4) {
+            //console.log(`got weird matrix: ${landmarkCoords.name}`)
             const specialGeometryMatrix = new THREE.Matrix4()
             specialGeometryMatrix.fromArray(meshNode.matrix)
             bufferGeometryRef.current.applyMatrix4(specialGeometryMatrix)
         }
         //Apply individual matrices to all individual trees
-        for (let index = 0; index < allmatrices.length; index++) {
-            const matrix = allmatrices[index]
+        for (let index = 0; index < entryMatrices.length; index++) {
+            const matrix = entryMatrices[index]
             instancedMeshRef.current.setMatrixAt(index, matrix)
         }
-        //qqtas: this is needed for non-flatshading to work properly, however non-flat only works on the FIRST level rendered.
-        // switching levels, regardless of order, causes some vertex normals to be wrong 
-        // No idea what react-fiber weirdness might cause that so we use flatshading for now
         bufferGeometryRef.current.computeVertexNormals()
     })
 
+    //NB- random key on instancedmesh prevents react from reusing meshes from incomplete loads.
+    // When this happens we get bad UVs, bad transforms etc on a handful of entities.
     return (
         <>
             <instancedMesh
+                key={Math.random()}
                 ref={instancedMeshRef}
-                args={[undefined, undefined, allmatrices.length]}
+                args={[undefined, undefined, landmarkCoords.entries.length]}
                 layers={LAYERS.Landmarks}
                 castShadow
                 receiveShadow
@@ -97,7 +103,7 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
                         args={[uvsFloats, 2]}
                     ></bufferAttribute>
                 </bufferGeometry>
-                <meshPhongMaterial map={texture} flatShading />
+                <meshPhongMaterial map={texture} />
             </instancedMesh>
         </>
     )

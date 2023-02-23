@@ -10,7 +10,7 @@ export default function Lighting(props: { isWinter: boolean }) {
             <directionalLight
                 layers={allLayers}
                 color={0xffffff}
-                position={[-2000, 1250, 0]}
+                position={[-2000, 1800, 0]}
                 intensity={props.isWinter ? 1 : 1.2}
                 castShadow
                 shadow-mapSize-width={4096}

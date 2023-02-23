@@ -17,7 +17,7 @@ export default function App() {
     const [focus, setFocus] = useState({ objName: 'terrainMesh', offset: defaultCameraOffset })
     const cameraRef = useRef<THREE.PerspectiveCamera>(null!)
 
-    const pickLevel = (levelId: string) => {
+    const pickLevel = (levelId?: string) => {
         setSelectedLevelId(levelId)
         //setShowMenu(false)
         setFocus({ objName: 'terrainMesh', offset: defaultCameraOffset }) //qqtas this needs to happen only once loading is complete, otherwise we fail to find the object to focus on
