@@ -2,6 +2,7 @@ import * as React from 'react'
 import { LandmarkCoords } from '../../typings/types'
 import { LandmarkIndex } from '../landmarkParser'
 import { Landmarks } from './landmarks'
+import { Models } from './models'
 import Terrain from './terrain'
 import { useLevelResources } from './useFetchForLevel'
 import Zones from './zones'
@@ -27,6 +28,11 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
                 landmarkIndex={levelResources.landmarkModels}
                 levelFileName={levelFileName}
             ></Landmarks>
+            <Models
+                allModelCoords={levelResources.levelJson.models}
+                landmarkIndex={levelResources.landmarkModels}
+                levelFileName={levelFileName}
+            ></Models>
             <Terrain
                 levelTexture={levelResources.levelTexture}
                 tintTexture={levelResources.tintTexture}
@@ -36,10 +42,4 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
             />
         </>
     )
-}
-
-export interface LandmarksProps {
-    landmarkCoords: LandmarkCoords[]
-    landmarkIndex: LandmarkIndex
-    levelFileName: string
 }

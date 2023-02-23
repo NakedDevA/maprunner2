@@ -1,6 +1,13 @@
 import * as React from 'react'
+import { LandmarkCoords } from '../../typings/types'
+import { LandmarkIndex } from '../landmarkParser'
 import LandmarkKind from './landmarkKind'
-import { LandmarksProps } from './level'
+
+interface LandmarksProps {
+    landmarkCoords: LandmarkCoords[]
+    landmarkIndex: LandmarkIndex
+    levelFileName: string
+}
 
 export const Landmarks = ({ landmarkCoords, landmarkIndex, levelFileName }: LandmarksProps) => {
     return (
