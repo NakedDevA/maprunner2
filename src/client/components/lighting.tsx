@@ -1,6 +1,5 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { LAYERS } from './client'
 
 export default function Lighting(props: { isWinter: boolean }) {
     const allLayers = new THREE.Layers()

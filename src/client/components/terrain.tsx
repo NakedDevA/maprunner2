@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry'
-import { LevelJson } from '../typings/types'
-import { LAYERS } from './client'
+import { LevelJson } from '../../typings/types'
+import { LAYERS } from '../client'
 
 type TerrainProps = {
     levelTexture: THREE.Texture

@@ -1,10 +1,9 @@
 import * as React from 'react'
 import * as THREE from 'three'
 import { BufferGeometry, InstancedMesh, sRGBEncoding } from 'three'
-import { LandmarkCoords, LevelJson } from '../typings/types'
-import { LAYERS } from './client'
-import { LandmarkFile, LandmarkIndex, TreeNode } from './landmarkParser'
-import { modelMaterial } from './materials'
+import { LandmarkCoords, LevelJson } from '../../typings/types'
+import { LAYERS } from '../client'
+import { LandmarkFile, LandmarkIndex, TreeNode } from '../landmarkParser'
 
 interface LandmarkKindProps {
     landmarkIndex: LandmarkIndex

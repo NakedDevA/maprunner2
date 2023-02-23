@@ -3,7 +3,7 @@ import { useThree, useFrame } from '@react-three/fiber'
 import * as React from 'react'
 import { useRef } from 'react'
 import * as THREE from 'three'
-import { LAYERS } from './client'
+import { LAYERS } from '../client'
 
 export const MyCamera = (props: any) => {
     const ref = useRef<THREE.PerspectiveCamera>(null!)

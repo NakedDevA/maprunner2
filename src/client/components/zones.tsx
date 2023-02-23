@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import * as React from 'react'
-import { LevelJson, MapSize, ZoneCoords } from '../typings/types'
-import { LAYERS } from './client'
+import { LevelJson, MapSize, ZoneCoords } from '../../typings/types'
+import { LAYERS } from '../client'
 import { BoxGeometry } from 'three'
 
 interface IProps {

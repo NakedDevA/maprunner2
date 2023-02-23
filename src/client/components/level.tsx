@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { LandmarkCoords } from '../typings/types'
-import LandmarkKind from './landmarkKind'
-import { LandmarkIndex } from './landmarkParser'
+import { LandmarkCoords } from '../../typings/types'
+import { LandmarkIndex } from '../landmarkParser'
+import { Landmarks } from './landmarks'
 import Terrain from './terrain'
 import { useLevelResources } from './useFetchForLevel'
 import Zones from './zones'
@@ -38,22 +38,8 @@ export default function Level({ levelFileName, versionSuffix }: LevelProps) {
     )
 }
 
-interface LandmarksProps {
+export interface LandmarksProps {
     landmarkCoords: LandmarkCoords[]
     landmarkIndex: LandmarkIndex
     levelFileName: string
-}
-
-const Landmarks = ({ landmarkCoords, landmarkIndex, levelFileName }: LandmarksProps) => {
-    return (
-        <>
-            {landmarkCoords.map((landmark, index) => (
-                <LandmarkKind
-                    key={`${levelFileName}_lmkkinds_${index}`}
-                    landmarkCoords={landmark}
-                    landmarkIndex={landmarkIndex}
-                ></LandmarkKind>
-            ))}
-        </>
-    )
 }

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 import * as THREE from 'three'
 import { sRGBEncoding, TextureLoader } from 'three'
-import { MapZonesJson } from '../typings/initialCacheTypes'
-import { LevelJson } from '../typings/types'
-import { LandmarkFile, LandmarkIndex, processLandmark } from './landmarkParser'
+import { MapZonesJson } from '../../typings/initialCacheTypes'
+import { LevelJson } from '../../typings/types'
+import { LandmarkFile, LandmarkIndex, processLandmark } from '../landmarkParser'
 import {
     levelJsonPath,
     terrainImagePath,
@@ -12,7 +12,7 @@ import {
     snowImagePath,
     mapZonesJsonPath,
     overrideTruckLandmarkNames,
-} from './pathUtils'
+} from '../pathUtils'
 
 type LevelResources = {
     levelJson: LevelJson
