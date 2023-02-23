@@ -22,6 +22,10 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
         return <></>
     }
 
+    const xml = new DOMParser().parseFromString(landmarkFile.xml, 'application/xml')
+    const textureName = xml.getElementsByTagName('Material')[0].getAttribute('AlbedoMap')
+    const texture = textureName ? landmarkUVTexture(textureName) : undefined
+
     const allmatrices = landmarkCoords.entries.map((entry) => {
         const rotateQuat = new THREE.Quaternion()
         rotateQuat.fromArray(entry.q)
@@ -67,13 +71,18 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
             const matrix = allmatrices[index]
             instancedMeshRef.current.setMatrixAt(index, matrix)
         }
+        //qqtas: this is needed for non-flatshading to work properly, however non-flat only works on the FIRST level rendered.
+        // switching levels, regardless of order, causes some vertex normals to be wrong 
+        // No idea what react-fiber weirdness might cause that so we use flatshading for now
+        bufferGeometryRef.current.computeVertexNormals()
     })
+
     return (
         <>
             <instancedMesh
                 ref={instancedMeshRef}
-                args={[undefined, modelMaterial, allmatrices.length]}
-                layers={LAYERS.Zones}
+                args={[undefined, undefined, allmatrices.length]}
+                layers={LAYERS.Landmarks}
                 castShadow
                 receiveShadow
             >
@@ -88,7 +97,7 @@ export default function LandmarkKind({ landmarkIndex, landmarkCoords }: Landmark
                         args={[uvsFloats, 2]}
                     ></bufferAttribute>
                 </bufferGeometry>
-                <meshPhongMaterial color={0x3a3c42} flatShading />
+                <meshPhongMaterial map={texture} flatShading />
             </instancedMesh>
         </>
     )
@@ -106,3 +115,11 @@ const lookUpLandmarkData = (name: string, data: LandmarkIndex): LandmarkFile | u
     return selected?.data
 }
 
+const landmarkUVTexture = (landmarkTextureName: string) => {
+    const loader = new THREE.TextureLoader()
+    const fileName = landmarkTextureName.replace('/', '_').replace('.tga', '.png')
+    const texture = loader.load(`landmarkTextures/${fileName}`)
+    texture.flipY = false
+    texture.encoding = sRGBEncoding
+    return texture
+}

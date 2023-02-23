@@ -12,7 +12,7 @@ import { FocusHandler } from './focusHandler'
 const defaultCameraOffset = new Vector3(0, 800, 900)
 
 export default function App() {
-    const [selectedLevelId, setSelectedLevelId] = useState('level_us_01_01')
+    const [selectedLevelId, setSelectedLevelId] = useState<string>()
     const [showMenu, setShowMenu] = useState(true)
     const [focus, setFocus] = useState({ objName: 'terrainMesh', offset: defaultCameraOffset })
     const cameraRef = useRef<THREE.PerspectiveCamera>(null!)
@@ -38,7 +38,7 @@ export default function App() {
                 />
                 <Lighting isWinter={false} />
                 <group scale-z={-1}>
-                    <Level levelFileName={selectedLevelId} />
+                    {selectedLevelId && <Level levelFileName={selectedLevelId} />}
                 </group>
                 <FocusHandler objName={focus.objName} offset={focus.offset} />
             </Canvas>
