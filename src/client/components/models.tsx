@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { ModelCoords } from '../../typings/types'
 import { LandmarkIndex } from '../landmarkParser'
-import LandmarkKind from './landmarkKind'
-import ModelKind from './modelKind'
+import { lookUpLandmarkData } from './landmarkFileHelpers'
+import PlaceholderModelKind from './placeholderModelKind'
 
 interface ModelsProps {
     allModelCoords: ModelCoords[]
@@ -29,13 +29,20 @@ export const Models = ({ allModelCoords, landmarkIndex, levelFileName }: ModelsP
     //qqtas filter banned models
     return (
         <>
-            {filteredModelCoords.map((modelCoords, index) => (
-                <ModelKind
-                    key={`${levelFileName}_lmkkinds_${index}`}
-                    modelCoords={modelCoords}
-                    landmarkIndex={landmarkIndex}
-                ></ModelKind>
-            ))}
+            {filteredModelCoords.map((modelCoords, index) => {
+                const landmarkData = lookUpLandmarkData(
+                    modelCoords.lmk.replace('/', '_'),
+                    landmarkIndex
+                )
+                return landmarkData ? (
+                    <></>
+                ) : (
+                    <PlaceholderModelKind
+                        key={`${levelFileName}_lmkkinds_${index}`}
+                        modelCoords={modelCoords}
+                    ></PlaceholderModelKind>
+                )
+            })}
         </>
     )
 }

@@ -1,9 +1,15 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { BufferGeometry, InstancedMesh, sRGBEncoding } from 'three'
+import { BufferGeometry, InstancedMesh } from 'three'
 import { LandmarkCoords, LevelJson } from '../../typings/types'
 import { LAYERS } from '../client'
-import { LandmarkFile, LandmarkIndex, TreeNode } from '../landmarkParser'
+import { LandmarkIndex } from '../landmarkParser'
+import {
+    lookUpLandmarkData,
+    landmarkUVTexture,
+    pickLastMeshNode,
+    IDENTITY_MATRIX4,
+} from './landmarkFileHelpers'
 
 interface LandmarkKindProps {
     landmarkIndex: LandmarkIndex
@@ -11,10 +17,7 @@ interface LandmarkKindProps {
 }
 
 // Renders all landmarks of a single type, using an instanced mesh and shared material
-export default function LandmarkKind({
-    landmarkIndex,
-    landmarkCoords,
-}: LandmarkKindProps) {
+export default function LandmarkKind({ landmarkIndex, landmarkCoords }: LandmarkKindProps) {
     const instancedMeshRef = React.useRef<InstancedMesh>(null!)
     const bufferGeometryRef = React.useRef<BufferGeometry>(null!)
 
@@ -106,25 +109,4 @@ export default function LandmarkKind({
             </instancedMesh>
         </>
     )
-}
-
-const IDENTITY_MATRIX4 = '1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1'
-const pickLastMeshNode = (landmark: LandmarkFile): TreeNode => {
-    const allNodesWithMeshes = landmark.treeNodes.filter((node) => node.mesh !== undefined)
-    const lastMeshNode = allNodesWithMeshes[allNodesWithMeshes.length - 1]
-    return lastMeshNode
-}
-
-const lookUpLandmarkData = (name: string, data: LandmarkIndex): LandmarkFile | undefined => {
-    const selected = data.find((data) => data.name === name)
-    return selected?.data
-}
-
-const landmarkUVTexture = (landmarkTextureName: string) => {
-    const loader = new THREE.TextureLoader()
-    const fileName = landmarkTextureName.replace('/', '_').replace('.tga', '.png')
-    const texture = loader.load(`landmarkTextures/${fileName}`)
-    texture.flipY = false
-    texture.encoding = sRGBEncoding
-    return texture
 }
