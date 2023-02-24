@@ -1,10 +1,8 @@
 import * as React from 'react'
 import * as THREE from 'three'
-import { BoxGeometry, BufferGeometry, InstancedMesh, sRGBEncoding } from 'three'
-import { LandmarkCoords, LevelJson, ModelCoords } from '../../typings/types'
+import { BoxGeometry, InstancedMesh } from 'three'
+import { ModelCoords } from '../../typings/types'
 import { LAYERS } from '../client'
-import { LandmarkFile, LandmarkIndex, TreeNode } from '../landmarkParser'
-import { lookUpLandmarkData } from './landmarkFileHelpers'
 
 interface PlaceholderModelKindProps {
     modelCoords: ModelCoords
@@ -13,15 +11,13 @@ interface PlaceholderModelKindProps {
 // Renders all models of a single type, using an instanced mesh and shared material
 export default function PlaceholderModelKind({ modelCoords }: PlaceholderModelKindProps) {
     const instancedMeshRef = React.useRef<InstancedMesh>(null!)
-    const bufferGeometryRef = React.useRef<BoxGeometry>(null!)
+    const boxGeometryRef = React.useRef<BoxGeometry>(null!)
 
-    
-    //Draw box
+    //Draw placeholder box, since none of these items have an actual model
     //data includes bounding box corners, which we use to give approx mesh size
     const width = modelCoords.c.b.x - modelCoords.c.a.x
     const height = modelCoords.c.b.y - modelCoords.c.a.y
     const depth = modelCoords.c.b.z - modelCoords.c.a.z
-    // if (width>10) console.log(`type:${model.t} is ${width} x ${height} x ${depth}`)
 
     //Bounding boxes aren't symmetric, so we shift the mesh to account for this
     const xOffset = (modelCoords.c.b.x + modelCoords.c.a.x) / 2
@@ -46,10 +42,8 @@ export default function PlaceholderModelKind({ modelCoords }: PlaceholderModelKi
             const matrix = entryMatrices[index]
             instancedMeshRef.current.setMatrixAt(index, matrix)
         }
-        bufferGeometryRef.current.computeVertexNormals()
+        boxGeometryRef.current.computeVertexNormals()
     })
-
-    
 
     //NB- random key on instancedmesh prevents react from reusing meshes from incomplete loads.
     // When this happens we get bad UVs, bad transforms etc on a handful of entities.
@@ -63,8 +57,8 @@ export default function PlaceholderModelKind({ modelCoords }: PlaceholderModelKi
                 castShadow
                 receiveShadow
             >
-                <boxGeometry ref={bufferGeometryRef} args={[width, height, depth]}>
-                    <meshPhongMaterial color={0xdedede} />
+                <boxGeometry ref={boxGeometryRef} args={[width, height, depth]}>
+                    <meshPhongMaterial color={0x222222} />
                 </boxGeometry>
             </instancedMesh>
         </>

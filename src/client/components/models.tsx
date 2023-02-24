@@ -2,6 +2,7 @@ import * as React from 'react'
 import { ModelCoords } from '../../typings/types'
 import { LandmarkIndex } from '../landmarkParser'
 import { lookUpLandmarkData } from './landmarkFileHelpers'
+import ModelKind from './modelKind'
 import PlaceholderModelKind from './placeholderModelKind'
 
 interface ModelsProps {
@@ -25,20 +26,22 @@ export const Models = ({ allModelCoords, landmarkIndex, levelFileName }: ModelsP
     const filteredModelCoords = allModelCoords.filter(
         (mc) => !bannedModelList.includes(mc.t) && !mc.t.includes('farplane')
     )
-    // Farplane is the skybox, which is stupid to render because it is larger than everything else
-    //qqtas filter banned models
     return (
         <>
             {filteredModelCoords.map((modelCoords, index) => {
-                const landmarkData = lookUpLandmarkData(
+                const landmarkFile = lookUpLandmarkData(
                     modelCoords.lmk.replace('/', '_'),
                     landmarkIndex
                 )
-                return landmarkData ? (
-                    <></>
+                return landmarkFile ? (
+                    <ModelKind
+                        key={`${levelFileName}_model_${index}`}
+                        modelCoords={modelCoords}
+                        landmarkFile={landmarkFile}
+                    />
                 ) : (
                     <PlaceholderModelKind
-                        key={`${levelFileName}_lmkkinds_${index}`}
+                        key={`${levelFileName}_nomodel_${index}`}
                         modelCoords={modelCoords}
                     ></PlaceholderModelKind>
                 )
